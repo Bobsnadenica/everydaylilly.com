@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         en: {
             title: "Everyday Lilly",
             subtitle: "Capture the daily bloom of your lily. A simple, beautiful way to watch life unfold.",
-            androidBtn: "Download on Android",
+            androidBtn: "Download on Android (Invite Only)",
             iosBtn: "Coming Soon on iOS!",
             section1Title: "A Digital Flower Journal",
             section1Text: "Everyday Lilly helps you create a beautiful photographic diary of your plant's life, from sprout to full bloom.",
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bg: {
             title: "Всеки ден Лили",
             subtitle: "Записвайте ежедневното разцъфтяване на вашата лилия. Прост и красив начин да наблюдавате живота.",
-            androidBtn: "Изтеглете за Android",
+            androidBtn: "Изтеглете за Android (само с покана)",
             iosBtn: "Скоро за iOS!",
             section1Title: "Дигитален цветен дневник",
             section1Text: "Всеки ден Лили ви помага да създадете красив фотографски дневник на живота на вашето растение, от пъпка до пълноцъфтеж.",
