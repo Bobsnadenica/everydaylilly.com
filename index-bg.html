@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Всеки ден Лили - Наблюдавай разцъфтяването на твоята лилия</title>
-    
+    <title>Лили всеки ден - Гледайте как разцъфтява вашата Лили</title>
+
     <script src="https://cdn.tailwindcss.com" defer></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,13 +16,45 @@
     </noscript>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .header-bg {
+            /* Осигурява по-добро представяне на фоновото изображение */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
 </head>
 <body class="text-gray-800 font-sans">
-    <header role="banner" class="relative min-h-screen flex items-center justify-center text-center text-white px-4">
-        <div class="absolute top-4 right-4 z-20 flex gap-2">
-            <button id="lang-en" aria-label="Превключи на английски език" class="w-8 h-8 rounded overflow-hidden border-2 border-gray-200">
+
+    <nav class="sticky-nav transition duration-300 hidden md:block" role="navigation" aria-label="Основна навигация">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="font-display text-2xl font-bold text-gray-900">Лили всеки ден</a>
+            <div class="flex space-x-6 text-sm font-medium">
+                <a href="#features" class="text-gray-600 hover:text-emerald-600 transition">Функции</a>
+                <a href="#how-it-works" class="text-gray-600 hover:text-emerald-600 transition">Как работи</a>
+                <a href="#gallery" class="text-gray-600 hover:text-emerald-600 transition">Галерия</a>
+                <a href="#developer-story" class="text-gray-600 hover:text-emerald-600 transition">Нашата история</a>
+                <a href="#faq" class="text-gray-600 hover:text-emerald-600 transition">ЧЗВ</a>
+                <a href="#testers" class="text-gray-600 hover:text-emerald-600 transition">Тестване</a>
+            </div>
+        </div>
+    </nav>
+
+    <header role="banner" class="relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" style="background-image: url('images/hero.jpg');">
+        <div class="absolute top-4 right-4 z-40 flex gap-2">
+            <button id="lang-en" aria-label="Превключване на английски език" class="w-8 h-8 rounded overflow-hidden border-2 border-white hover:border-emerald-400 transition">
                 <svg viewBox="0 0 60 30" width="32" height="32" role="img" aria-labelledby="flag-en-title">
-                    <title id="flag-en-title">United States Flag</title>
+                    <title id="flag-en-title">Американско знаме</title>
                     <rect width="60" height="30" fill="#b22234"/>
                     <g fill="#fff">
                         <rect y="3" width="60" height="3"/>
@@ -47,158 +79,249 @@
                     </g>
                 </svg>
             </button>
-            <button id="lang-bg" aria-label="Превключи на български език" class="w-8 h-8 rounded overflow-hidden border-2 border-gray-200">
+            <button id="lang-bg" aria-label="Превключване на български език" class="w-8 h-8 rounded overflow-hidden border-2 border-white hover:border-emerald-400 transition">
                 <svg viewBox="0 0 3 2" width="32" height="32" role="img" aria-labelledby="flag-bg-title">
-                  <title id="flag-bg-title">Bulgarian Flag</title>
+                  <title id="flag-bg-title">Българско знаме</title>
                   <rect width="3" height="2" fill="#fff"/>
                   <rect y="0.666" width="3" height="0.666" fill="#00966e"/>
                   <rect y="1.333" width="3" height="0.667" fill="#d62612"/>
                 </svg>
             </button>
         </div>
-        <img src="images/hero.jpg" alt="Красив близък план на лилия в пълен разцвет." class="absolute inset-0 object-cover w-full h-full" loading="eager">
-        <div class="absolute inset-0 bg-black opacity-40"></div>
-        <div class="relative z-10">
-            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-4">Всеки ден Лили</h1>
-            <p class="text-lg md:text-2xl max-w-2xl mx-auto">Записвай ежедневното разцъфтяване на твоята лилия. Прост и красив начин да наблюдаваш живота.</p>
-            <div class="mt-10 flex flex-col justify-center items-center gap-4">
-                <a href="https://play.google.com/store/apps/details?id=com.privileged.everyday_lilly" class="btn-primary flex items-center gap-2" aria-label="Изтегли Всеки ден Лили за Android">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="relative z-10 p-4 md:p-8 rounded-lg">
+            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-4 text-shadow-lg">Лили всеки ден</h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto font-medium">Уловете <strong>ежедневния разцвет</strong> на вашата лилия. Лесен и красив начин да наблюдавате как животът <strong>се разгръща</strong>.</p>
+            <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="https://play.google.com/store/apps/details?id=com.privileged.everyday_lilly" class="btn-primary flex items-center gap-2" aria-label="Изтеглете Лили всеки ден за Android">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18a6 6 0 00-6-6h12a6 6 0 00-6 6zm-6 0h12" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Изтегли за Android (само с покана)</span>
+                    <span>Изтеглете за Android (Само с покана)</span>
                 </a>
-                <button class="btn-secondary" disabled aria-disabled="true" tabindex="-1" aria-label="Скоро за iOS!">Скоро за iOS!</button>
+                <button class="btn-secondary transition duration-300 opacity-70" disabled aria-disabled="true" tabindex="-1" aria-label="Очаквайте скоро за iOS">Очаквайте скоро за iOS!</button>
             </div>
         </div>
     </header>
 
     <main role="main">
-        <section class="py-20 bg-white">
+        <section id="features" class="py-24 bg-white">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Дигитален цветен дневник</h2>
-                <p class="max-w-3xl mx-auto text-gray-600 mb-12">Всеки ден Лили ти помага да създадеш красив фотографски дневник на живота на твоето растение - от поникване до пълен разцвет.</p>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="flex flex-col items-center p-6 rounded-lg shadow-sm">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 font-display">Повече от просто приложение за снимки</h2>
+                <p class="max-w-4xl mx-auto text-lg text-gray-600 mb-16">Лили всеки ден превръща обикновените снимки в динамичен, жив дневник на пътуването на вашето растение.</p>
+                <div class="grid md:grid-cols-3 gap-10">
+                    <div class="flex flex-col items-center p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border border-gray-100">
                         <div class="p-4 bg-emerald-100 rounded-full inline-block mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-emerald-700" viewBox="0 0 16 16" aria-hidden="true">
                                 <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
                                 <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Ежедневни снимки</h3>
-                        <p class="text-gray-600">Прави снимка всеки ден с нашия лесен и интуитивен интерфейс.</p>
+                        <h3 class="text-2xl font-bold mb-3">Прецизно заснемане</h3>
+                        <p class="text-gray-600">Нашият прост интерфейс на камерата ви помага да заснемете растението под същия ъгъл всеки ден за перфектни time-lapse видеа.</p>
                     </div>
-                    <div class="flex flex-col items-center p-6 rounded-lg shadow-sm">
+                    <div class="flex flex-col items-center p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border border-gray-100">
                         <div class="p-4 bg-emerald-100 rounded-full inline-block mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-emerald-700" viewBox="0 0 16 16" aria-hidden="true">
                                 <path d="m10.648.646-.69.69L11.293 3H1.5A1.5 1.5 0 0 0 0 4.5v7A1.5 1.5 0 0 0 1.5 13h9.793l-1.335 1.334.69.69L15.354 8.5H15.5a.5.5 0 0 0 0-1h-.146L10.648.646M4 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m3 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m3 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m-6 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m3 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m3 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Автоматични таймлапси</h3>
-                        <p class="text-gray-600">Гледай как твоята лилия расте с автоматично генерирани таймлапс видеа.</p>
+                        <h3 class="text-2xl font-bold mb-3">Плавно Time-lapse</h3>
+                        <p class="text-gray-600">Моментално сглобете ежедневните си снимки в зашеметяващи, плавни видеа, които можете да споделите с приятели и семейство.</p>
                     </div>
-                    <div class="flex flex-col items-center p-6 rounded-lg shadow-sm">
+                    <div class="flex flex-col items-center p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border border-gray-100">
                         <div class="p-4 bg-emerald-100 rounded-full inline-block mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-emerald-700" viewBox="0 0 16 16" aria-hidden="true">
                                 <path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9V5.5z"/>
                                 <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1h-3zm1.038 3.018a6.095 6.095 0 0 1 2.924 0 6.095 6.095 0 0 1 2.583 2.583c.468 1.028.7 2.148.7 3.4s-.232 2.372-.7 3.4a6.095 6.095 0 0 1-2.583 2.583 6.095 6.095 0 0 1-2.924 0 6.095 6.095 0 0 1-2.583-2.583c-.468-1.028-.7-2.148-.7-3.4s.232-2.372.7-3.4a6.095 6.095 0 0 1 2.583-2.583z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Полезни напомняния</h3>
-                        <p class="text-gray-600">Настрой ежедневни известия, за да не пропуснеш нито един момент от растежа на лилията.</p>
+                        <h3 class="text-2xl font-bold mb-3">Контекстуални бележки</h3>
+                        <p class="text-gray-600">Добавяйте текстови бележки, записи за поливане и детайли за почвата към всяка снимка, превръщайки галерията си в ценен запис за грижа за растенията.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="py-20">
+        <section id="how-it-works" class="py-24 bg-gray-100">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-12 font-display">Как работи: Разцъфтете в три стъпки</h2>
+                <div class="grid md:grid-cols-3 gap-12 text-left">
+                    <div class="p-6 rounded-lg bg-white shadow-xl border-t-4 border-emerald-500">
+                        <span class="text-4xl font-extrabold text-emerald-500 block mb-2">1.</span>
+                        <h3 class="text-2xl font-bold mb-3">Настройте своето напомняне</h3>
+                        <p class="text-gray-700">Отворете приложението и настройте ежедневно известие за часа, в който искате да снимате вашата лилия. Ние ще ви подсещаме нежно.</p>
+                    </div>
+                    <div class="p-6 rounded-lg bg-white shadow-xl border-t-4 border-emerald-500">
+                        <span class="text-4xl font-extrabold text-emerald-500 block mb-2">2.</span>
+                        <h3 class="text-2xl font-bold mb-3">Направете снимката</h3>
+                        <p class="text-gray-700">Използвайте вградената в приложението камера. Наслояване на предишната ви снимка гарантира перфектно подравняване, ден след ден.</p>
+                    </div>
+                    <div class="p-6 rounded-lg bg-white shadow-xl border-t-4 border-emerald-500">
+                        <span class="text-4xl font-extrabold text-emerald-500 block mb-2">3.</span>
+                        <h3 class="text-2xl font-bold mb-3">Гледайте как расте</h3>
+                        <p class="text-gray-700">Приложението автоматично компилира вашите снимки. Прегледайте галерията си или генерирайте зашеметяващо time-lapse видео.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="py-24">
             <div class="container mx-auto px-6">
                 <div class="flex flex-col md:flex-row items-center gap-12">
                     <div class="md:w-1/2 relative">
                         <div class="gallery-container" role="region" aria-label="Галерия със скрийншоти на приложението">
-                            <button class="gallery-nav gallery-prev" aria-label="Предишно изображение">&#10094;</button>
-                            <img src="images/screenshot.jpg" alt="Everyday Lilly app screenshot showing the main gallery view" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot2.jpg" alt="Everyday Lilly app screenshot showing photo capture interface" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot3.jpg" alt="Everyday Lilly app screenshot showing time-lapse playback" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot4.jpg" alt="Everyday Lilly app screenshot showing reminders setup" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot5.jpg" alt="Everyday Lilly app screenshot showing photo notes" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot6.jpg" alt="Everyday Lilly app screenshot showing calendar view" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot7.jpg" alt="Everyday Lilly app screenshot showing settings screen" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot8.jpg" alt="Everyday Lilly app screenshot showing notification options" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot9.jpg" alt="Everyday Lilly app screenshot showing photo editing tools" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot10.jpg" alt="Everyday Lilly app screenshot showing user profile" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot11.jpg" alt="Everyday Lilly app screenshot showing sharing options" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot12.jpg" alt="Everyday Lilly app screenshot showing plant health tracking" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot13.jpg" alt="Everyday Lilly app screenshot showing detailed photo info" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot14.jpg" alt="Everyday Lilly app screenshot showing app notifications" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <img src="images/screenshot15.jpg" alt="Everyday Lilly app screenshot showing app help and support" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
-                            <button class="gallery-nav gallery-next" aria-label="Next image">&#10095;</button>
+                            <img src="images/screenshot.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ основния изглед на галерията" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot2.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ интерфейса за заснемане на снимки" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot3.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ възпроизвеждане на time-lapse" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot4.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ настройка на напомняния" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot5.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ бележки към снимки" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot6.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ изглед на календара" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot7.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ екрана с настройки" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot8.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ опции за известия" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot9.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ инструменти за редактиране на снимки" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot10.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ потребителски профил" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot11.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ опции за споделяне" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot12.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ проследяване на здравето на растенията" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot13.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ подробна информация за снимката" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot14.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ известия от приложението" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
+                            <img src="images/screenshot15.jpg" alt="Скрийншот от приложението Лили всеки ден, показващ помощ и поддръжка" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
                         </div>
-                        <div class="gallery-dots" role="navigation" aria-label="Пагинация на галерия"></div>
+                        <div class="gallery-dots" role="navigation" aria-label="Пагинация на галерията"></div>
                     </div>
                     <div class="md:w-1/2">
-                        <h2 class="text-3xl md:text-4xl font-bold mb-4">Твоята лична галерия</h2>
-                        <p class="text-gray-600 leading-relaxed">
-                            Всички твои снимки са организирани в красива и лесна за разглеждане галерия. Кликни върху всяка снимка, за да я видиш в по-голям размер. Прелиствaй през дните и преживей отново пътя на твоята лилия от малък поник до великолепно цвете. Добавяй бележки към всяка снимка, за да запазиш специалните моменти.
+                        <h2 class="text-4xl md:text-5xl font-bold mb-4 font-display">Изживейте отново всеки ден на растеж</h2>
+                        <p class="text-lg text-gray-700 leading-relaxed">
+                            Вашата <strong>Лична галерия</strong> е сърцето на приложението. Това е хронологичен визуален дневник, където всяка снимка е крайъгълен камък. <strong>Плъзгащата се галерия</strong> ви позволява без усилие да преминавате през дните, предлагайки уникално, осезаемо усещане за отминаващото време. Добавяйте бележки за проследяване на поливането, слънчевата светлина и промените в торовете, превръщайки вашата фотоколекция в мощен <strong>запис за грижа за растенията</strong>.
                         </p>
+                        <ul class="list-disc list-inside mt-6 space-y-2 text-gray-700">
+                            <li><strong>Бележки към снимки:</strong> Документирайте рутинните грижи и наблюдения.</li>
+                            <li><strong>Изглед Календар:</strong> Бързо преминаване към конкретни дати.</li>
+                            <li><strong>Висококачествен Експорт:</strong> Запазвайте и споделяйте time-lapse видеа лесно.</li>
+                        </ul>
                     </div>
+                </div>
+            </section>
+        </section>
+
+        <section id="developer-story" class="py-24 bg-emerald-50">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 font-display text-emerald-800">Разцветът зад кода</h2>
+                    <p class="text-xl text-gray-700 mb-8">
+                        Лили всеки ден не е създадено от корпорация – то е създадено от ентусиаст на растенията, точно като вас.
+                    </p>
+                    <p class="text-lg text-gray-600 leading-relaxed italic border-l-4 border-emerald-400 pl-4 py-2 bg-white shadow-sm inline-block">
+                        "Започнах този проект, когато исках да уловя магията на моята първа лилия, която разтваряше цветето си. Съществуващите приложения бяха твърде сложни. Исках прост, специализиран инструмент. Лили всеки ден е резултатът: проект, създаден с любов и съсредоточен изцяло върху отбелязването на растежа."
+                    </p>
+                    <p class="text-lg text-gray-600 mt-6">
+                        Ние даваме приоритет на <strong>простотата, поверителността и чистата радост</strong> от наблюдаването на разгръщащия се живот. Вашите данни остават на телефона ви и приложението винаги ще бъде фокусирано върху основната си мисия: документиране на пътуването на вашето растение, снимка по снимка.
+                    </p>
                 </div>
             </div>
         </section>
+
+        <section id="testimonials" class="py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-16 font-display">Какво казват нашите потребители</h2>
+                <div class="grid md:grid-cols-3 gap-10">
+                    <figure class="p-8 bg-gray-50 rounded-xl shadow-lg border-t-4 border-emerald-400">
+                        <blockquote class="text-lg italic text-gray-700 mb-4">
+                            "Ghagha gghahga ghaghga ghagggghaghhahhhahggagggha"
+                        </blockquote>
+                        <figcaption class="font-semibold text-emerald-600">
+                            — Саша Г., Страстен любител на питони
+                        </figcaption>
+                    </figure>
+                    <figure class="p-8 bg-gray-50 rounded-xl shadow-lg border-t-4 border-emerald-400">
+                        <blockquote class="text-lg italic text-gray-700 mb-4">
+                            "Брат какво е това бе? Много е яко ама междудругото имаш ли някви къси 50лв?"
+                        </blockquote>
+                        <figcaption class="font-semibold text-emerald-600">
+                            — Дейвид Л., Наркоман
+                        </figcaption>
+                    </figure>
+                    <figure class="p-8 bg-gray-50 rounded-xl shadow-lg border-t-4 border-emerald-400">
+                        <blockquote class="text-lg italic text-gray-700 mb-4">
+                            "Тука какво се прави? Това за какво е? Как се ползва?"
+                        </blockquote>
+                        <figcaption class="font-semibold text-emerald-600">
+                            — Клои С., Харесва Русия, малоумна.
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="testers" class="py-24 bg-gray-900 text-white text-center">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4 font-display text-emerald-400">Присъединете се към Ексклузивния Бета Екип</h2>
+                <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto opacity-90">
+                    Лили всеки ден в момента е <strong>Само с покана</strong> за Android. Търсим страстни потребители, които да ни помогнат да усъвършенстваме приложението преди публичното пускане.
+                </p>
+                <a href="mailto:Lilly@everydaylilly.com?subject=Beta%20Tester%20Request&body=Бих%20искал%20да%20помогна%20за%20тестването%20на%20Лили%20всеки%20ден%20на%20Android!" class="inline-flex items-center gap-2 px-10 py-4 text-lg font-bold rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition duration-300 shadow-2xl hover:shadow-none" aria-label="Поискайте покана за Бета теста">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Поискайте вашата Android покана</span>
+                </a>
+                <p class="mt-4 text-sm opacity-70">Местата са ограничени. Разкажете ни малко за любимото си растение в имейла!</p>
+            </div>
+        </section>
+
+        <section id="faq" class="py-20 bg-gray-50">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 font-display">Често Задавани Въпроси</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div class="p-4 bg-white rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold mb-2 text-gray-800">Безплатно ли е Лили всеки ден?</h3>
+                <p class="text-gray-600">Да! Лили всеки ден в момента е <strong>напълно безплатно</strong> за ползване.</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold mb-2 text-gray-800">Мога ли да използвам приложението за други растения?</h3>
+                <p class="text-gray-600">Абсолютно. Въпреки че брандирането е насочено към лилии, можете да проследявате растежа на <strong>всяко растение</strong>, зеленчук или дори дългосрочни лични проекти като строителство.</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold mb-2 text-gray-800">Къде се съхраняват моите снимки?</h3>
+                <p class="text-gray-600">Всички снимки се записват сигурно <strong>на вашето устройство</strong> (локално), гарантирайки, че спомените ви остават напълно поверителни и под ваш контрол.</p>
+              </div>
+              <div class="p-4 bg-white rounded-lg shadow-sm">
+                <h3 class="text-xl font-semibold mb-2 text-gray-800">Ще има ли версия за iOS?</h3>
+                <p class="text-gray-600">Да, активно разработваме версията за iOS. Абонирайте се за нашия бюлетин във футъра, за да бъдете първите, които ще научат за старта ѝ!</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" class="py-20 bg-gray-100">
+          <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 font-display">Свържете се с нас</h2>
+            <p class="text-lg text-gray-600 max-w-xl mx-auto">Имате въпрос, обратна връзка или се нуждаете от помощ с вашата покана? Свържете се с нас по всяко време на <a href="mailto:Lilly@everydaylilly.com" class="text-emerald-600 font-medium hover:underline">Lilly@everydaylilly.com</a></p>
+          </div>
+        </section>
     </main>
 
-    <!-- About Section -->
-    <section class="py-20 bg-gray-50">
-      <div class="container mx-auto px-6 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">За Всеки ден Лили</h2>
-        <p class="max-w-3xl mx-auto text-gray-600 leading-relaxed">
-          Всеки ден Лили е създаден, за да помогне на любителите на растения да уловят красотата на растежа по прост и смислен начин. От една лилия до цяла градина, нашето приложение е създадено да запази спомените и да отпразнува малките неща в живота.
-        </p>
-      </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 bg-white">
-      <div class="container mx-auto px-6">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Често задавани въпроси</h2>
-        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div>
-            <h3 class="text-xl font-semibold mb-2">Безплатен ли е Всеки ден Лили?</h3>
-            <p class="text-gray-600">Да! Всеки ден Лили е напълно безплатен за използване.</p>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">Мога ли да използвам приложението за други растения?</h3>
-            <p class="text-gray-600">Разбира се. Въпреки че е създадено за лилии, можеш да следиш растежа на всяко растение или дори лични проекти.</p>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">Къде се съхраняват снимките ми?</h3>
-            <p class="text-gray-600">Всички снимки се запазват сигурно на твоето устройство, за да останат лични.</p>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold mb-2">Ще има ли версия за iOS?</h3>
-            <p class="text-gray-600">Да, активно работим върху версия за iOS. Очаквай скоро!</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="py-20 bg-gray-100">
-      <div class="container mx-auto px-6 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Свържи се с нас</h2>
-        <p class="text-gray-600 max-w-xl mx-auto">Свържи се с нас на <a href="mailto:Lilly@everydaylilly.com" class="text-emerald-600 hover:underline">Lilly@everydaylilly.com</a></p>
-      </div>
-    </section>
-
-    <footer class="bg-gray-800 text-white py-10">
+    <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-6 text-center">
-            <p class="font-display text-2xl mb-4">Всеки ден Лили</p>
-            <div class="flex justify-center space-x-6 mb-6">
+            <p class="font-display text-3xl mb-4 text-emerald-400">Лили всеки ден</p>
+            <div class="flex flex-wrap justify-center space-x-6 text-sm mb-6">
+                <a href="#features" class="hover:text-emerald-400 transition">Функции</a>
+                <a href="#developer-story" class="hover:text-emerald-400 transition">Нашата история</a>
+                <a href="#testimonials" class="hover:text-emerald-400 transition">Препоръки</a>
+                <a href="#faq" class="hover:text-emerald-400 transition">ЧЗВ</a>
+                <a href="#contact" class="hover:text-emerald-400 transition">Контакт</a>
                 <a href="privacypolicy-bg.html" class="hover:text-emerald-400 transition" aria-label="Политика за поверителност">Политика за поверителност</a>
             </div>
-            <p class="text-gray-400">&copy; <span id="current-year"></span> Всеки ден Лили. Всички права запазени.</p>
+            <div class="mt-8 mb-6 max-w-md mx-auto">
+                <p class="text-gray-400 mb-3">Присъединете се към нашия разцъфтяващ бюлетин за актуализации!</p>
+                <form class="flex justify-center gap-2">
+                    <input type="email" placeholder="Вашият имейл адрес" aria-label="Имейл за бюлетина" class="p-3 rounded-l-lg w-full max-w-xs text-gray-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-r-lg transition duration-200">Абониране</button>
+                </form>
+            </div>
+            <p class="text-gray-500 mt-8">&copy; <span id="current-year"></span> Лили всеки ден. Всички права запазени.</p>
         </div>
     </footer>
 
