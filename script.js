@@ -22,125 +22,34 @@ document.addEventListener('DOMContentLoaded', () => {
         btnBg: query('#lang-bg'),
         galleryItems: queryAll('.gallery-item'),
         galleryContainer: query('.gallery-container'),
-        dotsContainer: query('.gallery-dots')
+        dotsContainer: query('.gallery-dots'),
+        aboutTitle: query('#about-section h2'),
+        aboutText: query('#about-section p'),
+        faqQuestions: queryAll('#faq-section .faq-question'),
+        faqAnswers: queryAll('#faq-section .faq-answer'),
+        contactTitle: query('#contact-section h2'),
+        contactText: query('#contact-section p'),
     };
 
-    // === Translations ===
-    const translations = {
-        en: {
-            title: "Everyday Lilly",
-            subtitle: "Capture the daily bloom of your lily. A simple, beautiful way to watch life unfold.",
-            androidBtn: "Download on Android (Invite Only)",
-            iosBtn: "Coming Soon on iOS!",
-            section1Title: "A Digital Flower Journal",
-            section1Text: "Everyday Lilly helps you create a beautiful photographic diary of your plant's life, from sprout to full bloom.",
-            feature1Title: "Daily Photo Capture",
-            feature1Text: "Take a picture every day with our simple, intuitive camera interface.",
-            feature2Title: "Automatic Time-lapses",
-            feature2Text: "Watch your lily grow before your eyes with automatically generated time-lapse videos.",
-            feature3Title: "Helpful Reminders",
-            feature3Text: "Set daily notifications so you never miss a moment of your lily's growth.",
-            galleryTitle: "Your Personal Gallery",
-            galleryText: "All your photos are organized in a beautiful, easy-to-browse gallery. Click on any picture to view a larger version. Scroll through the days and relive your lily's journey from a tiny sprout to a magnificent flower. Add notes to each photo to remember special moments."
-        },
-        bg: {
-            title: "Всеки ден Лили",
-            subtitle: "Записвайте ежедневното разцъфтяване на вашата лилия. Прост и красив начин да наблюдавате живота.",
-            androidBtn: "Изтеглете за Android (само с покана)",
-            iosBtn: "Скоро за iOS!",
-            section1Title: "Дигитален цветен дневник",
-            section1Text: "Всеки ден Лили ви помага да създадете красив фотографски дневник на живота на вашето растение, от пъпка до пълноцъфтеж.",
-            feature1Title: "Ежедневно снимане",
-            feature1Text: "Правете снимка всеки ден с нашия прост и интуитивен интерфейс.",
-            feature2Title: "Автоматични таймлапси",
-            feature2Text: "Наблюдавайте как вашата лилия расте с автоматично генерирани таймлапс видеа.",
-            feature3Title: "Полезни напомняния",
-            feature3Text: "Настройте ежедневни известия, за да не изпуснете нито един момент от растежа на лилията.",
-            galleryTitle: "Вашата лична галерия",
-            galleryText: "Всички ваши снимки са организирани в красива и лесна за разглеждане галерия. Кликнете върху всяка снимка, за да видите по-голяма версия. Прелиствате през дните и преживейте пътя на лилията от малка пъпка до величествен цвят. Добавяйте бележки към всяка снимка, за да запомните специални моменти."
-        }
-    };
-
-    // Cache translation keys for features
-    const featureTitleKeys = ['feature1Title', 'feature2Title', 'feature3Title'];
-    const featureTextKeys = ['feature1Text', 'feature2Text', 'feature3Text'];
-
-    // === Language Switcher ===
-    function switchLanguage(lang) {
-        const t = translations[lang];
-        if (!t) {
-            console.warn(`No translations found for language: ${lang}`);
-            return;
-        }
-
-        if (elements.titleEl) elements.titleEl.textContent = t.title;
-        else warnMissingElement('Title');
-
-        if (elements.subtitleEl) elements.subtitleEl.textContent = t.subtitle;
-        else warnMissingElement('Subtitle');
-
-        if (elements.androidBtnEl) elements.androidBtnEl.textContent = t.androidBtn;
-        else warnMissingElement('Android button');
-
-        if (elements.iosBtnEl) elements.iosBtnEl.textContent = t.iosBtn;
-        else warnMissingElement('iOS button');
-
-        if (elements.section1Title) elements.section1Title.textContent = t.section1Title;
-        else warnMissingElement('Section 1 title');
-
-        if (elements.section1Text) elements.section1Text.textContent = t.section1Text;
-        else warnMissingElement('Section 1 text');
-
-        elements.featureTitles.forEach((el, i) => {
-            if (el) {
-                const key = featureTitleKeys[i];
-                if (t[key]) el.textContent = t[key];
-                else console.warn(`Missing translation for ${key}`);
-            } else {
-                console.warn(`Feature title element ${i + 1} not found`);
-            }
-        });
-
-        elements.featureTexts.forEach((el, i) => {
-            if (el) {
-                const key = featureTextKeys[i];
-                if (t[key]) el.textContent = t[key];
-                else console.warn(`Missing translation for ${key}`);
-            } else {
-                console.warn(`Feature text element ${i + 1} not found`);
-            }
-        });
-
-        if (elements.galleryTitle) elements.galleryTitle.textContent = t.galleryTitle;
-        else warnMissingElement('Gallery title');
-
-        if (elements.galleryText) elements.galleryText.textContent = t.galleryText;
-        else warnMissingElement('Gallery text');
-    }
-
-    // Event delegation for language buttons
+    // === Language Button Navigation ===
     const langButtonsContainer = query('#language-buttons');
     if (langButtonsContainer) {
         langButtonsContainer.addEventListener('click', (e) => {
             const target = e.target;
-            if (target && target.id && target.id.startsWith('lang-')) {
-                const lang = target.id.slice(5);
-                switchLanguage(lang);
+            if (target && target.id === 'lang-en') {
+                window.location.href = 'index.html';
+            } else if (target && target.id === 'lang-bg') {
+                window.location.href = 'index-bg.html';
             }
         });
     } else {
-        // fallback to individual buttons if container not found
         if (elements.btnEn) {
-            elements.btnEn.addEventListener('click', () => switchLanguage('en'));
-        } else warnMissingElement('English language button');
-
+            elements.btnEn.addEventListener('click', () => window.location.href = 'index.html');
+        }
         if (elements.btnBg) {
-            elements.btnBg.addEventListener('click', () => switchLanguage('bg'));
-        } else warnMissingElement('Bulgarian language button');
+            elements.btnBg.addEventListener('click', () => window.location.href = 'index-bg.html');
+        }
     }
-
-    // Set default language
-    switchLanguage('bg');
 
     // === Lightbox Setup ===
     const galleryItems = elements.galleryItems;
