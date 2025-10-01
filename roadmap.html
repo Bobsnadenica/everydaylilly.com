@@ -30,59 +30,40 @@
   </header>
 
   <main class="mx-auto max-w-4xl px-4 py-8">
-    <h1 class="text-3xl font-bold tracking-tight">Roadmap & Known Bugs</h1>
-    <p class="mt-2 text-zinc-400">Lightweight, bilingual page summarizing what’s planned and what needs fixing.</p>
+    <div>
+      <h1 id="title-en" class="text-3xl font-bold tracking-tight">Roadmap & Known Bugs</h1>
+      <h1 id="title-bg" class="text-3xl font-bold tracking-tight hidden">Пътна карта и известни проблеми</h1>
+      <p id="subtitle-en" class="mt-2 text-zinc-400">Lightweight, bilingual page summarizing what’s planned and what needs fixing.</p>
+      <p id="subtitle-bg" class="mt-2 text-zinc-400 hidden">Лека, двуезична страница, обобщаваща какво е планирано и какво трябва да се оправи.</p>
+    </div>
 
     <!-- English content -->
     <section id="content-en" class="mt-8 space-y-10">
       <div>
         <h2 class="text-xl font-semibold">Bugs</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Timelapse is not working</li>
-          <li>[ ] Prompts pile up when you click on things like achievements and they don’t show up on top (same when you backup all)</li>
+        <ul class="mt-3 space-y-2 list-disc list-inside">
+          <li class="text-red-400">[ ] Timelapse is not working</li>
+          <li class="text-red-400">[ ] Prompts pile up when you click on things like achievements and they don’t show up on top (same when you backup all)</li>
+          <li class="text-red-400">[ ] Achievements don’t properly track different calendars – each calendar’s photo should count</li>
+          <li class="text-red-400">[ ] Achievement rewards cannot be downloaded now as they go only to app storage</li>
+          <li class="line-through text-green-400">[x] Backup to gallery – All: previously backed up only one calendar X times; fixed to export per calendar correctly</li>
         </ul>
       </div>
 
       <div>
-        <h2 class="text-xl font-semibold">Permissions & Reliability</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] App should guide you to enable permissions</li>
-          <li>[ ] Better permissions handling for reading gallery</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">UI/UX Improvements</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Fix videos on front page to be better, longer, with sound, smaller in size</li>
-          <li>[ ] Increase front page top icon bar box so it’s easier to touch</li>
-          <li>[ ] Overlap picture with one from previous day – add a camera option to align poses</li>
-          <li>[ ] Better English/Bulgarian translation</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Achievements</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] More achievements</li>
-          <li>[ ] Achievements don’t properly track different calendars – each calendar’s photo should count</li>
-          <li>[ ] Achievement rewards cannot be downloaded now as they go only to app storage</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Backup & Import</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[x] Backup to gallery – All: previously backed up only one calendar X times; fixed to export per calendar correctly</li>
-          <li>[ ] Add import from ZIP backups (e.g., Google Drive)</li>
-          <li>[ ] Friendly reminders to back up</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Smart Features</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Auto-scan gallery and add random pictures by date (auto-fill calendar)</li>
+        <h2 class="text-xl font-semibold">Roadmap</h2>
+        <ul class="mt-3 space-y-2 list-disc list-inside">
+          <li class="text-red-400">[ ] App should guide you to enable permissions</li>
+          <li class="text-red-400">[ ] Better permissions handling for reading gallery</li>
+          <li class="text-red-400">[ ] Fix videos on front page to be better, longer, with sound, smaller in size</li>
+          <li class="text-red-400">[ ] Increase front page top icon bar box so it’s easier to touch</li>
+          <li class="text-red-400">[ ] Overlap picture with one from previous day – add a camera option to align poses</li>
+          <li class="text-red-400">[ ] Better English/Bulgarian translation</li>
+          <li class="text-red-400">[ ] More achievements</li>
+          <li class="text-red-400">[ ] Add import from ZIP backups (e.g., Google Drive)</li>
+          <li class="text-red-400">[ ] Friendly reminders to back up</li>
+          <li class="text-red-400">[ ] Auto-scan gallery and add random pictures by date (auto-fill calendar)</li>
+          <li class="text-red-400">[ ] Timelapse effects</li>
         </ul>
       </div>
     </section>
@@ -92,52 +73,29 @@
       <h1 class="sr-only">Пътна карта и известни проблеми</h1>
       <div>
         <h2 class="text-xl font-semibold">Бъгове</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Таймлапсът не работи</li>
-          <li>[ ] Прозорците (prompts) се наслагват при кликове (напр. постижения) и не излизат най-отгоре (същото и при backup all)</li>
+        <ul class="mt-3 space-y-2 list-disc list-inside">
+          <li class="text-red-400">[ ] Таймлапсът не работи</li>
+          <li class="text-red-400">[ ] Прозорците (prompts) се наслагват при кликове (напр. постижения) и не излизат най-отгоре (същото и при backup all)</li>
+          <li class="text-red-400">[ ] Постиженията не отчитат правилно различните календари – всяка снимка по календар да се брои</li>
+          <li class="text-red-400">[ ] Наградите от постиженията не могат да се свалят (записват се само в app storage)</li>
+          <li class="line-through text-green-400">[x] Backup към галерия – All: преди правеше backup на един календар X пъти; вече експортира правилно по календари</li>
         </ul>
       </div>
 
       <div>
-        <h2 class="text-xl font-semibold">Разрешения и надеждност</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Приложението трябва да насочва как да се разрешат нужните permissions</li>
-          <li>[ ] По-добро управление на разрешенията за четене на галерията</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Подобрения в UI/UX</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] По-добри видеа на началната страница – по-дълги, със звук, по-малки като размер</li>
-          <li>[ ] По-голяма зона за иконите горе на началната страница (по-лесно за натискане)</li>
-          <li>[ ] Наслагване на снимката с предишния ден – бутон в камерата за подравняване на позата</li>
-          <li>[ ] По-добър превод EN/BG</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Постижения</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-zinc-300">
-          <li>[ ] Още постижения</li>
-          <li>[ ] Постиженията не отчитат правилно различните календари – всяка снимка по календар да се брои</li>
-          <li>[ ] Наградите от постиженията не могат да се свалят (записват се само в app storage)</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Backup & Import</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-зinc-300">
-          <li>[x] Backup към галерия – All: преди правеше backup на един календар X пъти; вече експортира правилно по календари</li>
-          <li>[ ] Добавяне на импорт от ZIP backup (напр. Google Drive)</li>
-          <li>[ ] Приятелски напомняния за backup</li>
-        </ul>
-      </div>
-
-      <div>
-        <h2 class="text-xl font-semibold">Умни функции</h2>
-        <ul class="mt-3 space-y-2 list-disc list-inside text-зinc-300">
-          <li>[ ] Автоматично сканиране на галерията и добавяне на случайни снимки по дата (auto-fill на календара)</li>
+        <h2 class="text-xl font-semibold">Пътна карта</h2>
+        <ul class="mt-3 space-y-2 list-disc list-inside">
+          <li class="text-red-400">[ ] Приложението трябва да насочва как да се разрешат нужните permissions</li>
+          <li class="text-red-400">[ ] По-добро управление на разрешенията за четене на галерията</li>
+          <li class="text-red-400">[ ] По-добри видеа на началната страница – по-дълги, със звук, по-малки като размер</li>
+          <li class="text-red-400">[ ] По-голяма зона за иконите горе на началната страница (по-лесно за натискане)</li>
+          <li class="text-red-400">[ ] Наслагване на снимката с предишния ден – бутон в камерата за подравняване на позата</li>
+          <li class="text-red-400">[ ] По-добър превод EN/BG</li>
+          <li class="text-red-400">[ ] Още постижения</li>
+          <li class="text-red-400">[ ] Добавяне на импорт от ZIP backup (напр. Google Drive)</li>
+          <li class="text-red-400">[ ] Приятелски напомняния за backup</li>
+          <li class="text-red-400">[ ] Автоматично сканиране на галерията и добавяне на случайни снимки по дата (auto-fill на календара)</li>
+              <li class="text-red-400">[ ] Таимлапс ефекти</li>
         </ul>
       </div>
     </section>
@@ -153,6 +111,10 @@
     const bgBtn = document.getElementById('lang-bg');
     const en = document.getElementById('content-en');
     const bg = document.getElementById('content-bg');
+    const titleEn = document.getElementById('title-en');
+    const titleBg = document.getElementById('title-bg');
+    const subtitleEn = document.getElementById('subtitle-en');
+    const subtitleBg = document.getElementById('subtitle-bg');
 
     function setLang(lang){
       const isEN = lang === 'en';
@@ -161,6 +123,10 @@
       enBtn.dataset.active = isEN;
       bgBtn.dataset.active = !isEN;
       document.documentElement.lang = isEN ? 'en' : 'bg';
+      titleEn.classList.toggle('hidden', !isEN);
+      titleBg.classList.toggle('hidden', isEN);
+      subtitleEn.classList.toggle('hidden', !isEN);
+      subtitleBg.classList.toggle('hidden', isEN);
       localStorage.setItem('everydaylilly_lang', lang);
     }
 
