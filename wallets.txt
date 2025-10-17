@@ -1,0 +1,17 @@
+BTC:
+bc1q9jh0w4w8ug59qdt2e9lxw54c9sz2aw5q2njxgl
+
+Ethereum:
+0xF00716eDAF7Aca38Db93228D3372B3c642F03b03
+
+SOL:
+5dnwFVsjHcrCSNzA4wy88pFq1o57kKU9gm8C8JzmMwBa
+
+XRP:
+r3y1du8c8BZrxcX45vehoz2rSkEFqjD154
+
+Doge:
+bnb1a4aye09zl258qjt8laqggqhd86j6g8chelgwv9
+
+Revolut:
+https://revolut.me/privileged
