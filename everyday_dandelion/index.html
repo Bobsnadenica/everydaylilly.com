@@ -1,72 +1,326 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Everyday Dandelion - Capture 5 Second Daily Moments</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../style.css" />
   <script src="../script.js" defer></script>
   <style>
+    /* Base styles */
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(to bottom right, #ecfccb, #d9f99d);
       color: #1f2937;
       margin: 0;
       text-align: center;
+      overflow-x: hidden;
     }
+    a {
+      color: #4ade80;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+      margin: 0 0 1rem 0;
+      color: #166534;
+    }
+    p {
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto 1.5rem auto;
+      line-height: 1.5;
+      color: #14532d;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background-color: #4ade80;
+      color: #14532d;
+      box-shadow: 0 4px 8px rgba(74, 222, 128, 0.4);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #22c55e;
+      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.6);
+    }
+    .btn-secondary {
+      background-color: transparent;
+      color: #166534;
+      border: 2px solid #4ade80;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #d9f99d;
+      border-color: #22c55e;
+    }
+
+    /* Header */
     header {
-      padding: 4rem 1rem 2rem;
+      padding: 3rem 1rem 2rem;
+      position: relative;
+      z-index: 10;
     }
     .app-icon {
       width: 100px;
       height: 100px;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+      margin-bottom: 1rem;
     }
     h1 {
-      font-family: 'Playfair Display', serif;
       font-size: 3rem;
-      margin: 1rem 0;
+      margin-bottom: 0.5rem;
     }
-    p {
+    p.lead {
       font-size: 1.25rem;
       max-width: 600px;
       margin: 0 auto 2rem;
+      color: #166534;
     }
     .btn-group {
       display: flex;
       justify-content: center;
       gap: 1rem;
       flex-wrap: wrap;
+      margin-top: 1rem;
     }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      padding: 6rem 1rem 4rem;
+      background: linear-gradient(270deg, #ecfccb, #d9f99d, #ecfccb);
+      background-size: 600% 600%;
+      animation: gradientShift 30s ease infinite;
+      color: #14532d;
+      overflow: hidden;
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+      max-width: 700px;
+      margin: 0 auto 1rem;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .hero p {
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    @keyframes gradientShift {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    /* Features Section */
+    .features {
+      padding: 4rem 1rem 3rem;
+      background: #f7fee7;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      padding: 2rem 1.5rem;
+      max-width: 320px;
+      flex: 1 1 280px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .feature-icon {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #166534;
+    }
+    .feature-card p {
+      font-size: 1rem;
+      color: #4d7c0f;
+      margin-bottom: 0;
+    }
+
+    /* Preview Section */
+    .preview {
+      padding: 4rem 1rem 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+    .preview img:hover {
+      transform: scale(1.03);
+    }
+
+    /* About Section */
+    .about {
+      background: #d9f99d;
+      padding: 4rem 1rem 3rem;
+      color: #14532d;
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 1rem;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    }
+    .about h2 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+    .about p {
+      font-size: 1.125rem;
+      max-width: none;
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    /* Download Section */
+    .download {
+      padding: 4rem 1rem 4rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .download h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #166534;
+    }
+    .download .btn-group {
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .download a.btn-primary {
+      display: inline-block;
+      min-width: 180px;
+      text-align: center;
+      text-decoration: none;
+      color: #14532d;
+      background-color: #4ade80;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(74, 222, 128, 0.4);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .download a.btn-primary:hover {
+      background-color: #22c55e;
+      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.6);
+    }
+
+    /* Footer */
     footer {
       margin-top: 4rem;
-      padding: 2rem;
+      padding: 2rem 1rem;
       background: #1f2937;
       color: white;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    footer .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    footer .footer-links a {
+      color: #a3e635;
+      font-weight: 600;
+    }
+    footer .footer-links a:hover {
+      color: #84cc16;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon">
+    <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon" />
     <h1>Everyday Dandelion</h1>
-    <p>A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</p>
-    <div class="btn-group">
-      <button class="btn-secondary" disabled>Get it on Android (Coming Soon)</button>
-      <button class="btn-secondary" disabled>Get it on iPhone (Coming Soon)</button>
-    </div>
+    <p class="lead">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</p>
   </header>
 
-  <main>
-    <section>
-      <h2 class="font-display text-3xl mb-4">Why Everyday Dandelion?</h2>
-      <p>Capture your day in just 5 seconds. Whether it's a smile, a sunset, or a quiet coffee moment — make every day worth remembering.</p>
-    </section>
-  </main>
+  <section class="hero" aria-label="Hero section with tagline">
+    <h2>Capture Your Life, One Moment at a Time</h2>
+    <p>Mindful video journaling designed to help you remember the beauty in everyday moments.</p>
+  </section>
+
+  <section class="features" aria-label="Features of Everyday Dandelion">
+    <article class="feature-card" tabindex="0" aria-labelledby="feature1-title" aria-describedby="feature1-desc">
+      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">📸</div>
+      <h3 id="feature1-title">Capture Moments</h3>
+      <p id="feature1-desc">Quickly record 5-second videos to preserve your daily highlights effortlessly.</p>
+    </article>
+    <article class="feature-card" tabindex="0" aria-labelledby="feature2-title" aria-describedby="feature2-desc">
+      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">⏱️</div>
+      <h3 id="feature2-title">Watch Timelapses</h3>
+      <p id="feature2-desc">Watch your days and weeks unfold with beautiful timelapse compilations.</p>
+    </article>
+    <article class="feature-card" tabindex="0" aria-labelledby="feature3-title" aria-describedby="feature3-desc">
+      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">🌿</div>
+      <h3 id="feature3-title">Stay Mindful</h3>
+      <p id="feature3-desc">Encourage daily reflection and mindfulness through simple, creative journaling.</p>
+    </article>
+  </section>
+
+
+  <section class="about" aria-label="About the Everyday series">
+    <h2>About the Everyday Series</h2>
+    <p>Everyday Dandelion is part of the Everyday family of apps, including Everyday Lilly and Filetrap. Each app is designed to inspire creativity, mindfulness, and simplicity in your daily digital life. Capture, organize, and cherish your moments with ease and beauty.</p>
+  </section>
+
+  <section class="download" aria-label="Download Everyday Dandelion app">
+    <h2>Get the App</h2>
+    <div class="btn-group">
+      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Google Play Store">Get it on Google Play</a>
+      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store">Get it on the App Store</a>
+    </div>
+  </section>
 
   <footer>
+    <div class="footer-links" role="navigation" aria-label="Footer navigation">
+      <a href="https://www.everydaylilly.com/support" target="_blank" rel="noopener">Support</a>
+      <a href="https://www.everydaylilly.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener">Everyday Lilly Website</a>
+    </div>
     <p>&copy; <span id="year"></span> Everyday Dandelion. All rights reserved.</p>
   </footer>
 
