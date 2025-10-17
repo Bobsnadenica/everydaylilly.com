@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyday Storage - A Simple App for Everyday Storage</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../script.js" defer></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #dbeafe, #bfdbfe);
+      color: #1f2937;
+      margin: 0;
+      text-align: center;
+    }
+    header {
+      padding: 4rem 1rem 2rem;
+    }
+    .app-icon {
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+    p {
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    footer {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: #1f2937;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../images/icons/everyday_storage.png" alt="Everyday Storage Icon" class="app-icon">
+    <h1>Everyday Storage</h1>
+    <p>A simple app for everyday storage — photos of your tire’s expiration date, your shelf storage, or anything you need to remember.</p>
+    <div class="btn-group">
+      <button class="btn-secondary" disabled>Get it on Android (Coming Soon)</button>
+      <button class="btn-secondary" disabled>Get it on iPhone (Coming Soon)</button>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2 class="font-display text-3xl mb-4">Why Everyday Storage?</h2>
+      <p>Keep track of things that matter. Whether it's receipts, labels, tools, or warranty cards — capture and organize them with ease, right on your phone.</p>
+    </section>
+
+    <section style="padding: 4rem 1rem; background: white; margin-top: 3rem;">
+      <h2 class="font-display text-3xl mb-4">Key Features</h2>
+      <div style="max-width: 800px; margin: 0 auto; text-align: left; font-size: 1.1rem; line-height: 1.75;">
+        <ul style="list-style-type: disc; padding-left: 2rem;">
+          <li><strong>Photo-based organization:</strong> Snap a picture of anything you need to remember — tire pressure, expiration labels, receipts, and more.</li>
+          <li><strong>Quick tags and notes:</strong> Add short text or labels to help you search and recall faster.</li>
+          <li><strong>Local privacy:</strong> All your photos stay stored safely on your device — nothing uploaded, nothing shared.</li>
+          <li><strong>Simple search:</strong> Quickly find what you need through tags or date filters.</li>
+          <li><strong>Cloud backup (coming soon):</strong> Optional safe sync for peace of mind.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section style="padding: 4rem 1rem; background: #f9fafb; margin-top: 3rem;">
+      <h2 class="font-display text-3xl mb-4">Use Cases</h2>
+      <p style="max-width: 700px; margin: 0 auto 2rem; font-size: 1.1rem;">Everyday Storage is designed for practical memory keeping — the small things you can’t afford to forget.</p>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+        <div style="max-width: 250px;">
+          <img src="../images/sample-tires.jpg" alt="Tire Expiration Example" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <p><strong>Vehicle Maintenance:</strong> Track tire wear, oil change dates, or car registration renewals.</p>
+        </div>
+        <div style="max-width: 250px;">
+          <img src="../images/sample-shelf.jpg" alt="Shelf Organization Example" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <p><strong>Home Inventory:</strong> Keep photos of what’s on your shelves, in boxes, or storage rooms for easy access.</p>
+        </div>
+        <div style="max-width: 250px;">
+          <img src="../images/sample-docs.jpg" alt="Receipt Example" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <p><strong>Receipts & Warranties:</strong> Save pictures of documents or serial numbers for fast reference later.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 4rem 1rem; background: white; margin-top: 3rem;">
+      <h2 class="font-display text-3xl mb-4">Coming Soon</h2>
+      <p style="max-width: 700px; margin: 0 auto 2rem; font-size: 1.1rem;">We’re expanding Everyday Storage with new features including automatic sorting, reminders for expiring items, and secure cross-device sync. Stay tuned for updates!</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Everyday Storage. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

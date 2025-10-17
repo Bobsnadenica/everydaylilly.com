@@ -204,5 +204,52 @@ document.addEventListener('DOMContentLoaded', () => {
     } else warnMissingElement('Gallery container');
 
     // === Resize: Recalculate scroll positions ===
-    window.addEventListener('resize', () => scrollToImage(currentIndex));
+window.addEventListener('resize', () => scrollToImage(currentIndex));
+
+// === App Carousel Logic ===
+const cards = document.querySelectorAll('.app-card');
+const nextBtn = document.getElementById('carousel-next');
+const prevBtn = document.getElementById('carousel-prev');
+let current = 0;
+
+function updateCarousel() {
+  cards.forEach((card, index) => {
+    card.classList.remove('active', 'prev', 'next');
+    if (index === current) {
+      card.classList.add('active');
+    } else if (index === (current + 1) % cards.length) {
+      card.classList.add('next');
+    } else if (index === (current - 1 + cards.length) % cards.length) {
+      card.classList.add('prev');
+    }
+  });
+}
+
+nextBtn?.addEventListener('click', () => {
+  current = (current + 1) % cards.length;
+  updateCarousel();
+});
+
+prevBtn?.addEventListener('click', () => {
+  current = (current - 1 + cards.length) % cards.length;
+  updateCarousel();
+});
+
+// Touch support
+let startX = 0;
+const carousel = document.querySelector('.app-carousel');
+carousel?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+carousel?.addEventListener('touchend', e => {
+  const endX = e.changedTouches[0].clientX;
+  if (endX - startX > 50) prevBtn?.click();
+  if (startX - endX > 50) nextBtn?.click();
+});
+
+// Keyboard arrow support
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') nextBtn?.click();
+  if (e.key === 'ArrowLeft') prevBtn?.click();
+});
+
+updateCarousel();
 });

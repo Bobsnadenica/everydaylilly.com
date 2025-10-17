@@ -1,0 +1,77 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyday Dandelion - Capture 5 Second Daily Moments</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../script.js" defer></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #ecfccb, #d9f99d);
+      color: #1f2937;
+      margin: 0;
+      text-align: center;
+    }
+    header {
+      padding: 4rem 1rem 2rem;
+    }
+    .app-icon {
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+    p {
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    footer {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: #1f2937;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon">
+    <h1>Everyday Dandelion</h1>
+    <p>A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</p>
+    <div class="btn-group">
+      <button class="btn-secondary" disabled>Get it on Android (Coming Soon)</button>
+      <button class="btn-secondary" disabled>Get it on iPhone (Coming Soon)</button>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2 class="font-display text-3xl mb-4">Why Everyday Dandelion?</h2>
+      <p>Capture your day in just 5 seconds. Whether it's a smile, a sunset, or a quiet coffee moment — make every day worth remembering.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Everyday Dandelion. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

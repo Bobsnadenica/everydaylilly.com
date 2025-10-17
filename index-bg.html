@@ -91,24 +91,43 @@
         <div class="relative z-30 p-4 md:p-8 rounded-lg">
             <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-4 text-shadow-lg">Всеки ден Лили</h1>
             <p class="text-xl md:text-2xl max-w-3xl mx-auto font-medium">Уловете <strong>ежедневния разцвет</strong> на вашата лилия. Лесен и красив начин да наблюдавате как животът <strong>се разгръща</strong>.</p>
-            <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="https://play.google.com/store/apps/details?id=com.privileged.everyday_lilly" class="btn-primary flex items-center gap-2" aria-label="Изтеглете Всеки ден Лили за Android">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18a6 6 0 00-6-6h12a6 6 0 00-6 6zm-6 0h12" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 6a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Изтеглете приложението за Android</span>
-                </a>
-                <a href="https://apps.apple.com/bg/app/everyday-lilly/id6753817021" class="btn-primary flex items-center gap-2" aria-label="Изтеглете Всеки ден Лили за iPhone">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.341A8 8 0 018.659 4.572l1.408 1.408A6 6 0 0018 16.001l1.428-1.428z" />
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                    </svg>
-                    <span>Изтеглете приложението за iPhone</span>
-                </a>
-                <a href="roadmap.html" target="_blank" rel="noopener" class="btn-primary pointer-events-auto relative z-40" aria-label="Известни бъгове и бъдещето на апликацията">
-                  Известни бъгове и пътна карта
-                </a>
+            <div class="app-carousel-container">
+              <div class="app-carousel">
+                <div class="app-card active" data-app="lilly">
+                  <img src="images/icons/everyday_lilly.png" alt="Всеки ден Лили" class="app-icon" />
+                  <h3>Всеки ден Лили</h3>
+                  <div class="app-buttons">
+                    <a href="https://play.google.com/store/apps/details?id=com.privileged.everyday_lilly" class="btn-primary">Android</a>
+                    <a href="https://apps.apple.com/bg/app/everyday-lilly/id6753817021" class="btn-primary">iPhone</a>
+                    <a href="roadmap.html" class="btn-primary">Пътна карта</a>
+                  </div>
+                </div>
+
+                <div class="app-card" data-app="dandelion">
+                  <img src="images/icons/everyday_dandelion.png" alt="Всеки ден Глухарче" class="app-icon" />
+                  <h3>Всеки ден Глухарче</h3>
+                  <div class="app-buttons">
+                    <button class="btn-secondary" disabled>Android (Скоро)</button>
+                    <button class="btn-secondary" disabled>iPhone (Скоро)</button>
+                    <a href="everyday_dandelion/index.html" class="btn-primary">Разгледай</a>
+                  </div>
+                </div>
+
+                <div class="app-card" data-app="storage">
+                  <img src="images/icons/everyday_storage.png" alt="Всеки ден Съхранение" class="app-icon" />
+                  <h3>Всеки ден Съхранение</h3>
+                  <div class="app-buttons">
+                    <button class="btn-secondary" disabled>Android (Скоро)</button>
+                    <button class="btn-secondary" disabled>iPhone (Скоро)</button>
+                    <a href="everyday_storage/index.html" class="btn-primary">Разгледай</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="carousel-controls">
+                <button id="carousel-prev" aria-label="Предишно приложение">&#10094;</button>
+                <button id="carousel-next" aria-label="Следващо приложение">&#10095;</button>
+              </div>
             </div>
         </div>
     </header>
