@@ -10,61 +10,107 @@
     /* Base styles */
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to bottom right, #ecfccb, #d9f99d);
-      color: #1f2937;
+      background: radial-gradient(circle at top left, #e6f4d9, #f9f6ea);
+      color: #2f4f2f;
       margin: 0;
       text-align: center;
       overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     a {
-      color: #4ade80;
+      color: #7ed8c6;
       text-decoration: none;
+      transition: color 0.3s ease;
     }
     a:hover {
+      color: #4db6a1;
       text-decoration: underline;
     }
     h1, h2, h3 {
       font-family: 'Playfair Display', serif;
       margin: 0 0 1rem 0;
-      color: #166534;
+      color: #3a6b35;
+      line-height: 1.2;
     }
     p {
       font-size: 1.125rem;
       max-width: 600px;
       margin: 0 auto 1.5rem auto;
-      line-height: 1.5;
-      color: #14532d;
+      color: #3a6b35;
     }
     button {
       cursor: pointer;
       border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      padding: 0.75rem 2rem;
       font-weight: 600;
       font-size: 1rem;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
+      color: #1b3a1b;
+      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+    }
+    button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
+      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
     }
     button:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
     }
     .btn-primary {
-      background-color: #4ade80;
-      color: #14532d;
-      box-shadow: 0 4px 8px rgba(74, 222, 128, 0.4);
+      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
+      color: #1b3a1b;
+      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
     }
     .btn-primary:hover:not(:disabled) {
-      background-color: #22c55e;
-      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.6);
+      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
+      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
     }
     .btn-secondary {
       background-color: transparent;
-      color: #166534;
-      border: 2px solid #4ade80;
+      color: #3a6b35;
+      border: 2px solid #a7d8a7;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
     .btn-secondary:hover:not(:disabled) {
-      background-color: #d9f99d;
-      border-color: #22c55e;
+      background-color: #e6f4d9;
+      border-color: #7ed8c6;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 8px 2px rgba(126, 216, 198, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 14px 4px rgba(126, 216, 198, 0.5);
+      }
+    }
+    @keyframes floatSeed {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-120px) translateX(30px) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     /* Header */
@@ -72,24 +118,34 @@
       padding: 3rem 1rem 2rem;
       position: relative;
       z-index: 10;
+      max-width: 700px;
+      margin: 0 auto;
     }
     .app-icon {
-      width: 96px;
-      height: 96px;
+      width: 72px;
+      height: 72px;
       object-fit: contain;
-      border-radius: 16px;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+      border-radius: 20px;
       margin-bottom: 1rem;
+      animation: pulseGlow 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 6px rgba(126, 216, 198, 0.5));
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 100%;
+      display: block;
+      /* Fallback for visibility */
+      background-color: transparent;
     }
     h1 {
-      font-size: 3rem;
+      font-size: 2.75rem;
       margin-bottom: 0.5rem;
     }
     p.lead {
       font-size: 1.25rem;
       max-width: 600px;
       margin: 0 auto 2rem;
-      color: #166534;
+      color: #3a6b35;
+      font-weight: 500;
     }
     .btn-group {
       display: flex;
@@ -102,104 +158,147 @@
     /* Hero Section */
     .hero {
       position: relative;
-      padding: 6rem 1rem 4rem;
-      background: linear-gradient(270deg, #ecfccb, #d9f99d, #ecfccb);
-      background-size: 600% 600%;
-      animation: gradientShift 30s ease infinite;
-      color: #14532d;
+      padding: 6rem 1rem 5rem;
+      background: radial-gradient(circle at center, #d9f9d9 0%, #f9f9ea 80%);
+      color: #3a6b35;
       overflow: hidden;
+      max-width: 720px;
+      margin: 0 auto 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 24px rgba(58, 107, 53, 0.1);
+      animation: fadeInUp 1s ease forwards;
     }
     .hero h2 {
       font-size: 2.5rem;
       max-width: 700px;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.25rem;
       font-weight: 700;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-shadow: none;
     }
     .hero p {
       font-size: 1.25rem;
       max-width: 600px;
-      margin: 0 auto 2rem;
+      margin: 0 auto 0;
       font-weight: 500;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    @keyframes gradientShift {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
+    /* Floating dandelion seeds */
+    .seed {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #fff8dc 60%, transparent 70%);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 2px #f0e9c9);
+      opacity: 0.2;
+      animation-name: floatSeed;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-duration: 12s;
+      pointer-events: none;
+    }
+    .seed:nth-child(1) {
+      left: 15%;
+      bottom: 10%;
+      animation-delay: 0s;
+      width: 18px;
+      height: 18px;
+    }
+    .seed:nth-child(2) {
+      left: 40%;
+      bottom: 5%;
+      animation-delay: 4s;
+      width: 15px;
+      height: 15px;
+    }
+    .seed:nth-child(3) {
+      left: 70%;
+      bottom: 15%;
+      animation-delay: 2s;
+      width: 20px;
+      height: 20px;
+    }
+    .seed:nth-child(4) {
+      left: 85%;
+      bottom: 8%;
+      animation-delay: 6s;
+      width: 12px;
+      height: 12px;
+    }
+    .seed:nth-child(5) {
+      left: 30%;
+      bottom: 12%;
+      animation-delay: 8s;
+      width: 14px;
+      height: 14px;
     }
 
     /* Features Section */
     .features {
       padding: 4rem 1rem 3rem;
-      background: #f7fee7;
+      background: #f9f9ea;
       display: flex;
       justify-content: center;
       gap: 2rem;
       flex-wrap: wrap;
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 960px;
+      margin: 0 auto 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 18px rgba(58, 107, 53, 0.05);
     }
     .feature-card {
       background: white;
-      border-radius: 1rem;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-      padding: 2rem 1.5rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 6px 14px rgba(58, 107, 53, 0.1);
+      padding: 2.5rem 2rem;
       max-width: 320px;
       flex: 1 1 280px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+      animation-fill-mode: forwards;
+      animation-delay: 0.3s;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+    .feature-card:nth-child(3) {
+      animation-delay: 0.7s;
     }
     .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(58, 107, 53, 0.15);
     }
     .feature-icon {
-      width: 72px;
-      height: 72px;
+      font-size: 2.5rem;
       margin-bottom: 1rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      filter: drop-shadow(0 1px 2px rgba(58, 107, 53, 0.1));
     }
     .feature-card h3 {
       font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      color: #166534;
+      margin-bottom: 0.75rem;
+      color: #3a6b35;
     }
     .feature-card p {
       font-size: 1rem;
-      color: #4d7c0f;
+      color: #6b8e4a;
       margin-bottom: 0;
-    }
-
-    /* Preview Section */
-    .preview {
-      padding: 4rem 1rem 3rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .preview img {
-      max-width: 100%;
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease;
-    }
-    .preview img:hover {
-      transform: scale(1.03);
     }
 
     /* About Section */
     .about {
-      background: #d9f99d;
+      background: #e6f4d9;
       padding: 4rem 1rem 3rem;
-      color: #14532d;
-      max-width: 800px;
-      margin: 0 auto;
-      border-radius: 1rem;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+      color: #3a6b35;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 12px rgba(58, 107, 53, 0.05);
+      font-weight: 500;
     }
     .about h2 {
       margin-bottom: 1rem;
@@ -216,12 +315,13 @@
     .download {
       padding: 4rem 1rem 4rem;
       max-width: 700px;
-      margin: 0 auto;
+      margin: 0 auto 4rem;
     }
     .download h2 {
       font-size: 2rem;
       margin-bottom: 1.5rem;
-      color: #166534;
+      color: #3a6b35;
+      font-weight: 700;
     }
     .download .btn-group {
       justify-content: center;
@@ -232,30 +332,35 @@
       min-width: 180px;
       text-align: center;
       text-decoration: none;
-      color: #14532d;
-      background-color: #4ade80;
-      border-radius: 0.5rem;
+      color: #1b3a1b;
+      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
+      border-radius: 0.75rem;
       padding: 0.75rem 1.5rem;
       font-weight: 600;
-      box-shadow: 0 4px 8px rgba(74, 222, 128, 0.4);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
+      transition: background 0.4s ease, box-shadow 0.4s ease;
     }
     .download a.btn-primary:hover {
-      background-color: #22c55e;
-      box-shadow: 0 6px 12px rgba(34, 197, 94, 0.6);
+      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
+      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
     }
 
     /* Footer */
     footer {
       margin-top: 4rem;
       padding: 2rem 1rem;
-      background: #1f2937;
-      color: white;
+      background: #2f4f2f;
+      color: #d9f9d9;
       font-size: 0.9rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.75rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 1rem;
+      box-shadow: 0 6px 12px rgba(58, 107, 53, 0.2);
     }
     footer .footer-links {
       display: flex;
@@ -264,18 +369,19 @@
       justify-content: center;
     }
     footer .footer-links a {
-      color: #a3e635;
+      color: #a7d8a7;
       font-weight: 600;
+      transition: color 0.3s ease;
     }
     footer .footer-links a:hover {
-      color: #84cc16;
+      color: #7ed8c6;
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon" />
+    <img src="/images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon" />
     <h1>Everyday Dandelion</h1>
     <p class="lead">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</p>
   </header>
@@ -283,21 +389,26 @@
   <section class="hero" aria-label="Hero section with tagline">
     <h2>Capture Your Life, One Moment at a Time</h2>
     <p>Mindful video journaling designed to help you remember the beauty in everyday moments.</p>
+    <div class="seed"></div>
+    <div class="seed"></div>
+    <div class="seed"></div>
+    <div class="seed"></div>
+    <div class="seed"></div>
   </section>
 
   <section class="features" aria-label="Features of Everyday Dandelion">
-    <article class="feature-card" tabindex="0" aria-labelledby="feature1-title" aria-describedby="feature1-desc">
-      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">📸</div>
+    <article class="feature-card" tabindex="0" aria-labelledby="feature1-title" aria-describedby="feature1-desc" style="animation-delay: 0.3s;">
+      <div class="feature-icon" aria-hidden="true">📸</div>
       <h3 id="feature1-title">Capture Moments</h3>
       <p id="feature1-desc">Quickly record 5-second videos to preserve your daily highlights effortlessly.</p>
     </article>
-    <article class="feature-card" tabindex="0" aria-labelledby="feature2-title" aria-describedby="feature2-desc">
-      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">⏱️</div>
+    <article class="feature-card" tabindex="0" aria-labelledby="feature2-title" aria-describedby="feature2-desc" style="animation-delay: 0.5s;">
+      <div class="feature-icon" aria-hidden="true">⏱️</div>
       <h3 id="feature2-title">Watch Timelapses</h3>
       <p id="feature2-desc">Watch your days and weeks unfold with beautiful timelapse compilations.</p>
     </article>
-    <article class="feature-card" tabindex="0" aria-labelledby="feature3-title" aria-describedby="feature3-desc">
-      <div class="feature-icon" aria-hidden="true" style="font-size:2.5rem; margin-bottom:1rem;">🌿</div>
+    <article class="feature-card" tabindex="0" aria-labelledby="feature3-title" aria-describedby="feature3-desc" style="animation-delay: 0.7s;">
+      <div class="feature-icon" aria-hidden="true">🌿</div>
       <h3 id="feature3-title">Stay Mindful</h3>
       <p id="feature3-desc">Encourage daily reflection and mindfulness through simple, creative journaling.</p>
     </article>
@@ -312,14 +423,14 @@
   <section class="download" aria-label="Download Everyday Dandelion app">
     <h2>Get the App</h2>
     <div class="btn-group">
-      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Google Play Store">Get it on Google Play</a>
-      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store">Get it on the App Store</a>
+      <a href="#" style="opacity: 0.6; pointer-events: none;" class="btn-primary" aria-label="Coming Soon on Google Play">Coming Soon on Google Play</a>
+      <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store">Get it on the App Store</a>
     </div>
   </section>
 
   <footer>
     <div class="footer-links" role="navigation" aria-label="Footer navigation">
-      <a href="../supportus.html" rel="noopener">Support Us</a>
+      <a href="https://www.everydaylilly.com/supportus.html" rel="noopener">Support Us</a>
       <a href="privacypolicy.html" rel="noopener">Privacy Policy</a>
       <a href="https://www.everydaylilly.com" target="_blank" rel="noopener">Everyday Lilly Website</a>
     </div>
