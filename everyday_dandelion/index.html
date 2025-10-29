@@ -18,6 +18,7 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      position: relative;
     }
     a {
       color: #7ed8c6;
@@ -153,6 +154,20 @@
       gap: 1rem;
       flex-wrap: wrap;
       margin-top: 1rem;
+    }
+
+    /* Language toggle button */
+    #lang-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.9rem;
+      color: #3a6b35;
+      background: transparent;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+      z-index: 20;
     }
 
     /* Hero Section */
@@ -377,18 +392,30 @@
       color: #7ed8c6;
       text-decoration: underline;
     }
+
+    /* Bilingual text styles */
+    .bg-text {
+      display: none;
+    }
+    .bg .en-text {
+      display: none;
+    }
+    .bg .bg-text {
+      display: inline;
+    }
   </style>
 </head>
 <body>
   <header>
+    <button id="lang-toggle" aria-label="Toggle language">Български</button>
     <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon" />
-    <h1>Everyday Dandelion</h1>
-    <p class="lead">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</p>
+    <h1><span class="en-text">Everyday Dandelion</span><span class="bg-text">Всеки ден Глухарче</span></h1>
+    <p class="lead"><span class="en-text">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</span><span class="bg-text">Лека апликация за улавяне на 5-секундни ежедневни моменти — бързо, осъзнато и красиво.</span></p>
   </header>
 
   <section class="hero" aria-label="Hero section with tagline">
-    <h2>Capture Your Life, One Moment at a Time</h2>
-    <p>Mindful video journaling designed to help you remember the beauty in everyday moments.</p>
+    <h2><span class="en-text">Capture Your Life, One Moment at a Time</span><span class="bg-text">Улови живота си, един момент наведнъж</span></h2>
+    <p><span class="en-text">Mindful video journaling designed to help you remember the beauty in everyday moments.</span><span class="bg-text">Осъзнат видео дневник, създаден да ти помогне да помниш красотата в ежедневните моменти.</span></p>
     <div class="seed"></div>
     <div class="seed"></div>
     <div class="seed"></div>
@@ -399,46 +426,58 @@
   <section class="features" aria-label="Features of Everyday Dandelion">
     <article class="feature-card" tabindex="0" aria-labelledby="feature1-title" aria-describedby="feature1-desc" style="animation-delay: 0.3s;">
       <div class="feature-icon" aria-hidden="true">📸</div>
-      <h3 id="feature1-title">Capture Moments</h3>
-      <p id="feature1-desc">Quickly record 5-second videos to preserve your daily highlights effortlessly.</p>
+      <h3 id="feature1-title"><span class="en-text">Capture Moments</span><span class="bg-text">Улавяй моменти</span></h3>
+      <p id="feature1-desc"><span class="en-text">Quickly record 5-second videos to preserve your daily highlights effortlessly.</span><span class="bg-text">Бързо записвай 5-секундни видеа, за да запазиш важните моменти от деня.</span></p>
     </article>
     <article class="feature-card" tabindex="0" aria-labelledby="feature2-title" aria-describedby="feature2-desc" style="animation-delay: 0.5s;">
       <div class="feature-icon" aria-hidden="true">⏱️</div>
-      <h3 id="feature2-title">Watch Timelapses</h3>
-      <p id="feature2-desc">Watch your days and weeks unfold with beautiful timelapse compilations.</p>
+      <h3 id="feature2-title"><span class="en-text">Watch Timelapses</span><span class="bg-text">Гледай таймлапси</span></h3>
+      <p id="feature2-desc"><span class="en-text">Watch your days and weeks unfold with beautiful timelapse compilations.</span><span class="bg-text">Наслаждавай се на дни и седмици, събрани в красиви таймлапс видеа.</span></p>
     </article>
     <article class="feature-card" tabindex="0" aria-labelledby="feature3-title" aria-describedby="feature3-desc" style="animation-delay: 0.7s;">
       <div class="feature-icon" aria-hidden="true">🌿</div>
-      <h3 id="feature3-title">Stay Mindful</h3>
-      <p id="feature3-desc">Encourage daily reflection and mindfulness through simple, creative journaling.</p>
+      <h3 id="feature3-title"><span class="en-text">Stay Mindful</span><span class="bg-text">Бъди осъзнат</span></h3>
+      <p id="feature3-desc"><span class="en-text">Encourage daily reflection and mindfulness through simple, creative journaling.</span><span class="bg-text">Насърчава ежедневна рефлексия и осъзнатост чрез прост и творчески дневник.</span></p>
     </article>
   </section>
 
 
   <section class="about" aria-label="About the Everyday series">
-    <h2>About the Everyday Series</h2>
-    <p>Everyday Dandelion is part of the Everyday family of apps, including Everyday Lilly and Filetrap. Each app is designed to inspire creativity, mindfulness, and simplicity in your daily digital life. Capture, organize, and cherish your moments with ease and beauty.</p>
+    <h2><span class="en-text">About the Everyday Series</span><span class="bg-text">За серията Everyday</span></h2>
+    <p><span class="en-text">Everyday Dandelion is part of the Everyday family of apps, including Everyday Lilly and Filetrap. Each app is designed to inspire creativity, mindfulness, and simplicity in your daily digital life. Capture, organize, and cherish your moments with ease and beauty.</span><span class="bg-text">Everyday Dandelion е част от семейството приложения Everyday, включително Everyday Lilly и Filetrap. Всяко приложение е създадено да вдъхновява креативност, осъзнатост и простота в ежедневния ти дигитален живот. Заснемай, организирай и съхранявай моментите си лесно и красиво.</span></p>
   </section>
 
   <section class="download" aria-label="Download Everyday Dandelion app">
-    <h2>Get the App</h2>
+    <h2><span class="en-text">Get the App</span><span class="bg-text">Изтегли приложението</span></h2>
     <div class="btn-group">
-      <a href="#" style="opacity: 0.6; pointer-events: none;" class="btn-primary" aria-label="Coming Soon on Google Play">Coming Soon on Google Play</a>
-      <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store">Get it on the App Store</a>
+      <a href="#" style="opacity: 0.6; pointer-events: none;" class="btn-primary" aria-label="Coming Soon on Google Play"><span class="en-text">Coming Soon on Google Play</span><span class="bg-text">Очаквайте скоро в Google Play</span></a>
+      <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store"><span class="en-text">Get it on the App Store</span><span class="bg-text">Изтегли от App Store</span></a>
     </div>
   </section>
 
   <footer>
     <div class="footer-links" role="navigation" aria-label="Footer navigation">
-      <a href="https://www.everydaylilly.com/supportus.html" rel="noopener">Support Us</a>
-      <a href="privacypolicy.html" rel="noopener">Privacy Policy</a>
-      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener">Everyday Lilly Website</a>
+      <a href="https://www.everydaylilly.com/supportus.html" rel="noopener"><span class="en-text">Support Us</span><span class="bg-text">Подкрепи ни</span></a>
+      <a href="privacypolicy.html" rel="noopener"><span class="en-text">Privacy Policy</span><span class="bg-text">Политика за поверителност</span></a>
+      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener"><span class="en-text">Everyday Lilly Website</span><span class="bg-text">Уебсайт на Everyday Lilly</span></a>
     </div>
-    <p>&copy; <span id="year"></span> Everyday Dandelion. All rights reserved.</p>
+    <p>&copy; <span id="year"></span> <span class="en-text">Everyday Dandelion. All rights reserved.</span><span class="bg-text">Всеки ден Глухарче. Всички права запазени.</span></p>
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const langToggle = document.getElementById('lang-toggle');
+    langToggle.addEventListener('click', () => {
+      document.body.classList.toggle('bg');
+      if(document.body.classList.contains('bg')){
+        langToggle.textContent = 'English';
+        langToggle.setAttribute('aria-label', 'Switch to English');
+      } else {
+        langToggle.textContent = 'Български';
+        langToggle.setAttribute('aria-label', 'Превключи на български');
+      }
+    });
   </script>
 </body>
 </html>
