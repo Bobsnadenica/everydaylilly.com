@@ -4,15 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Everyday Filetrap - Simple Visual Storage for Everyday Life</title>
-  <link rel="stylesheet" href="../style.css">
-  <script src="../script.js" defer></script>
+  <link rel="stylesheet" href="style.css">
   <style>
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      display: block;
+      pointer-events: none;
+    }
+
+    body > *:not(canvas) {
+      position: relative;
+      z-index: 10;
+    }
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(to bottom right, #dbeafe, #bfdbfe);
-      color: #1f2937;
+      font-family: "Questrial", sans-serif;
+      background-color: #fff9ed;
       margin: 0;
-      text-align: center;
+      display: block;
+      overflow: hidden;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
     }
     header {
       padding: 4rem 1rem 2rem;
@@ -63,7 +81,7 @@
       <p>Because memories fade, but photos don’t. Everyday Filetrap helps you visually organize the things that matter — from ID cards and tools to storage boxes and tire dates — all in one private place on your phone.</p>
     </section>
 
-    <section style="padding: 4rem 1rem; background: white; margin-top: 3rem;">
+    <section style="padding: 4rem 1rem; background: transparent; margin-top: 3rem;">
       <h2 class="font-display text-3xl mb-4">Key Features</h2>
       <div style="max-width: 800px; margin: 0 auto; text-align: left; font-size: 1.1rem; line-height: 1.75;">
         <ul style="list-style-type: disc; padding-left: 2rem;">
@@ -95,7 +113,7 @@
       </div>
     </section>
 
-    <section style="padding: 4rem 1rem; background: white; margin-top: 3rem;">
+    <section style="padding: 4rem 1rem; background: transparent; margin-top: 3rem;">
       <h2 class="font-display text-3xl mb-4">Coming Soon</h2>
       <p style="max-width: 700px; margin: 0 auto 2rem; font-size: 1.1rem;">We’re building new tools for smarter organization — including AI-powered categorization, automatic tagging, and seamless cloud backup. Everyday Filetrap will always stay private-first.</p>
     </section>
@@ -114,5 +132,6 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+  <script src="style.js"></script>
 </body>
 </html>
