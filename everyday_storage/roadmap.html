@@ -1,0 +1,99 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyday Filetrap - Roadmap</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(120deg, #0d0d0d, #1c1c1c, #0d0d0d);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #00d084;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+    h2 {
+      margin-top: 2rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+      font-size: 1.4rem;
+      color: #ddd;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 0.6rem 0;
+      padding: 0.9rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeIn 0.6s ease;
+    }
+    li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .bug {
+      background: #3a0c0c;
+      border-left: 4px solid #ff4d4d;
+    }
+    .in-progress {
+      background: #3a3000;
+      border-left: 4px solid #ffd700;
+    }
+    .coming {
+      background: #2f2f2f;
+      border-left: 4px solid #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Everyday Filetrap - Roadmap</h1>
+
+    <h2>Bugs</h2>
+    <ul>
+      <li class="bug">Thumbnails on last searched doesn't show up</li>
+      <li class="bug">Import doesn't really work — it tries to auto import</li>
+      <li class="bug">Search by folder names as well, not just tags</li>
+      <li class="bug">Ability to edit tags</li>
+      <li class="in-progress">Price graph breaks sometimes</li>
+    </ul>
+
+    <h2>Roadmap</h2>
+    <ul>
+      <li class="coming">AI search</li>
+      <li class="coming">Scan your receipt and auto fill</li>
+      <li class="coming">Better UI for spending tracker</li>
+      <li class="coming">Ability to share data and have a centralised website</li>
+    </ul>
+  </div>
+</body>
+</html>
