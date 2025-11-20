@@ -386,3 +386,28 @@ body.loaded {
     display: none;
   }
 }
+
+@media (max-width: 640px) {
+  .app-carousel {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    transform: none !important;
+    height: auto !important;
+  }
+
+  .app-card {
+    position: relative !important;
+    min-width: 75% !important;
+    opacity: 1 !important;
+    transform: none !important;
+    scroll-snap-align: center !important;
+    margin: 0 auto !important;
+  }
+
+  .carousel-controls {
+    display: none !important;
+  }
+}
