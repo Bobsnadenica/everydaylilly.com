@@ -61,7 +61,7 @@
           <li class="line-through text-green-400">[x] Missing feature in Import ZIP to import a full backup, not just per-calendar backup — full backup must include notes and custom calendars as well</li>
           <li class="line-through text-green-400">[x] Photos can't be deleted now when opened full screen from calendar - delete button missing</li>
           <li class="line-through text-green-400">[x] When you import, even if you don't have the calendar created it still imports the pictures but they're not being shown in gallery, they just sit in internal storage taking space</li>
-          <li class="text-yellow-400">[~] Timelapse not working correctly</li>
+          <li class="line-through text-green-400">[x] Timelapse not working correctly</li>
         </ul>
       </div>
 
@@ -146,7 +146,8 @@
 
     <footer class="mt-12 pt-6 border-t border-zinc-800 text-sm text-zinc-400">
       <p>Last updated: <span id="updated"></span></p>
-      <p class="mt-1">Have feedback? <a class="text-emerald-400 hover:underline" href="mailto:Lilly@everydaylilly.com">Lilly@everydaylilly.com</a></p>
+      <p id="feedback-en" class="mt-1">Have feedback? <a class="text-emerald-400 hover:underline" href="mailto:Lilly@everydaylilly.com">Lilly@everydaylilly.com</a></p>
+      <p id="feedback-bg" class="mt-1 hidden">Имате обратна връзка? <a class="text-emerald-400 hover:underline" href="mailto:Lilly@everydaylilly.com">Lilly@everydaylilly.com</a></p>
     </footer>
   </main>
 
@@ -171,6 +172,8 @@
       titleBg.classList.toggle('hidden', isEN);
       subtitleEn.classList.toggle('hidden', !isEN);
       subtitleBg.classList.toggle('hidden', isEN);
+      document.getElementById('feedback-en').classList.toggle('hidden', !isEN);
+      document.getElementById('feedback-bg').classList.toggle('hidden', isEN);
       localStorage.setItem('everydaylilly_lang', lang);
     }
 
