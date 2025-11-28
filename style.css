@@ -7,6 +7,11 @@ body {
     margin: 0;
 }
 
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 body.loaded {
     opacity: 1;
     transform: translateY(0);
@@ -288,6 +293,8 @@ body.loaded {
   align-items: center;
   justify-content: center;
   margin-top: 3rem;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .app-carousel {
@@ -298,6 +305,8 @@ body.loaded {
   max-width: 500px;
   height: 400px;
   position: relative;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .app-card {
@@ -313,6 +322,7 @@ body.loaded {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 100%;
 }
 
 .app-card.active {
