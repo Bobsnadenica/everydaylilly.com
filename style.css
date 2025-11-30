@@ -83,6 +83,26 @@ body.loaded {
     transform: none;
 }
 
+/* --- FIX: Remove green halo around rounded buttons on Firefox (Desktop) --- */
+.btn-primary {
+    isolation: isolate;        /* prevents shadow bleeding */
+    box-shadow: 0 3px 8px rgba(5, 150, 105, 0.22); /* softer default shadow */
+}
+
+/* Strong shadows only on hover (PC only) */
+@media (min-width: 768px) {
+    .btn-primary:hover {
+        box-shadow: 0 8px 18px rgba(5, 150, 105, 0.35);
+    }
+}
+
+/* On mobile keep softer shadows */
+@media (max-width: 767px) {
+    .btn-primary {
+        box-shadow: 0 4px 10px rgba(5, 150, 105, 0.30);
+    }
+}
+
 .btn-secondary {
     background-color: #ffffff;
     color: #4b5563; /* gray-600 */
