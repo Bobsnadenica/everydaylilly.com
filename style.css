@@ -23,6 +23,17 @@ body.loaded {
 
 /* --- Navigation & Header --- */
 
+/* --- Hero Section Mobile Fix --- */
+.hero-section {
+    padding-top: env(safe-area-inset-top, 2rem);
+    padding-bottom: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 /* STICKY NAVIGATION */
 .sticky-nav {
     position: sticky;
