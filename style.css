@@ -52,7 +52,6 @@ body.loaded {
     font-weight: bold;
     padding: 0.75rem 2rem;
     border-radius: 9999px; /* full rounded-full */
-    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     border: none;
@@ -60,6 +59,16 @@ body.loaded {
     align-items: center;
     justify-content: center;
     text-align: center;
+    position: relative;
+}
+
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: -1;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18); /* Apple-style subtle shadow */
 }
 
 .btn-primary:hover,
@@ -67,7 +76,10 @@ body.loaded {
     background-color: #047857; /* emerald-700 */
     outline: none;
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(5, 150, 105, 0.5);
+}
+
+.btn-primary:hover::before {
+    box-shadow: 0 10px 22px rgba(0,0,0,0.22);
 }
 
 .btn-primary:focus-visible {
@@ -92,11 +104,10 @@ body.loaded {
 /* Strong shadows only on hover (PC only) */
 @media (min-width: 768px) {
     .btn-primary:hover {
-        box-shadow: 0 8px 18px rgba(5, 150, 105, 0.35);
     }
 }
 
-/* On mobile keep softer shadows */
+ /* On mobile keep softer shadows */
 @media (max-width: 767px) {
     .btn-primary {
         box-shadow: 0 4px 10px rgba(5, 150, 105, 0.30);
@@ -315,6 +326,7 @@ body.loaded {
   margin-top: 3rem;
   overflow-x: hidden;
   width: 100%;
+  overflow: hidden;
 }
 
 .app-carousel {
@@ -323,10 +335,10 @@ body.loaded {
   transition: transform 1s ease;
   width: 100%;
   max-width: 500px;
-  height: 400px;
+  height: 420px;
   position: relative;
   max-width: 100%;
-  overflow: hidden;
+  overflow: hidden !important;
 }
 
 .app-card {
@@ -343,6 +355,7 @@ body.loaded {
   flex-direction: column;
   align-items: center;
   max-width: 100%;
+  contain: layout paint;
 }
 
 .app-card.active {
@@ -439,5 +452,14 @@ body.loaded {
 
   .carousel-controls {
     display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-carousel {
+    scroll-padding-left: 50%;
+  }
+  .app-card {
+    scroll-snap-align: center !important;
   }
 }
