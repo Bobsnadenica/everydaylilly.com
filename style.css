@@ -71,6 +71,11 @@ body.loaded {
     max-width: 95%;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 1.5rem !important;
+  }
+  .hero-text {
+    max-width: 260px !important;
+    text-align: center !important;
   }
 }
 
