@@ -238,12 +238,14 @@ prevBtn?.addEventListener('click', () => {
 // Touch support
 let startX = 0;
 const carousel = document.querySelector('.app-carousel');
-carousel?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-carousel?.addEventListener('touchend', e => {
-  const endX = e.changedTouches[0].clientX;
-  if (endX - startX > 50) prevBtn?.click();
-  if (startX - endX > 50) nextBtn?.click();
-});
+if (window.innerWidth > 640) {
+    carousel?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    carousel?.addEventListener('touchend', e => {
+      const endX = e.changedTouches[0].clientX;
+      if (endX - startX > 50) prevBtn?.click();
+      if (startX - endX > 50) nextBtn?.click();
+    });
+}
 
 // Keyboard arrow support
 document.addEventListener('keydown', e => {

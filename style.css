@@ -474,56 +474,33 @@ body.loaded {
 
 @media (max-width: 640px) {
   .app-carousel {
-    height: auto;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-behavior: smooth !important;
+    gap: 1.25rem !important;
+    padding: 1rem 1.5rem !important;
+    -webkit-overflow-scrolling: touch !important;
   }
-  .app-card {
-    position: relative;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .carousel-controls {
+  .app-carousel::-webkit-scrollbar {
     display: none;
   }
-}
-
-@media (max-width: 640px) {
-  .app-carousel {
-    display: flex !important;
-    overflow-x: auto !important;
-    scroll-snap-type: x mandatory !important;
-    gap: 1rem !important;
-    padding: 1rem 2.5rem 1rem 1rem !important;
-    transform: none !important;
-    height: auto !important;
-  }
-
   .app-card {
     position: relative !important;
-    min-width: 70% !important;
     opacity: 1 !important;
     transform: none !important;
+    min-width: 80% !important;
+    max-width: 80% !important;
     scroll-snap-align: center !important;
     margin: 0 auto !important;
   }
-
-  .carousel-controls {
-    display: none !important;
-  }
 }
 
-@media (max-width: 640px) {
-  .app-carousel {
-    scroll-padding-left: 50%;
-  }
-  .app-card {
-    scroll-snap-align: center !important;
-  }
-}
-
-/* Extra scroll room so last app-card is fully visible on mobile */
 @media (max-width: 640px) {
   .app-carousel::after {
     content: "";
-    flex: 0 0 2rem;
+    flex: 0 0 1rem;
   }
 }
