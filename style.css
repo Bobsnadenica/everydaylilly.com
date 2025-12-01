@@ -488,7 +488,7 @@ body.loaded {
     scroll-behavior: smooth !important;
     gap: 1.25rem !important;
     padding: 1rem 1.5rem !important;
-    padding-left: 2rem !important;
+    padding-right: 2rem !important;
     -webkit-overflow-scrolling: touch !important;
   }
   .app-carousel::-webkit-scrollbar {
