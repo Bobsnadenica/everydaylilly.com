@@ -51,6 +51,14 @@ body.loaded {
     font-size: 1.15rem;
     max-width: 100%;
   }
+  .hero-text {
+      max-width: 85% !important;
+      margin: 0 auto !important;
+      font-size: 1rem !important;
+      line-height: 1.35 !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+  }
   .hero-section h1, 
   .hero-section p {
     max-width: 95%;
@@ -486,7 +494,7 @@ body.loaded {
 
   .app-card {
     position: relative !important;
-    min-width: 75% !important;
+    min-width: 70% !important;
     opacity: 1 !important;
     transform: none !important;
     scroll-snap-align: center !important;
