@@ -420,6 +420,22 @@ document.addEventListener("DOMContentLoaded", () => {
 <\/script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // 🔥 Add 150 extra seeds dynamically for a fuller dandelion
+  const head = document.querySelector(".dandelion-bg .head");
+  for (let i = 0; i < 150; i++) {
+    const wrap = document.createElement("div");
+    wrap.className = "seed-wrapper outter";
+
+    const inner = document.createElement("div");
+    inner.className = "inner";
+
+    const seedEl = document.createElement("div");
+    seedEl.className = "seed";
+
+    inner.appendChild(seedEl);
+    wrap.appendChild(inner);
+    head.appendChild(wrap);
+  }
   const wrappers = document.querySelectorAll(".dandelion-bg .seed-wrapper.outter");
 
   wrappers.forEach((w, i) => {
@@ -436,12 +452,26 @@ document.addEventListener("DOMContentLoaded", () => {
     w.style.setProperty("--tx", tx);
     w.style.setProperty("--ty", ty);
 
+    // Random curve points for flying
+    w.style.setProperty("--rx1", (Math.random() * 30 - 15).toFixed(1) + "vw");
+    w.style.setProperty("--ry1", (Math.random() * -40 - 10).toFixed(1));
+
+    w.style.setProperty("--rx2", (Math.random() * 40 - 20).toFixed(1) + "vw");
+    w.style.setProperty("--ry2", (Math.random() * -80 - 20).toFixed(1));
+
+    w.style.setProperty("--rx3", (Math.random() * 60 - 30).toFixed(1) + "vw");
+    w.style.setProperty("--ry3", (Math.random() * -150 - 50).toFixed(1));
+
     // Randomize delays & durations slightly
     w.style.animationDelay = delay;
     w.style.animationDuration = (6 + Math.random() * 3).toFixed(2) + "s";
 
     const inner = w.querySelector(".inner");
     const seed = w.querySelector(".seed");
+
+    // Give each seed a fully random starting rotation (ignores CSS nth-child fixed rotation)
+    const randomRotation = (Math.random() * 360).toFixed(1) + "deg";
+    seed.style.transform = "rotate(" + randomRotation + ")";
 
     inner.style.animationDelay = delay;
     seed.style.animationDelay = delay;
@@ -497,6 +527,53 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
         <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
