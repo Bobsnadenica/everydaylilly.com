@@ -108,6 +108,18 @@
 </head>
 <body>
   <div class="container" role="main">
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  for (let i = 0; i < 12; i++) {
+    const seed = document.createElement("div");
+    seed.className = "floating-seed";
+    seed.style.left = Math.random() * 100 + "vw";
+    seed.style.animationDuration = 8 + Math.random() * 6 + "s";
+    seed.style.animationDelay = Math.random() * 4 + "s";
+    document.body.appendChild(seed);
+  }
+});
+</script>
     <h1>Everyday Dandelion – Roadmap</h1>
     <section aria-labelledby="roadmap-title">
       <h2 id="roadmap-title">Roadmap</h2>
@@ -117,21 +129,24 @@
         <span>🔴 Bugs</span>
         <span>🩶 Coming Soon</span>
       </div>
-      <ul class="planned">
-        <li>Notifications</li>
-        <li>More and better videos/backgrounds</li>
-        <li>Timelapse</li>
+      <ul class="completed">
         <li>Achievements</li>
-      </ul>
-      <ul class="roadmap">
         <li>Export to gallery</li>
         <li>Download videos</li>
+        <li>Need to optimize screen size on all phone models</li>
+      </ul>
+      <ul class="planned">
+        <li>More and better videos/backgrounds</li>
+      </ul>
+      <ul class="roadmap">
+        <li>Notifications</li>
+        <li>Timelapse</li>
       </ul>
     </section>
     <section aria-labelledby="bugs-title" class="bugs">
       <h2 id="bugs-title">Bugs</h2>
       <ul>
-        <li>Need to optimize screen size on all phone models</li>
+        <li>None for now, it's a simple app</li>
       </ul>
     </section>
   </div>

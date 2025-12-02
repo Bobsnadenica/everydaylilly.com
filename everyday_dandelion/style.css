@@ -1,4 +1,28 @@
 
+/* --- Floating background dandelion seeds --- */
+.floating-seed {
+  position: fixed;
+  top: -10vh;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 1 1'><g fill='none' stroke='%23ffffff' stroke-width='1'><path d='M 0.5 0 C 0.38 0.32 0.48 0.78 0.5 1' vector-effect='non-scaling-stroke'/></g></svg>");
+  background-size: cover;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: seed-float linear infinite;
+}
+
+@keyframes seed-float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(50vh) translateX(5vw) rotate(80deg);
+  }
+  100% {
+    transform: translateY(110vh) translateX(-5vw) rotate(160deg);
+  }
+}
 /* Dandelion background wrapper */
 .dandelion-bg {
   position: fixed;
