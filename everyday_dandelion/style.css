@@ -7,9 +7,10 @@
   height: 14px;
   background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 1 1'><g fill='none' stroke='%23ffffff' stroke-width='1'><path d='M 0.5 0 C 0.38 0.32 0.48 0.78 0.5 1' vector-effect='non-scaling-stroke'/></g></svg>");
   background-size: cover;
-  opacity: 0.9;
+  opacity: 0.4;
   pointer-events: none;
   animation: seed-float linear infinite;
+  mix-blend-mode: screen;
 }
 
 @keyframes seed-float {
@@ -61,8 +62,8 @@ body > *:not(.dandelion-bg) {
   transform: translate(-50%, -50%) rotate(15deg);
 }
 .dandelion-bg .seed-wrapper.outter {
-  width: 20vh;
-  max-width: 20vw;
+  width: 28vh;
+  max-width: 28vw;
   aspect-ratio: 1/1;
   position: absolute;
   left: 50%;
@@ -77,24 +78,24 @@ body > *:not(.dandelion-bg) {
   transform: rotateY(180deg);
 }
 .dandelion-bg .seed-wrapper.outter:nth-child(2n-1) {
+  width: 24vh;
+  max-width: 24vw;
+}
+.dandelion-bg .seed-wrapper.outter:nth-child(3n-2) {
   width: 18vh;
   max-width: 18vw;
 }
-.dandelion-bg .seed-wrapper.outter:nth-child(3n-2) {
-  width: 12vh;
-  max-width: 12vw;
-}
 .dandelion-bg .seed-wrapper.outter:nth-child(5n-3) {
+  width: 20vh;
+  max-width: 20vw;
+}
+.dandelion-bg .seed-wrapper.outter:nth-child(8n-4) {
   width: 14vh;
   max-width: 14vw;
 }
-.dandelion-bg .seed-wrapper.outter:nth-child(8n-4) {
-  width: 8vh;
-  max-width: 8vw;
-}
 .dandelion-bg .seed-wrapper.outter:nth-child(9n-5) {
-  width: 9vh;
-  max-width: 9vw;
+  width: 15vh;
+  max-width: 15vw;
 }
 
 .dandelion-bg .seed-wrapper.inner {
@@ -116,8 +117,8 @@ body > *:not(.dandelion-bg) {
   content: "";
   position: absolute;
   bottom: 0;
-  width: 5px;
-  height: 3vh;
+  width: 7px;
+  height: 4.5vh;
   max-height: 3vw;
   left: 50%;
   transform: translateX(-50%) rotate(-3deg);
@@ -136,7 +137,7 @@ body > *:not(.dandelion-bg) {
   background-size: cover;
 }
 
-/* 40 seeds: distribute evenly in a circle */
+/* 60 seeds: distribute evenly in a circle */
 .dandelion-bg .seed-wrapper:nth-child(1) .seed { transform: rotate(9deg); }
 .dandelion-bg .seed-wrapper:nth-child(2) .seed { transform: rotate(18deg); }
 .dandelion-bg .seed-wrapper:nth-child(3) .seed { transform: rotate(27deg); }
@@ -177,6 +178,26 @@ body > *:not(.dandelion-bg) {
 .dandelion-bg .seed-wrapper:nth-child(38) .seed { transform: rotate(342deg); }
 .dandelion-bg .seed-wrapper:nth-child(39) .seed { transform: rotate(351deg); }
 .dandelion-bg .seed-wrapper:nth-child(40) .seed { transform: rotate(360deg); }
+.dandelion-bg .seed-wrapper:nth-child(41) .seed { transform: rotate(369deg); }
+.dandelion-bg .seed-wrapper:nth-child(42) .seed { transform: rotate(378deg); }
+.dandelion-bg .seed-wrapper:nth-child(43) .seed { transform: rotate(387deg); }
+.dandelion-bg .seed-wrapper:nth-child(44) .seed { transform: rotate(396deg); }
+.dandelion-bg .seed-wrapper:nth-child(45) .seed { transform: rotate(405deg); }
+.dandelion-bg .seed-wrapper:nth-child(46) .seed { transform: rotate(414deg); }
+.dandelion-bg .seed-wrapper:nth-child(47) .seed { transform: rotate(423deg); }
+.dandelion-bg .seed-wrapper:nth-child(48) .seed { transform: rotate(432deg); }
+.dandelion-bg .seed-wrapper:nth-child(49) .seed { transform: rotate(441deg); }
+.dandelion-bg .seed-wrapper:nth-child(50) .seed { transform: rotate(450deg); }
+.dandelion-bg .seed-wrapper:nth-child(51) .seed { transform: rotate(459deg); }
+.dandelion-bg .seed-wrapper:nth-child(52) .seed { transform: rotate(468deg); }
+.dandelion-bg .seed-wrapper:nth-child(53) .seed { transform: rotate(477deg); }
+.dandelion-bg .seed-wrapper:nth-child(54) .seed { transform: rotate(486deg); }
+.dandelion-bg .seed-wrapper:nth-child(55) .seed { transform: rotate(495deg); }
+.dandelion-bg .seed-wrapper:nth-child(56) .seed { transform: rotate(504deg); }
+.dandelion-bg .seed-wrapper:nth-child(57) .seed { transform: rotate(513deg); }
+.dandelion-bg .seed-wrapper:nth-child(58) .seed { transform: rotate(522deg); }
+.dandelion-bg .seed-wrapper:nth-child(59) .seed { transform: rotate(531deg); }
+.dandelion-bg .seed-wrapper:nth-child(60) .seed { transform: rotate(540deg); }
 
 /* Feather styles (12 feathers, 6 up, 6 down) */
 .dandelion-bg .feather {
@@ -486,9 +507,10 @@ body > *:not(.dandelion-bg) {
 
 @keyframes fly-away {
   from {
+    transform: translateX(0) translateY(0) scale(1);
   }
   to {
-    transform: translateX(calc(70vw)) scale(0);
+    transform: translateX(var(--tx, 50vw)) translateY(var(--ty, -150vh)) scale(0);
   }
 }
 @keyframes fly-up {
