@@ -513,8 +513,18 @@
       button.addEventListener("click", () => setLanguage(button.dataset.setlang));
     });
 
+    const params = new URLSearchParams(window.location.search);
+    const requestedLanguage = params.get("lang");
     const savedLanguage = localStorage.getItem("everydaylilly_lang");
-    setLanguage(savedLanguage === "bg" ? "bg" : "en");
+    const filetrapLanguage = localStorage.getItem("everyday_filetrap_lang");
+    const browserLanguage = navigator.language && navigator.language.toLowerCase().startsWith("bg") ? "bg" : "en";
+    const initialLanguage =
+      requestedLanguage === "bg" || requestedLanguage === "en" ? requestedLanguage :
+      savedLanguage === "bg" || savedLanguage === "en" ? savedLanguage :
+      filetrapLanguage === "bg" || filetrapLanguage === "en" ? filetrapLanguage :
+      browserLanguage;
+
+    setLanguage(initialLanguage);
 
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
