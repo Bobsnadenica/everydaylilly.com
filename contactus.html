@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Everyday Lilly for questions about our apps, privacy, support, or general feedback.">
+  <title>Contact Us - Everyday Lilly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f5ef;
+      --ink: #1f2937;
+      --muted: #5f6c7b;
+      --surface: rgba(255, 255, 255, 0.82);
+      --line: rgba(17, 24, 39, 0.1);
+      --emerald: #047857;
+      --emerald-soft: rgba(4, 120, 87, 0.1);
+      --gold: #d4a84e;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      --max-width: 1120px;
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 14%, rgba(4, 120, 87, 0.12), transparent 24%),
+        radial-gradient(circle at 88% 16%, rgba(212, 168, 78, 0.16), transparent 18%),
+        linear-gradient(180deg, #f8fbf7 0%, #f5f3ec 48%, #f2efe8 100%);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(17, 24, 39, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17, 24, 39, 0.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 76%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.15rem 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.95rem;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      box-shadow: 0 16px 30px rgba(4, 120, 87, 0.24);
+    }
+
+    .brand-copy span {
+      display: block;
+    }
+
+    .brand-name {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--emerald);
+    }
+
+    .brand-subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .mini-link,
+    .lang-toggle {
+      padding: 0.76rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(14px);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .mini-link:hover,
+    .lang-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(4, 120, 87, 0.28);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .lang-toggle {
+      cursor: pointer;
+      font-weight: 700;
+      min-width: 3.5rem;
+    }
+
+    .lang-toggle[data-active="true"] {
+      background: var(--emerald);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .hero {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 4rem 0 2rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(280px, 0.94fr);
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--emerald);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 3.4rem;
+      height: 1px;
+      background: rgba(4, 120, 87, 0.42);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, serif;
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 5.7rem);
+      max-width: 10ch;
+    }
+
+    .hero p {
+      margin: 1.2rem 0 0;
+      max-width: 38rem;
+      font-size: 1.08rem;
+      color: var(--muted);
+    }
+
+    .hero-card {
+      padding: 1.55rem;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72));
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card h2 {
+      font-size: 1.9rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .email-box {
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      border-radius: 1rem;
+      background: var(--emerald-soft);
+      border: 1px solid rgba(4, 120, 87, 0.14);
+    }
+
+    .email-box a {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--emerald);
+      word-break: break-word;
+    }
+
+    .actions {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--emerald);
+      color: #fff;
+      box-shadow: 0 16px 28px rgba(4, 120, 87, 0.18);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .sections {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding-bottom: 5rem;
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.2rem;
+    }
+
+    .panel {
+      padding: 1.45rem;
+      border-radius: 1.5rem;
+      background: var(--surface);
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    .panel h3 {
+      font-size: 1.45rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+    }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    .wide-panel {
+      padding: 1.6rem;
+      border-radius: 1.6rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74));
+      border: 1px solid rgba(17, 24, 39, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .wide-panel h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      max-width: 14ch;
+    }
+
+    .wide-panel p {
+      margin: 0.95rem 0 0;
+      max-width: 40rem;
+      color: var(--muted);
+    }
+
+    footer {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0 0 2.4rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    footer a {
+      color: var(--emerald);
+      text-decoration: underline;
+      text-underline-offset: 0.16rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-actions,
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .mini-link,
+      .lang-toggle,
+      .btn {
+        width: 100%;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">EL</span>
+        <span class="brand-copy">
+          <span class="brand-name">Everyday Lilly</span>
+          <span class="brand-subtitle" data-lang="en">Contact and support across the Everyday apps.</span>
+          <span class="brand-subtitle" data-lang="bg" data-display="block" style="display:none;">Контакт и поддръжка за приложенията Everyday.</span>
+        </span>
+      </a>
+      <div class="nav-actions">
+        <a class="mini-link" href="index.html">
+          <span data-lang="en">Home</span>
+          <span data-lang="bg" style="display:none;">Начало</span>
+        </a>
+        <a class="mini-link" href="supportus.html">
+          <span data-lang="en">Support</span>
+          <span data-lang="bg" style="display:none;">Подкрепа</span>
+        </a>
+        <a class="mini-link" href="privacypolicy.html">
+          <span data-lang="en">Privacy</span>
+          <span data-lang="bg" style="display:none;">Поверителност</span>
+        </a>
+        <button class="lang-toggle" type="button" data-setlang="en" data-active="true">EN</button>
+        <button class="lang-toggle" type="button" data-setlang="bg" data-active="false">BG</button>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <span class="eyebrow">
+          <span data-lang="en">Contact us</span>
+          <span data-lang="bg" style="display:none;">Свържете се с нас</span>
+        </span>
+        <h1 data-lang="en" data-display="block">For any questions, email us here.</h1>
+        <h1 data-lang="bg" data-display="block" style="display:none;">За всякакви въпроси ни пишете тук.</h1>
+        <p data-lang="en" data-display="block">
+          If you have questions about Everyday Lilly, Everyday Dandelion, Everyday Filetrap, privacy, support, or general feedback, use the contact address below.
+        </p>
+        <p data-lang="bg" data-display="block" style="display:none;">
+          Ако имате въпроси за Everyday Lilly, Everyday Dandelion, Everyday Filetrap, поверителност, поддръжка или обща обратна връзка, използвайте адреса по-долу.
+        </p>
+      </div>
+
+      <aside class="hero-card">
+        <h2 data-lang="en" data-display="block">Primary contact</h2>
+        <h2 data-lang="bg" data-display="block" style="display:none;">Основен контакт</h2>
+        <p data-lang="en" data-display="block">For any questions, please contact us at:</p>
+        <p data-lang="bg" data-display="block" style="display:none;">За всякакви въпроси, моля свържете се с нас на:</p>
+        <div class="email-box">
+          <a href="mailto:contactus@everydaylilly.com">contactus@everydaylilly.com</a>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="mailto:contactus@everydaylilly.com">
+            <span data-lang="en">Email us</span>
+            <span data-lang="bg" style="display:none;">Пишете ни</span>
+          </a>
+          <a class="btn btn-secondary" href="index.html">
+            <span data-lang="en">Back to home</span>
+            <span data-lang="bg" style="display:none;">Обратно към началото</span>
+          </a>
+        </div>
+      </aside>
+    </header>
+
+    <main class="sections">
+      <section class="panel-grid">
+        <article class="panel">
+          <h3 data-lang="en" data-display="block">Questions and help</h3>
+          <h3 data-lang="bg" data-display="block" style="display:none;">Въпроси и помощ</h3>
+          <p data-lang="en" data-display="block">Use the contact email for app questions, invite help, setup questions, bug reports, or general support.</p>
+          <p data-lang="bg" data-display="block" style="display:none;">Използвайте контактния имейл за въпроси за приложенията, помощ с покани, настройки, бъг репорти или обща поддръжка.</p>
+        </article>
+
+        <article class="panel">
+          <h3 data-lang="en" data-display="block">App family</h3>
+          <h3 data-lang="bg" data-display="block" style="display:none;">Семейство приложения</h3>
+          <ul>
+            <li data-lang="en">Everyday Lilly</li>
+            <li data-lang="bg" style="display:none;">Everyday Lilly</li>
+            <li data-lang="en">Everyday Dandelion</li>
+            <li data-lang="bg" style="display:none;">Everyday Dandelion</li>
+            <li data-lang="en">Everyday Filetrap</li>
+            <li data-lang="bg" style="display:none;">Everyday Filetrap</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h3 data-lang="en" data-display="block">Best way to write</h3>
+          <h3 data-lang="bg" data-display="block" style="display:none;">Най-добрият начин да ни пишете</h3>
+          <p data-lang="en" data-display="block">Tell us which app you are using and what you need help with so we can understand your message faster.</p>
+          <p data-lang="bg" data-display="block" style="display:none;">Кажете ни кое приложение използвате и за какво ви трябва помощ, за да разберем по-бързо съобщението ви.</p>
+        </article>
+      </section>
+
+      <section class="wide-panel">
+        <h2 data-lang="en" data-display="block">One contact path across the whole website.</h2>
+        <h2 data-lang="bg" data-display="block" style="display:none;">Един ясен контакт за целия сайт.</h2>
+        <p data-lang="en" data-display="block">
+          We now use <strong>contactus@everydaylilly.com</strong> as the public contact address across the Everyday Lilly website so visitors always know where to write.
+        </p>
+        <p data-lang="bg" data-display="block" style="display:none;">
+          Вече използваме <strong>contactus@everydaylilly.com</strong> като публичен адрес за контакт в целия сайт Everyday Lilly, така че посетителите винаги да знаят къде да пишат.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        &copy; <span id="year"></span> Everyday Lilly
+      </div>
+      <div>
+        <a href="mailto:contactus@everydaylilly.com">contactus@everydaylilly.com</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const translatedNodes = document.querySelectorAll("[data-lang]");
+    const langButtons = document.querySelectorAll("[data-setlang]");
+
+    function setLanguage(lang) {
+      translatedNodes.forEach((node) => {
+        const shouldShow = node.dataset.lang === lang;
+        node.style.display = shouldShow ? (node.dataset.display || "") : "none";
+      });
+
+      langButtons.forEach((button) => {
+        button.dataset.active = String(button.dataset.setlang === lang);
+      });
+
+      document.documentElement.lang = lang;
+      localStorage.setItem("everydaylilly_lang", lang);
+    }
+
+    langButtons.forEach((button) => {
+      button.addEventListener("click", () => setLanguage(button.dataset.setlang));
+    });
+
+    const savedLanguage = localStorage.getItem("everydaylilly_lang");
+    setLanguage(savedLanguage === "bg" ? "bg" : "en");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
