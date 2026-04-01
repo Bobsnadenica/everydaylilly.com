@@ -3,214 +3,1250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Everyday Filetrap — visual storage and spending tracker that helps you remember, organize, and understand your world through photos. Keep everything local, private, and secure.">
-  <title>Everyday Filetrap - Smart Visual Storage & Spending Tracker</title>
+  <meta name="description" content="Everyday Filetrap is a local-first visual storage and spending tracker for boxes, receipts, shelves, and everyday items.">
+  <title>Everyday Filetrap | Local-First Visual Storage</title>
   <link rel="icon" type="image/png" href="../images/icons/everyday_storage.png">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600..800&family=Questrial&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; scroll-behavior: smooth; }
+    :root {
+      --bg: #f5ecde;
+      --bg-deep: #e8dcc8;
+      --surface: rgba(255, 251, 245, 0.7);
+      --surface-strong: rgba(255, 248, 239, 0.9);
+      --ink: #1e1711;
+      --muted: #65564a;
+      --line: rgba(30, 23, 17, 0.12);
+      --moss: #4a6c3f;
+      --moss-deep: #2c4a24;
+      --rust: #9d5130;
+      --amber: #d6a766;
+      --sky: #6e9db3;
+      --paper: #fdf8f1;
+      --shadow: 0 32px 80px rgba(77, 49, 24, 0.17);
+      --radius: 28px;
+      --max-width: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: "Questrial", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background-color: #fff9ed;
-      color: #1f2937;
       margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(110, 157, 179, 0.16), transparent 32%),
+        radial-gradient(circle at 80% 20%, rgba(214, 167, 102, 0.18), transparent 28%),
+        linear-gradient(180deg, #f7efe3 0%, #f4ead9 48%, #efe2ce 100%);
       overflow-x: hidden;
       line-height: 1.6;
     }
-    header {
-      text-align: center;
-      padding: 5rem 0 2rem;
-      background: linear-gradient(160deg, #fff8e7, #eef3ff);
-      position: relative;
-    }
-    h1 {
-      font-family: "Playfair Display", serif;
-      font-weight: 700;
-      font-size: clamp(2.3rem, 4vw, 3.2rem);
-      color: #0f172a;
-    }
-    .tagline { font-size: 1.1rem; color: #555; margin-top: 0.5rem; }
-    .lead {
-      font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-      max-width: 720px;
-      margin: 1rem auto 1.5rem;
-      color: #374151;
-    }
-    .btn-group { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
-    .btn {
-      border: 1px solid #11182722;
-      background: #ffffffcc;
-      backdrop-filter: blur(6px);
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: not-allowed;
-      color: #111827;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
 
-    section { padding: 3.25rem 0; opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
-    section.visible { opacity: 1; transform: translateY(0); }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(30, 23, 17, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 23, 17, 0.03) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 70%);
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 4rem;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.58), transparent 26%),
+        radial-gradient(circle at 82% 32%, rgba(110, 157, 179, 0.22), transparent 25%),
+        linear-gradient(160deg, rgba(74, 108, 63, 0.08), transparent 35%);
+      z-index: -2;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(245, 236, 222, 0.16) 0%, rgba(245, 236, 222, 0) 28%, rgba(31, 21, 14, 0.06) 100%);
+      z-index: -1;
+    }
+
+    .nav {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.15rem 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      min-width: 0;
+    }
+
+    .brand-link img {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(77, 49, 24, 0.16);
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-name {
+      display: block;
+      font-size: 0.97rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--moss-deep);
+    }
+
+    .brand-subtitle {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .mini-link,
+    .lang-toggle {
+      border: 1px solid rgba(30, 23, 17, 0.1);
+      background: rgba(255, 252, 247, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 999px;
+      padding: 0.72rem 1rem;
+      color: var(--ink);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .mini-link:hover,
+    .lang-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(74, 108, 63, 0.35);
+      background: rgba(255, 252, 247, 0.92);
+    }
+
+    .lang-toggle {
+      cursor: pointer;
+      font-weight: 700;
+      min-width: 3.5rem;
+    }
+
+    .lang-toggle[data-active="true"] {
+      background: var(--moss-deep);
+      color: #f7efe3;
+      border-color: transparent;
+    }
+
+    .hero-grid {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 4.2rem 0 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero-copy {
+      max-width: 38rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--moss-deep);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 3.5rem;
+      height: 1px;
+      background: rgba(44, 74, 36, 0.4);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(3.4rem, 9vw, 6.6rem);
+      max-width: 10.5ch;
+    }
+
+    .hero-lead {
+      margin: 1.4rem 0 0;
+      font-size: clamp(1.05rem, 2vw, 1.24rem);
+      max-width: 34rem;
+      color: var(--muted);
+    }
+
+    .hero-cta {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .btn,
+    .store-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      padding: 0.95rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover,
+    .store-pill:hover:not([disabled]) {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--moss-deep);
+      color: #f7efe3;
+      box-shadow: 0 18px 32px rgba(44, 74, 36, 0.18);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 251, 245, 0.58);
+      color: var(--ink);
+      border-color: rgba(30, 23, 17, 0.12);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(157, 81, 48, 0.28);
+      box-shadow: 0 18px 28px rgba(77, 49, 24, 0.08);
+    }
+
+    .store-pill {
+      background: rgba(255, 247, 236, 0.74);
+      border-color: rgba(30, 23, 17, 0.08);
+      color: rgba(30, 23, 17, 0.66);
+      cursor: not-allowed;
+    }
+
+    .hero-facts {
+      list-style: none;
+      padding: 0;
+      margin: 1.9rem 0 0;
+      display: grid;
+      gap: 0.75rem;
+      max-width: 35rem;
+    }
+
+    .hero-facts li {
+      display: grid;
+      grid-template-columns: 1.1rem 1fr;
+      gap: 0.9rem;
+      align-items: start;
+      color: var(--ink);
+    }
+
+    .hero-facts li::before {
+      content: "";
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 50%;
+      margin-top: 0.38rem;
+      background: linear-gradient(135deg, var(--rust), var(--amber));
+      box-shadow: 0 0 0 7px rgba(157, 81, 48, 0.08);
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 34rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .poster {
+      position: relative;
+      width: min(100%, 32rem);
+      aspect-ratio: 4 / 5;
+      border-radius: 2rem;
+      overflow: hidden;
+      border: 1px solid rgba(30, 23, 17, 0.08);
+      background:
+        radial-gradient(circle at top right, rgba(110, 157, 179, 0.4), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(214, 167, 102, 0.25), transparent 28%),
+        linear-gradient(180deg, rgba(255, 248, 239, 0.95), rgba(236, 223, 202, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30, 23, 17, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 23, 17, 0.06) 1px, transparent 1px);
+      background-size: 64px 64px;
+      opacity: 0.5;
+    }
+
+    .poster::after {
+      content: "";
+      position: absolute;
+      inset: auto auto 10% -8%;
+      width: 72%;
+      height: 32%;
+      border-radius: 999px;
+      background: rgba(74, 108, 63, 0.14);
+      filter: blur(26px);
+    }
+
+    .poster-topline,
+    .poster-footer {
+      position: absolute;
+      left: 1.35rem;
+      right: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+      color: rgba(30, 23, 17, 0.72);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .poster-topline {
+      top: 1.25rem;
+    }
+
+    .poster-footer {
+      bottom: 1.35rem;
+      align-items: flex-end;
+    }
+
+    .poster-grid {
+      position: absolute;
+      inset: 4.2rem 1.35rem 4.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .icon-halo {
+      position: absolute;
+      width: 65%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 239, 0.18) 68%, transparent 78%);
+      filter: blur(1px);
+    }
+
+    .app-icon {
+      position: relative;
+      z-index: 2;
+      width: min(84%, 24rem);
+      filter: drop-shadow(0 26px 34px rgba(42, 27, 15, 0.18));
+    }
+
+    .floating-note {
+      position: absolute;
+      z-index: 3;
+      max-width: 11rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(30, 23, 17, 0.1);
+      background: rgba(255, 252, 247, 0.86);
+      box-shadow: 0 18px 34px rgba(77, 49, 24, 0.12);
+      backdrop-filter: blur(16px);
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .floating-note small {
+      display: block;
+      margin-top: 0.15rem;
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .note-storage {
+      top: 18%;
+      right: -3%;
+    }
+
+    .note-spend {
+      bottom: 20%;
+      left: -6%;
+    }
+
+    .note-private {
+      bottom: 8%;
+      right: 8%;
+    }
+
+    .section {
+      padding: 5.5rem 1rem;
+    }
+
+    .section-shell {
+      width: min(var(--max-width), 100%);
+      margin: 0 auto;
+    }
+
+    .section-header {
+      max-width: 40rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-kicker {
+      display: inline-flex;
+      margin-bottom: 1rem;
+      color: var(--rust);
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
 
     .section-title {
-      font-family: "Playfair Display", serif;
-      font-weight: 700;
-      font-size: clamp(1.6rem, 2.4vw, 2rem);
-      text-align: center;
-      color: #0f172a;
-      margin-bottom: 1rem;
+      font-size: clamp(2.3rem, 5vw, 4rem);
+      max-width: 12ch;
     }
+
     .section-intro {
-      text-align: center;
-      max-width: 760px;
-      margin: 0 auto 2rem;
-      color: #374151;
+      margin-top: 1rem;
+      max-width: 42rem;
+      color: var(--muted);
+      font-size: 1.06rem;
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    .support-item {
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .support-item h3 {
+      font-size: 1.55rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .support-item p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .workflow-section {
+      background:
+        linear-gradient(180deg, rgba(255, 250, 244, 0.45), rgba(255, 250, 244, 0.88)),
+        radial-gradient(circle at top right, rgba(110, 157, 179, 0.12), transparent 28%);
+    }
+
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .workflow-aside {
+      position: sticky;
+      top: 1.5rem;
+      padding: 1.75rem;
+      border-radius: var(--radius);
+      background: rgba(255, 251, 245, 0.72);
+      border: 1px solid rgba(30, 23, 17, 0.08);
+      box-shadow: 0 18px 42px rgba(77, 49, 24, 0.08);
+    }
+
+    .workflow-aside p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .workflow-aside strong {
+      display: block;
+      margin-bottom: 0.65rem;
+      font-size: 1.02rem;
+      color: var(--moss-deep);
+    }
+
+    .step-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.15rem;
+      padding: 1.15rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .step:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .step-number {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2rem;
+      color: var(--rust);
+      line-height: 1;
+    }
+
+    .step h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.4rem;
+    }
+
+    .proof-panel {
+      min-height: 100%;
+      padding: 1.6rem;
+      border-radius: 1.75rem;
+      background: var(--surface-strong);
+      border: 1px solid rgba(30, 23, 17, 0.08);
+      box-shadow: 0 22px 44px rgba(77, 49, 24, 0.08);
+    }
+
+    .proof-panel:nth-child(1) {
+      background:
+        linear-gradient(180deg, rgba(74, 108, 63, 0.08), rgba(255, 251, 245, 0.95));
+    }
+
+    .proof-panel:nth-child(2) {
+      background:
+        linear-gradient(180deg, rgba(214, 167, 102, 0.14), rgba(255, 251, 245, 0.95));
+    }
+
+    .proof-panel:nth-child(3) {
+      background:
+        linear-gradient(180deg, rgba(110, 157, 179, 0.12), rgba(255, 251, 245, 0.95));
+    }
+
+    .proof-label {
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--moss-deep);
+    }
+
+    .proof-panel h3 {
+      font-size: 1.6rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .proof-panel p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .proof-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      display: grid;
+      gap: 0.6rem;
+      color: var(--ink);
+    }
+
+    .proof-list li {
+      display: grid;
+      grid-template-columns: 0.85rem 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    .proof-list li::before {
+      content: "";
+      width: 0.52rem;
+      height: 0.52rem;
+      margin-top: 0.42rem;
+      border-radius: 50%;
+      background: var(--moss);
+    }
+
+    .cta-wrap {
+      padding-bottom: 6rem;
+    }
+
+    .cta-band {
+      position: relative;
+      overflow: hidden;
+      padding: 2.4rem;
+      border-radius: 2rem;
+      background:
+        radial-gradient(circle at top right, rgba(110, 157, 179, 0.24), transparent 24%),
+        linear-gradient(145deg, #1f1812, #2d2017 56%, #3b291c 100%);
+      color: #f8efe3;
+      box-shadow: 0 30px 70px rgba(33, 22, 14, 0.28);
+    }
+
+    .cta-band::before {
+      content: "";
+      position: absolute;
+      inset: auto -8% -36% auto;
+      width: 19rem;
+      height: 19rem;
+      border-radius: 50%;
+      background: rgba(214, 167, 102, 0.12);
+      filter: blur(10px);
+    }
+
+    .cta-band h2 {
+      max-width: 11ch;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+    }
+
+    .cta-band p {
+      max-width: 38rem;
+      margin: 1rem 0 0;
+      color: rgba(248, 239, 227, 0.8);
       font-size: 1.05rem;
     }
-    ul.feature-list {
-      list-style: disc;
-      padding-left: 1.25rem;
-      margin: 0 auto;
-      max-width: 760px;
-      color: #374151;
-    }
-    ul.feature-list li { margin: 0.4rem 0; }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.25rem;
-      max-width: 980px;
-      margin: 0 auto;
+    .cta-actions {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
     }
-    .card {
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(8px);
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 1.25rem;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    .cta-actions .btn-primary {
+      background: #f8efe3;
+      color: #1f1812;
     }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
-    .card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-    .card p { margin: 0; color: #4b5563; }
+
+    .cta-actions .btn-secondary {
+      background: rgba(248, 239, 227, 0.08);
+      color: #f8efe3;
+      border-color: rgba(248, 239, 227, 0.18);
+    }
 
     footer {
-      margin-top: 2.5rem;
-      padding: 2rem 0;
-      background: #111827;
-      color: #e5e7eb;
-      text-align: center;
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0 0 2.3rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
-    footer a { color: #e5e7eb; text-decoration: underline; }
 
-    .lang-btn {
-      font-size: 1.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin-left: 6px;
-      transition: transform 0.2s ease;
+    footer a {
+      color: var(--moss-deep);
+      text-decoration: underline;
+      text-decoration-color: rgba(44, 74, 36, 0.3);
+      text-underline-offset: 0.18rem;
     }
-    .lang-btn:hover { transform: scale(1.1); }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .workflow-grid,
+      .support-grid,
+      .proof-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-grid {
+        padding-top: 3rem;
+      }
+
+      .hero-visual {
+        min-height: 28rem;
+        order: -1;
+      }
+
+      .workflow-aside {
+        position: static;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body::before {
+        background-size: 56px 56px;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-grid {
+        gap: 2rem;
+      }
+
+      h1 {
+        max-width: 9ch;
+      }
+
+      .hero-cta,
+      .cta-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn,
+      .store-pill,
+      .mini-link,
+      .lang-toggle {
+        width: 100%;
+      }
+
+      .poster {
+        width: min(100%, 25rem);
+      }
+
+      .floating-note {
+        max-width: 9.4rem;
+        font-size: 0.82rem;
+      }
+
+      .note-storage {
+        top: 12%;
+        right: 0;
+      }
+
+      .note-spend {
+        left: 0;
+        bottom: 18%;
+      }
+
+      .note-private {
+        right: 4%;
+        bottom: 6%;
+      }
+
+      .section {
+        padding: 4.4rem 1rem;
+      }
+
+      .cta-band {
+        padding: 1.8rem;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .reveal,
+      .reveal.is-visible,
+      .btn,
+      .store-pill,
+      .mini-link,
+      .lang-toggle {
+        transition: none;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div style="position:absolute;top:20px;right:20px;">
-      <button class="lang-btn" data-setlang="en">🇬🇧</button>
-      <button class="lang-btn" data-setlang="bg">🇧🇬</button>
-    </div>
-    <img src="../images/icons/everyday_storage.png" alt="Everyday Filetrap Icon" style="width:120px;height:120px;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.18));">
-    <h1><span data-lang="en">Everyday Filetrap</span><span data-lang="bg" style="display:none;">Всеки ден Filetrap</span></h1>
-    <p class="tagline"><span data-lang="en">Visual storage and smart spending tracker for everyday life.</span><span data-lang="bg" style="display:none;">Визуално хранилище и интелигентен проследител на разходи за всекидневието.</span></p>
-    <p class="lead"><span data-lang="en">Snap photos of your boxes, receipts, or items — organize, tag, and track what you own and spend with full privacy.</span><span data-lang="bg" style="display:none;">Снимайте кутиите, касовите бележки или вещите си — организирайте, отбелязвайте и следете какво притежавате и колко харчите с пълна поверителност.</span></p>
-    <div class="btn-group">
-      <button class="btn" disabled><span data-lang="en">Get it on Android (Coming Soon)</span><span data-lang="bg" style="display:none;">Изтеглете за Android (скоро)</span></button>
-      <button class="btn" disabled><span data-lang="en">Get it on iPhone (Coming Soon)</span><span data-lang="bg" style="display:none;">Изтеглете за iPhone (скоро)</span></button>
-    </div>
-  </header>
-
-  <main>
-    <section>
-      <h2 class="section-title"><span data-lang="en">Key Features</span><span data-lang="bg" style="display:none;">Основни функции</span></h2>
-      <ul class="feature-list">
-        <li><strong><span data-lang="en">Visual storage:</span><span data-lang="bg" style="display:none;">Визуално хранилище:</span></strong> <span data-lang="en">Capture what’s inside your boxes or drawers with quick photos.</span><span data-lang="bg" style="display:none;">Запечатайте съдържанието на кутиите или чекмеджетата с бързи снимки.</span></li>
-        <li><strong><span data-lang="en">Smart tagging:</span><span data-lang="bg" style="display:none;">Интелигентно отбелязване:</span></strong> <span data-lang="en">Add notes and tags to make finding items effortless.</span><span data-lang="bg" style="display:none;">Добавяйте бележки и тагове, за да намирате лесно вещите си.</span></li>
-        <li><strong><span data-lang="en">Local privacy:</span><span data-lang="bg" style="display:none;">Локална поверителност:</span></strong> <span data-lang="en">Everything stays on your device — no tracking, no uploads.</span><span data-lang="bg" style="display:none;">Всичко остава на устройството ви — без проследяване и качване.</span></li>
-        <li><strong><span data-lang="en">Price tracking:</span><span data-lang="bg" style="display:none;">Проследяване на цени:</span></strong> <span data-lang="en">Attach prices or receipts to your photos and see spending trends over time with simple, visual graphs.</span><span data-lang="bg" style="display:none;">Прикачайте цени или касови бележки към снимките и виждайте тенденциите в разходите си с прости визуални графики.</span></li>
-        <li><strong><span data-lang="en">Organization made easy:</span><span data-lang="bg" style="display:none;">Лесна организация:</span></strong> <span data-lang="en">Filter by folders, dates, or costs to keep your inventory clear and insightful.</span><span data-lang="bg" style="display:none;">Филтрирайте по папки, дати или разходи, за да поддържате инвентара си ясен и информативен.</span></li>
-      </ul>
-    </section>
-
-    <section style="background:#f9fafb;">
-      <h2 class="section-title"><span data-lang="en">Use Cases</span><span data-lang="bg" style="display:none;">Приложения</span></h2>
-      <p class="section-intro"><span data-lang="en">Everyday Filetrap helps you remember where things are — and what they cost.</span><span data-lang="bg" style="display:none;">Всеки ден Filetrap ви помага да помните къде са нещата — и колко струват.</span></p>
-      <div class="cards">
-        <div class="card">
-          <h3><span data-lang="en">📦 Organize Anything</span><span data-lang="bg" style="display:none;">📦 Организирайте всичко</span></h3>
-          <p><span data-lang="en">Keep track of what's inside your boxes, drawers, or shelves with clear visual references.</span><span data-lang="bg" style="display:none;">Следете какво има в кутиите, чекмеджетата или рафтовете си с ясни визуални препратки.</span></p>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand-link" href="https://www.everydaylilly.com">
+          <img src="../images/icons/everyday_storage.png" alt="Everyday Filetrap icon">
+          <span class="brand-copy">
+            <span class="brand-name">Everyday Filetrap</span>
+            <span class="brand-subtitle" data-lang="en">Visual storage, receipts, and spending memory.</span>
+            <span class="brand-subtitle" data-lang="bg" data-display="block" style="display:none;">Визуално хранилище, касови бележки и памет за разходите.</span>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <a class="mini-link" href="roadmap.html">
+            <span data-lang="en">Roadmap</span>
+            <span data-lang="bg" style="display:none;">Пътна карта</span>
+          </a>
+          <a class="mini-link" href="privacypolicy.html">
+            <span data-lang="en">Privacy</span>
+            <span data-lang="bg" style="display:none;">Поверителност</span>
+          </a>
+          <button class="lang-toggle" type="button" data-setlang="en" data-active="true">EN</button>
+          <button class="lang-toggle" type="button" data-setlang="bg" data-active="false">BG</button>
         </div>
-        <div class="card">
-          <h3><span data-lang="en">🧾 Track Spending</span><span data-lang="bg" style="display:none;">🧾 Проследявайте разходите</span></h3>
-          <p><span data-lang="en">Snap your receipts or write prices manually. Filetrap automatically generates a clean visual graph of your spending over time.</span><span data-lang="bg" style="display:none;">Снимайте касовите бележки или въвеждайте цени ръчно. Filetrap автоматично създава чиста визуална графика на разходите ви във времето.</span></p>
+      </nav>
+
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <span class="eyebrow">
+            <span data-lang="en">Local-first visual storage</span>
+            <span data-lang="bg" style="display:none;">Локално визуално хранилище</span>
+          </span>
+
+          <h1 data-lang="en" data-display="block">Remember what you stored. Understand what you spent.</h1>
+          <h1 data-lang="bg" data-display="block" style="display:none;">Помнете какво сте прибрали. Разбирайте колко сте похарчили.</h1>
+
+          <p class="hero-lead" data-lang="en" data-display="block">
+            Everyday Filetrap turns boxes, drawers, receipts, and loose items into a searchable photo record that stays on your device.
+          </p>
+          <p class="hero-lead" data-lang="bg" data-display="block" style="display:none;">
+            Everyday Filetrap превръща кутиите, чекмеджетата, касовите бележки и вещите без място в търсим фотоархив, който остава на вашето устройство.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="roadmap.html">
+              <span data-lang="en">View roadmap</span>
+              <span data-lang="bg" style="display:none;">Виж пътната карта</span>
+            </a>
+            <a class="btn btn-secondary" href="privacypolicy.html">
+              <span data-lang="en">Read privacy policy</span>
+              <span data-lang="bg" style="display:none;">Прочети политиката</span>
+            </a>
+            <button class="store-pill" type="button" disabled>
+              <span data-lang="en">Android coming soon</span>
+              <span data-lang="bg" style="display:none;">Android скоро</span>
+            </button>
+            <button class="store-pill" type="button" disabled>
+              <span data-lang="en">iPhone coming soon</span>
+              <span data-lang="bg" style="display:none;">iPhone скоро</span>
+            </button>
+          </div>
+
+          <ul class="hero-facts">
+            <li>
+              <span data-lang="en">Capture boxes, shelves, drawers, and receipts in one calm archive.</span>
+              <span data-lang="bg" style="display:none;">Събирайте кутии, рафтове, чекмеджета и касови бележки в един спокоен архив.</span>
+            </li>
+            <li>
+              <span data-lang="en">Use tags, folders, dates, and price details to get back to what matters fast.</span>
+              <span data-lang="bg" style="display:none;">Използвайте тагове, папки, дати и цени, за да намирате важното бързо.</span>
+            </li>
+            <li>
+              <span data-lang="en">Everything stays local by design - no tracking, no account, no forced upload.</span>
+              <span data-lang="bg" style="display:none;">Всичко остава локално по дизайн - без проследяване, без акаунт, без задължително качване.</span>
+            </li>
+          </ul>
         </div>
-        <div class="card">
-          <h3><span data-lang="en">🔒 Stay Private</span><span data-lang="bg" style="display:none;">🔒 Запазете поверителността</span></h3>
-          <p><span data-lang="en">All data, photos, and graphs are stored locally — private and offline by design.</span><span data-lang="bg" style="display:none;">Всички данни, снимки и графики се съхраняват локално — по дизайн са частни и офлайн.</span></p>
+
+        <div class="hero-visual reveal" aria-hidden="true">
+          <div class="poster">
+            <div class="poster-topline">
+              <span data-lang="en">Filetrap</span>
+              <span data-lang="bg" style="display:none;">Filetrap</span>
+              <span data-lang="en">local archive</span>
+              <span data-lang="bg" style="display:none;">локален архив</span>
+            </div>
+
+            <div class="poster-grid">
+              <div class="icon-halo"></div>
+              <img class="app-icon" src="../images/icons/everyday_storage.png" alt="">
+            </div>
+
+            <div class="floating-note note-storage">
+              <span data-lang="en">Boxes and shelves<small>visual memory</small></span>
+              <span data-lang="bg" data-display="inline" style="display:none;">Кутии и рафтове<small>визуална памет</small></span>
+            </div>
+
+            <div class="floating-note note-spend">
+              <span data-lang="en">Receipts and prices<small>spending trace</small></span>
+              <span data-lang="bg" data-display="inline" style="display:none;">Касови бележки и цени<small>следа на разходите</small></span>
+            </div>
+
+            <div class="floating-note note-private">
+              <span data-lang="en">Private by default<small>stored on device</small></span>
+              <span data-lang="bg" data-display="inline" style="display:none;">Поверително по подразбиране<small>пази се на устройството</small></span>
+            </div>
+
+            <div class="poster-footer">
+              <span data-lang="en">tags / folders / dates</span>
+              <span data-lang="bg" style="display:none;">тагове / папки / дати</span>
+              <span data-lang="en">price notes</span>
+              <span data-lang="bg" style="display:none;">цени и бележки</span>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </header>
 
-    <section>
-      <h2 class="section-title"><span data-lang="en">Track Spending</span><span data-lang="bg" style="display:none;">Проследяване на разходите</span></h2>
-      <p class="section-intro"><span data-lang="en">Everyday Filetrap makes price tracking intuitive — attach a photo of your receipt, add price details, and see monthly summaries in an elegant, easy-to-read chart. Perfect for household budgets, projects, or small businesses.</span><span data-lang="bg" style="display:none;">Всеки ден Filetrap прави проследяването на цени интуитивно — прикачете снимка на касовата бележка, добавете ценови детайли и вижте месечни обобщения в елегантна, лесна за четене графика. Перфектно за семейни бюджети, проекти или малък бизнес.</span></p>
-      <div class="cards">
-        <div class="card">
-          <h3><span data-lang="en">📊 Visual Graphs</span><span data-lang="bg" style="display:none;">📊 Визуални графики</span></h3>
-          <p><span data-lang="en">Automatically see how your expenses grow and shrink across time periods — visually, not just in numbers.</span><span data-lang="bg" style="display:none;">Автоматично виждайте как разходите ви растат и намаляват във времето — визуално, не само с числа.</span></p>
+    <main>
+      <section class="section reveal">
+        <div class="section-shell">
+          <div class="section-header">
+            <span class="section-kicker">
+              <span data-lang="en">What it is for</span>
+              <span data-lang="bg" style="display:none;">За какво е</span>
+            </span>
+            <h2 class="section-title" data-lang="en" data-display="block">Made for real-life storage, not spreadsheet work.</h2>
+            <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Създадено за истинско съхранение, не за работа като в таблица.</h2>
+            <p class="section-intro" data-lang="en" data-display="block">
+              Filetrap is most useful when life gets messy: spare parts in a drawer, tools in a box, purchase history for a project, or a receipt you know you will need later.
+            </p>
+            <p class="section-intro" data-lang="bg" data-display="block" style="display:none;">
+              Filetrap е най-полезен, когато животът стане разхвърлян: резервни части в чекмедже, инструменти в кутия, история на покупки за проект или касова бележка, която знаете, че ще ви потрябва.
+            </p>
+          </div>
+
+          <div class="support-grid">
+            <article class="support-item">
+              <h3 data-lang="en" data-display="block">See the container, not just the label.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Вижте контейнера, не само етикета.</h3>
+              <p data-lang="en" data-display="block">Photograph the whole box, drawer, bag, or shelf so your memory has context before you even search.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Снимайте цялата кутия, чекмедже, чанта или рафт, за да имате контекст още преди да търсите.</p>
+            </article>
+
+            <article class="support-item">
+              <h3 data-lang="en" data-display="block">Keep notes and tags close to the item.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Дръжте бележките и таговете до самата вещ.</h3>
+              <p data-lang="en" data-display="block">Add just enough detail to make retrieval effortless - names, dates, tags, folder hints, or short reminders.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Добавете толкова детайл, колкото е нужно за лесно намиране - имена, дати, тагове, подсказки за папки или кратки бележки.</p>
+            </article>
+
+            <article class="support-item">
+              <h3 data-lang="en" data-display="block">Track what the archive cost you.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Следете колко ви струва архивът.</h3>
+              <p data-lang="en" data-display="block">Attach receipts and prices, then review spending through simple visual summaries instead of hunting through paper.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Прикачвайте касови бележки и цени, после преглеждайте разходите чрез прости визуални обобщения вместо да ровите в хартия.</p>
+            </article>
+          </div>
         </div>
-        <div class="card">
-          <h3><span data-lang="en">🪙 Smart Categorization</span><span data-lang="bg" style="display:none;">🪙 Интелигентно категоризиране</span></h3>
-          <p><span data-lang="en">Group your purchases by folder or tag — such as “car,” “home,” or “tools” — and get quick spending insights.</span><span data-lang="bg" style="display:none;">Групирайте покупките си по папка или таг — като „кола“, „дом“ или „инструменти“ — и получавайте бързи анализи на разходите.</span></p>
+      </section>
+
+      <section class="section workflow-section reveal">
+        <div class="section-shell">
+          <div class="section-header">
+            <span class="section-kicker">
+              <span data-lang="en">How it works</span>
+              <span data-lang="bg" style="display:none;">Как работи</span>
+            </span>
+            <h2 class="section-title" data-lang="en" data-display="block">Three steps. Fast enough to use every day.</h2>
+            <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Три стъпки. Достатъчно бързо за всеки ден.</h2>
+          </div>
+
+          <div class="workflow-grid">
+            <aside class="workflow-aside">
+              <strong data-lang="en" data-display="block">The goal is calm recall.</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Целта е спокойно припомняне.</strong>
+              <p data-lang="en" data-display="block">
+                Open Filetrap, capture the storage spot or receipt, add lightweight context, and leave. The archive should work quietly until the exact moment you need it.
+              </p>
+              <p data-lang="bg" data-display="block" style="display:none;">
+                Отворете Filetrap, снимайте мястото за съхранение или касовата бележка, добавете лек контекст и продължете. Архивът трябва да работи тихо, докато наистина не ви потрябва.
+              </p>
+            </aside>
+
+            <div class="step-list">
+              <article class="step">
+                <div class="step-number">01</div>
+                <div>
+                  <h3 data-lang="en" data-display="block">Capture the scene</h3>
+                  <h3 data-lang="bg" data-display="block" style="display:none;">Заснемете сцената</h3>
+                  <p data-lang="en" data-display="block">Take a quick photo of the box, shelf, drawer, item, or receipt so the visual cue is saved before it disappears from memory.</p>
+                  <p data-lang="bg" data-display="block" style="display:none;">Направете бърза снимка на кутията, рафта, чекмеджето, вещта или касовата бележка, за да запазите визуалната следа, преди да изчезне от паметта.</p>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-number">02</div>
+                <div>
+                  <h3 data-lang="en" data-display="block">Add lightweight structure</h3>
+                  <h3 data-lang="bg" data-display="block" style="display:none;">Добавете лек ред</h3>
+                  <p data-lang="en" data-display="block">Use tags, notes, folder names, and dates to turn a photo into something you can retrieve later without friction.</p>
+                  <p data-lang="bg" data-display="block" style="display:none;">Използвайте тагове, бележки, имена на папки и дати, за да превърнете снимката в нещо, което ще намерите по-късно без усилие.</p>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-number">03</div>
+                <div>
+                  <h3 data-lang="en" data-display="block">Review and understand spending</h3>
+                  <h3 data-lang="bg" data-display="block" style="display:none;">Прегледайте и разберете разходите</h3>
+                  <p data-lang="en" data-display="block">Attach price information or receipts and keep a clear cost history across home, tools, storage, or small business use.</p>
+                  <p data-lang="bg" data-display="block" style="display:none;">Прикачвайте ценова информация или касови бележки и пазете ясна история на разходите при дом, инструменти, съхранение или малък бизнес.</p>
+                </div>
+              </article>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-shell">
+          <div class="section-header">
+            <span class="section-kicker">
+              <span data-lang="en">Why it matters</span>
+              <span data-lang="bg" style="display:none;">Защо има значение</span>
+            </span>
+            <h2 class="section-title" data-lang="en" data-display="block">The product is simple on purpose.</h2>
+            <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Продуктът е прост нарочно.</h2>
+            <p class="section-intro" data-lang="en" data-display="block">
+              Filetrap is not trying to become a noisy inventory system. It is designed to be a visual memory tool with enough structure to stay useful and enough spending context to stay practical.
+            </p>
+            <p class="section-intro" data-lang="bg" data-display="block" style="display:none;">
+              Filetrap не се опитва да стане шумна инвентарна система. Създаден е да бъде визуална памет с достатъчно структура, за да е полезен, и достатъчно контекст за разходите, за да е практичен.
+            </p>
+          </div>
+
+          <div class="proof-grid">
+            <article class="proof-panel">
+              <span class="proof-label" data-lang="en">Searchable memory</span>
+              <span class="proof-label" data-lang="bg" style="display:none;">Търсима памет</span>
+              <h3 data-lang="en" data-display="block">Find the thing before you buy it twice.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Намерете вещта, преди да я купите втори път.</h3>
+              <p data-lang="en" data-display="block">Photos, tags, folders, and dates work together so your stored items stay recallable instead of disappearing into cupboards and boxes.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Снимки, тагове, папки и дати работят заедно, за да не изчезват вещите ви в шкафове и кутии.</p>
+              <ul class="proof-list">
+                <li>
+                  <span data-lang="en">Visual proof of where something lives</span>
+                  <span data-lang="bg" style="display:none;">Визуално доказателство къде живее нещо</span>
+                </li>
+                <li>
+                  <span data-lang="en">Quick context through notes and labels</span>
+                  <span data-lang="bg" style="display:none;">Бърз контекст чрез бележки и етикети</span>
+                </li>
+              </ul>
+            </article>
+
+            <article class="proof-panel">
+              <span class="proof-label" data-lang="en">Spending clarity</span>
+              <span class="proof-label" data-lang="bg" style="display:none;">Яснота за разходите</span>
+              <h3 data-lang="en" data-display="block">Receipts become a usable timeline.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Касовите бележки се превръщат в използваема линия на времето.</h3>
+              <p data-lang="en" data-display="block">Instead of losing paper trails, attach price details to what you bought and keep a clear record over time.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Вместо да губите хартиени следи, прикачвайте цените към това, което сте купили, и пазете ясен запис във времето.</p>
+              <ul class="proof-list">
+                <li>
+                  <span data-lang="en">Receipt photos linked to purchases</span>
+                  <span data-lang="bg" style="display:none;">Снимки на касови бележки, свързани с покупките</span>
+                </li>
+                <li>
+                  <span data-lang="en">Simple price history for later review</span>
+                  <span data-lang="bg" style="display:none;">Проста история на цените за по-късен преглед</span>
+                </li>
+              </ul>
+            </article>
+
+            <article class="proof-panel">
+              <span class="proof-label" data-lang="en">Privacy by design</span>
+              <span class="proof-label" data-lang="bg" style="display:none;">Поверителност по дизайн</span>
+              <h3 data-lang="en" data-display="block">Local-first means your archive stays yours.</h3>
+              <h3 data-lang="bg" data-display="block" style="display:none;">Локалният подход означава, че архивът си остава ваш.</h3>
+              <p data-lang="en" data-display="block">No account wall, no analytics layer, and no forced sync. The app is intentionally quiet about your data because it never needs to leave your device.</p>
+              <p data-lang="bg" data-display="block" style="display:none;">Без акаунт, без аналитичен слой и без задължителна синхронизация. Приложението умишлено мълчи за данните ви, защото те не трябва да напускат устройството.</p>
+              <ul class="proof-list">
+                <li>
+                  <span data-lang="en">No tracking or third-party ad stack</span>
+                  <span data-lang="bg" style="display:none;">Без проследяване и рекламен стек от трети страни</span>
+                </li>
+                <li>
+                  <span data-lang="en">Built for offline, personal use first</span>
+                  <span data-lang="bg" style="display:none;">Създадено първо за офлайн и лично ползване</span>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section cta-wrap reveal">
+        <div class="section-shell">
+          <div class="cta-band">
+            <h2 data-lang="en" data-display="block">Building toward smarter search, cleaner imports, and better organization.</h2>
+            <h2 data-lang="bg" data-display="block" style="display:none;">Движим се към по-умно търсене, по-чист импорт и по-добра организация.</h2>
+            <p data-lang="en" data-display="block">
+              The public roadmap shows what is being fixed now, what is coming next, and which product bets stay aligned with Filetrap's local-first promise.
+            </p>
+            <p data-lang="bg" data-display="block" style="display:none;">
+              Публичната пътна карта показва какво се оправя сега, какво идва след това и кои продуктови решения остават верни на локалното обещание на Filetrap.
+            </p>
+            <div class="cta-actions">
+              <a class="btn btn-primary" href="roadmap.html">
+                <span data-lang="en">Open roadmap</span>
+                <span data-lang="bg" style="display:none;">Отвори пътната карта</span>
+              </a>
+              <a class="btn btn-secondary" href="privacypolicy.html">
+                <span data-lang="en">Privacy policy</span>
+                <span data-lang="bg" style="display:none;">Политика за поверителност</span>
+              </a>
+              <a class="btn btn-secondary" href="https://www.everydaylilly.com">
+                <span data-lang="en">Back to Everyday Lilly</span>
+                <span data-lang="bg" style="display:none;">Обратно към Everyday Lilly</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        <span data-lang="en">Everyday Filetrap. Local-first by design.</span>
+        <span data-lang="bg" style="display:none;">Everyday Filetrap. Локално по дизайн.</span>
       </div>
-    </section>
-
-    <section>
-      <h2 class="section-title"><span data-lang="en">Coming Soon</span><span data-lang="bg" style="display:none;">Скоро</span></h2>
-      <p class="section-intro"><span data-lang="en">Next updates will bring AI-powered receipt scanning, automatic expense categorization, and secure backup options — all while keeping your data private and local.</span><span data-lang="bg" style="display:none;">Следващите актуализации ще донесат сканиране на касови бележки с изкуствен интелект, автоматично категоризиране на разходите и сигурни опции за архивиране — всичко това, като запазват вашите данни частни и локални.</span></p>
-    </section>
-  </main>
-
-  <footer>
-    <p><a href="https://www.everydaylilly.com">← <span data-lang="en">Back to Everyday Lilly</span><span data-lang="bg" style="display:none;">Обратно към Everyday Lilly</span></a></p>
-    <p><a href="roadmap.html"><span data-lang="en">Roadmap</span><span data-lang="bg" style="display:none;">Пътна карта</span></a> • <a href="privacypolicy.html"><span data-lang="en">Privacy Policy</span><span data-lang="bg" style="display:none;">Политика за поверителност</span></a></p>
-    <p>&copy; <span id="year"></span> <span data-lang="en">Everyday Filetrap. All rights reserved.</span><span data-lang="bg" style="display:none;">Всеки ден Filetrap. Всички права запазени.</span></p>
-  </footer>
+      <div>
+        &copy; <span id="year"></span>
+        <span data-lang="en"> Everyday Filetrap. All rights reserved.</span>
+        <span data-lang="bg" style="display:none;"> Everyday Filetrap. Всички права запазени.</span>
+      </div>
+    </footer>
+  </div>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('section').forEach(el => observer.observe(el));
+    const revealNodes = document.querySelectorAll(".reveal");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const setLanguage = (lang) => {
-      document.querySelectorAll('[data-lang]').forEach(el => {
-        el.style.display = el.getAttribute('data-lang') === lang ? '' : 'none';
+    if (!prefersReducedMotion) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.18
       });
-      localStorage.setItem('lang', lang);
-    };
-    document.querySelectorAll('.lang-btn').forEach(btn =>
-      btn.addEventListener('click', () => setLanguage(btn.dataset.setlang))
-    );
-    const savedLang = localStorage.getItem('lang') || 'en';
-    setLanguage(savedLang);
+
+      revealNodes.forEach((node) => revealObserver.observe(node));
+    } else {
+      revealNodes.forEach((node) => node.classList.add("is-visible"));
+    }
+
+    const translatedNodes = document.querySelectorAll("[data-lang]");
+    const langButtons = document.querySelectorAll("[data-setlang]");
+
+    function setLanguage(lang) {
+      translatedNodes.forEach((node) => {
+        const shouldShow = node.dataset.lang === lang;
+        node.style.display = shouldShow ? (node.dataset.display || "") : "none";
+      });
+
+      langButtons.forEach((button) => {
+        button.dataset.active = String(button.dataset.setlang === lang);
+      });
+
+      document.documentElement.lang = lang;
+      localStorage.setItem("everyday_filetrap_lang", lang);
+    }
+
+    langButtons.forEach((button) => {
+      button.addEventListener("click", () => setLanguage(button.dataset.setlang));
+    });
+
+    const savedLanguage = localStorage.getItem("everyday_filetrap_lang");
+    setLanguage(savedLanguage === "bg" ? "bg" : "en");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>

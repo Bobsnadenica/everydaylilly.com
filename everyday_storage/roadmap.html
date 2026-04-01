@@ -1,99 +1,886 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Everyday Filetrap - Roadmap</title>
+  <meta name="description" content="Public roadmap and known issues for Everyday Filetrap.">
+  <title>Everyday Filetrap | Roadmap</title>
+  <link rel="icon" type="image/png" href="../images/icons/everyday_storage.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #18110d;
+      --bg-2: #221711;
+      --surface: rgba(255, 247, 238, 0.08);
+      --surface-strong: rgba(255, 248, 239, 0.12);
+      --line: rgba(255, 243, 229, 0.12);
+      --text: #f8efe3;
+      --muted: rgba(248, 239, 227, 0.72);
+      --moss: #98b680;
+      --rust: #d08f70;
+      --amber: #e0be86;
+      --sky: #8db7cc;
+      --danger: #ff8f7a;
+      --shadow: 0 26px 70px rgba(0, 0, 0, 0.28);
+      --max-width: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(120deg, #0d0d0d, #1c1c1c, #0d0d0d);
-      background-size: 400% 400%;
-      animation: gradientShift 12s ease infinite;
-      color: #fff;
       margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(141, 183, 204, 0.18), transparent 24%),
+        radial-gradient(circle at 82% 14%, rgba(224, 190, 134, 0.14), transparent 22%),
+        linear-gradient(180deg, #17110d 0%, #201510 48%, #130d09 100%);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 243, 229, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 243, 229, 0.04) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 78%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.15rem 0 0;
       display: flex;
-      justify-content: center;
-      padding: 2rem;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
     }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
     }
-    .container {
-      max-width: 800px;
-      width: 100%;
+
+    .brand-link img {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
     }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-name {
+      display: block;
+      font-size: 0.97rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    .brand-subtitle {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .mini-link,
+    .lang-toggle {
+      border: 1px solid var(--line);
+      background: rgba(255, 247, 238, 0.06);
+      backdrop-filter: blur(14px);
+      border-radius: 999px;
+      padding: 0.72rem 1rem;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .mini-link:hover,
+    .lang-toggle:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 247, 238, 0.12);
+      border-color: rgba(224, 190, 134, 0.2);
+    }
+
+    .lang-toggle {
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 700;
+      min-width: 3.5rem;
+    }
+
+    .lang-toggle[data-active="true"] {
+      background: var(--amber);
+      color: #1b120d;
+      border-color: transparent;
+    }
+
+    .hero {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 4.25rem 0 3.5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
+      gap: 2.5rem;
+      align-items: end;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+      color: var(--amber);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 3.4rem;
+      height: 1px;
+      background: rgba(224, 190, 134, 0.42);
+    }
+
     h1 {
-      text-align: center;
-      color: #00d084;
-      font-size: 2rem;
-      letter-spacing: 1px;
+      font-size: clamp(3.2rem, 8vw, 6.2rem);
+      max-width: 11ch;
     }
-    h2 {
-      margin-top: 2rem;
-      border-bottom: 2px solid #333;
-      padding-bottom: 0.5rem;
-      font-size: 1.4rem;
-      color: #ddd;
+
+    .hero p {
+      margin: 1.25rem 0 0;
+      max-width: 38rem;
+      font-size: 1.08rem;
+      color: var(--muted);
     }
-    ul {
+
+    .status-card {
+      padding: 1.4rem;
+      border-radius: 1.8rem;
+      background:
+        radial-gradient(circle at top right, rgba(141, 183, 204, 0.18), transparent 28%),
+        rgba(255, 247, 238, 0.06);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .status-card h2 {
+      font-size: 1.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .summary-list {
       list-style: none;
       padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.85rem;
     }
-    li {
-      margin: 0.6rem 0;
-      padding: 0.9rem 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      animation: fadeIn 0.6s ease;
+
+    .summary-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(255, 243, 229, 0.08);
     }
-    li:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+
+    .summary-item:first-child {
+      padding-top: 0;
+      border-top: none;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    .summary-item strong {
+      display: block;
+      font-size: 0.98rem;
     }
-    .bug {
-      background: #3a0c0c;
-      border-left: 4px solid #ff4d4d;
+
+    .summary-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
-    .in-progress {
-      background: #3a3000;
-      border-left: 4px solid #ffd700;
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 4.4rem;
+      border-radius: 999px;
+      padding: 0.34rem 0.72rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
-    .coming {
-      background: #2f2f2f;
-      border-left: 4px solid #888;
+
+    .pill-danger {
+      background: rgba(255, 143, 122, 0.16);
+      color: #ffb3a3;
+    }
+
+    .pill-active {
+      background: rgba(224, 190, 134, 0.16);
+      color: #f3cf96;
+    }
+
+    .pill-planned {
+      background: rgba(152, 182, 128, 0.16);
+      color: #b8d7a1;
+    }
+
+    .main {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding-bottom: 5rem;
+    }
+
+    .section {
+      padding-top: 2.2rem;
+    }
+
+    .section-header {
+      max-width: 42rem;
+      margin-bottom: 1.9rem;
+    }
+
+    .section-title {
+      font-size: clamp(2.15rem, 5vw, 3.6rem);
+      max-width: 12ch;
+    }
+
+    .section-intro {
+      margin-top: 0.9rem;
+      color: var(--muted);
+    }
+
+    .focus-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      gap: 1.35rem;
+    }
+
+    .panel {
+      padding: 1.4rem;
+      border-radius: 1.7rem;
+      background: rgba(255, 247, 238, 0.06);
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.14);
+    }
+
+    .panel h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .current-focus {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .focus-highlight {
+      padding: 1rem 1rem 1.1rem;
+      border-radius: 1.25rem;
+      background: rgba(224, 190, 134, 0.08);
+      border: 1px solid rgba(224, 190, 134, 0.16);
+    }
+
+    .focus-highlight strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 0.45rem;
+      color: var(--text);
+    }
+
+    .focus-highlight span {
+      color: var(--muted);
+    }
+
+    .issue-list,
+    .timeline {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .issue-list li,
+    .timeline li {
+      padding: 1rem 1rem 1rem 1.1rem;
+      border-radius: 1.2rem;
+      background: rgba(255, 247, 238, 0.04);
+      border: 1px solid rgba(255, 243, 229, 0.08);
+    }
+
+    .issue-list strong,
+    .timeline strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 1rem;
+    }
+
+    .issue-list span,
+    .timeline span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 1rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 0.2rem;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      width: 1px;
+      background: rgba(255, 243, 229, 0.14);
+    }
+
+    .timeline li {
+      position: relative;
+      margin-left: 0.9rem;
+    }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      left: -1.42rem;
+      top: 1.15rem;
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber), var(--rust));
+      box-shadow: 0 0 0 8px rgba(224, 190, 134, 0.08);
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .principle {
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 243, 229, 0.12);
+    }
+
+    .principle h3 {
+      font-size: 1.45rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .principle p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .cta-band {
+      margin-top: 2.2rem;
+      padding: 1.7rem;
+      border-radius: 1.7rem;
+      background:
+        radial-gradient(circle at top right, rgba(141, 183, 204, 0.16), transparent 24%),
+        linear-gradient(145deg, rgba(255, 247, 238, 0.08), rgba(255, 247, 238, 0.04));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-band h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      max-width: 12ch;
+    }
+
+    .cta-band p {
+      margin: 0.9rem 0 0;
+      max-width: 40rem;
+      color: var(--muted);
+    }
+
+    .cta-actions {
+      margin-top: 1.35rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.88rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--amber);
+      color: #1a120d;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 247, 238, 0.06);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    footer {
+      width: min(var(--max-width), calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0 0 2.4rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    footer a {
+      color: var(--amber);
+      text-decoration: underline;
+      text-decoration-color: rgba(224, 190, 134, 0.3);
+      text-underline-offset: 0.18rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .focus-grid,
+      .principles {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body::before {
+        background-size: 56px 56px;
+      }
+
+      .hero {
+        padding-top: 3rem;
+      }
+
+      .cta-actions,
+      .nav-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn,
+      .mini-link,
+      .lang-toggle {
+        width: 100%;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .reveal,
+      .reveal.is-visible,
+      .btn,
+      .mini-link,
+      .lang-toggle {
+        transition: none;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Everyday Filetrap - Roadmap</h1>
+  <div class="page-shell">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand-link" href="index.html">
+        <img src="../images/icons/everyday_storage.png" alt="Everyday Filetrap icon">
+        <span class="brand-copy">
+          <span class="brand-name">Everyday Filetrap</span>
+          <span class="brand-subtitle" data-lang="en">Public roadmap and known issues.</span>
+          <span class="brand-subtitle" data-lang="bg" data-display="block" style="display:none;">Публична пътна карта и известни проблеми.</span>
+        </span>
+      </a>
+      <div class="nav-actions">
+        <a class="mini-link" href="index.html">
+          <span data-lang="en">Product page</span>
+          <span data-lang="bg" style="display:none;">Продуктова страница</span>
+        </a>
+        <a class="mini-link" href="privacypolicy.html">
+          <span data-lang="en">Privacy</span>
+          <span data-lang="bg" style="display:none;">Поверителност</span>
+        </a>
+        <button class="lang-toggle" type="button" data-setlang="en" data-active="true">EN</button>
+        <button class="lang-toggle" type="button" data-setlang="bg" data-active="false">BG</button>
+      </div>
+    </nav>
 
-    <h2>Bugs</h2>
-    <ul>
-      <li class="bug">Thumbnails on last searched doesn't show up</li>
-      <li class="bug">Import doesn't really work — it tries to auto import</li>
-      <li class="bug">Search by folder names as well, not just tags</li>
-      <li class="bug">Ability to edit tags</li>
-      <li class="in-progress">Price graph breaks sometimes</li>
-    </ul>
+    <header class="hero">
+      <div class="reveal">
+        <span class="eyebrow">
+          <span data-lang="en">Public roadmap</span>
+          <span data-lang="bg" style="display:none;">Публична пътна карта</span>
+        </span>
+        <h1 data-lang="en" data-display="block">Fixing recall, import flow, and spending clarity in that order.</h1>
+        <h1 data-lang="bg" data-display="block" style="display:none;">Поправяме припомнянето, импорта и яснотата на разходите точно в този ред.</h1>
+        <p data-lang="en" data-display="block">
+          Everyday Filetrap is being tuned to feel more dependable: stronger search, cleaner imports, editable organization, and clearer receipt history.
+        </p>
+        <p data-lang="bg" data-display="block" style="display:none;">
+          Everyday Filetrap се настройва да бъде по-надежден: по-силно търсене, по-чист импорт, редактируема организация и по-ясна история на касовите бележки.
+        </p>
+      </div>
 
-    <h2>Roadmap</h2>
-    <ul>
-      <li class="coming">AI search</li>
-      <li class="coming">Scan your receipt and auto fill</li>
-      <li class="coming">Better UI for spending tracker</li>
-      <li class="coming">Ability to share data and have a centralised website</li>
-    </ul>
+      <aside class="status-card reveal">
+        <h2 data-lang="en" data-display="block">Current snapshot</h2>
+        <h2 data-lang="bg" data-display="block" style="display:none;">Текуща снимка</h2>
+        <ul class="summary-list">
+          <li class="summary-item">
+            <div>
+              <strong data-lang="en" data-display="block">Search and import reliability</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Надеждност на търсенето и импорта</strong>
+              <span data-lang="en" data-display="block">This is the active quality pass.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">Това е активният качествен цикъл.</span>
+            </div>
+            <span class="pill pill-active" data-lang="en">Active</span>
+            <span class="pill pill-active" data-lang="bg" style="display:none;">Активно</span>
+          </li>
+          <li class="summary-item">
+            <div>
+              <strong data-lang="en" data-display="block">Open quality issues</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Отворени проблеми по качеството</strong>
+              <span data-lang="en" data-display="block">4 issues are tracked in the current pass.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">4 проблема се следят в текущия цикъл.</span>
+            </div>
+            <span class="pill pill-danger" data-lang="en">4 open</span>
+            <span class="pill pill-danger" data-lang="bg" style="display:none;">4 отворени</span>
+          </li>
+          <li class="summary-item">
+            <div>
+              <strong data-lang="en" data-display="block">Planned product work</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Планирана продуктова работа</strong>
+              <span data-lang="en" data-display="block">Search, receipt scanning, UI polish, and sharing options.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">Търсене, сканиране на касови бележки, подобрения по интерфейса и опции за споделяне.</span>
+            </div>
+            <span class="pill pill-planned" data-lang="en">Planned</span>
+            <span class="pill pill-planned" data-lang="bg" style="display:none;">Планирано</span>
+          </li>
+        </ul>
+      </aside>
+    </header>
+
+    <main class="main">
+      <section class="section reveal">
+        <div class="section-header">
+          <h2 class="section-title" data-lang="en" data-display="block">What is being fixed right now</h2>
+          <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Какво се оправя точно сега</h2>
+          <p class="section-intro" data-lang="en" data-display="block">
+            The immediate priority is reliability. Search, tags, imports, and result thumbnails need to feel predictable before larger feature work lands.
+          </p>
+          <p class="section-intro" data-lang="bg" data-display="block" style="display:none;">
+            Непосредственият приоритет е надеждността. Търсенето, таговете, импортът и миниатюрите в резултатите трябва да станат предвидими, преди да дойде по-голямата нова функционалност.
+          </p>
+        </div>
+
+        <div class="focus-grid">
+          <section class="panel current-focus">
+            <h3 data-lang="en" data-display="block">In progress</h3>
+            <h3 data-lang="bg" data-display="block" style="display:none;">В процес</h3>
+            <div class="focus-highlight">
+              <strong data-lang="en" data-display="block">Search and organization cleanup</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Изчистване на търсенето и организацията</strong>
+              <span data-lang="en" data-display="block">Current work is centered on folder matching, editable tags, clearer search results, and a more predictable import flow.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">Текущата работа е насочена към търсене по папки, редактиране на тагове, по-ясни резултати и по-предвидим поток на импорта.</span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h3 data-lang="en" data-display="block">Open issues next in line</h3>
+            <h3 data-lang="bg" data-display="block" style="display:none;">Следващи отворени проблеми</h3>
+            <ul class="issue-list">
+              <li>
+                <strong data-lang="en" data-display="block">Last searched thumbnails do not always show up.</strong>
+                <strong data-lang="bg" data-display="block" style="display:none;">Миниатюрите при последното търсене не се показват винаги.</strong>
+                <span data-lang="en" data-display="block">Recall feels weak when the visual result set is incomplete.</span>
+                <span data-lang="bg" data-display="block" style="display:none;">Припомнянето отслабва, когато визуалният резултат е непълен.</span>
+              </li>
+              <li>
+                <strong data-lang="en" data-display="block">Import flow can trigger auto-import behavior unexpectedly.</strong>
+                <strong data-lang="bg" data-display="block" style="display:none;">Потокът за импорт може неочаквано да стартира автоимпорт.</strong>
+                <span data-lang="en" data-display="block">Import should feel explicit and predictable, not automatic.</span>
+                <span data-lang="bg" data-display="block" style="display:none;">Импортът трябва да е ясен и предвидим, а не автоматичен.</span>
+              </li>
+              <li>
+                <strong data-lang="en" data-display="block">Search should include folder names, not only tags.</strong>
+                <strong data-lang="bg" data-display="block" style="display:none;">Търсенето трябва да включва и имената на папките, не само таговете.</strong>
+                <span data-lang="en" data-display="block">Folder-based recall is part of how people actually remember storage.</span>
+                <span data-lang="bg" data-display="block" style="display:none;">Припомнянето по папки е част от това как хората наистина помнят съхранението.</span>
+              </li>
+              <li>
+                <strong data-lang="en" data-display="block">Tags should remain editable after creation.</strong>
+                <strong data-lang="bg" data-display="block" style="display:none;">Таговете трябва да могат да се редактират след създаване.</strong>
+                <span data-lang="en" data-display="block">Organization needs to adapt as real storage changes over time.</span>
+                <span data-lang="bg" data-display="block" style="display:none;">Организацията трябва да се променя, когато реалното съхранение се променя с времето.</span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-header">
+          <h2 class="section-title" data-lang="en" data-display="block">What comes after stability</h2>
+          <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Какво идва след стабилността</h2>
+          <p class="section-intro" data-lang="en" data-display="block">
+            The next layer of product work expands search, makes receipt capture lighter, improves the spending experience, and explores careful sharing without abandoning the local-first core.
+          </p>
+          <p class="section-intro" data-lang="bg" data-display="block" style="display:none;">
+            Следващият слой продуктова работа разширява търсенето, прави заснемането на касови бележки по-леко, подобрява преживяването при разходите и изследва внимателно споделяне без да изоставя локалната основа.
+          </p>
+        </div>
+
+        <section class="panel">
+          <h3 data-lang="en" data-display="block">Planned improvements</h3>
+          <h3 data-lang="bg" data-display="block" style="display:none;">Планирани подобрения</h3>
+          <ul class="timeline">
+            <li>
+              <strong data-lang="en" data-display="block">AI search</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">AI търсене</strong>
+              <span data-lang="en" data-display="block">A smarter way to get back to the right item, box, or receipt when exact tags are missing.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">По-умен начин да стигнете до правилната вещ, кутия или касова бележка, когато точните тагове липсват.</span>
+            </li>
+            <li>
+              <strong data-lang="en" data-display="block">Scan your receipt and auto-fill details</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Сканиране на касови бележки и автоматично попълване</strong>
+              <span data-lang="en" data-display="block">Reduce manual entry so spending capture feels more like a quick snap than admin work.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">По-малко ръчно въвеждане, така че запазването на разходите да е по-скоро бърза снимка, отколкото административна работа.</span>
+            </li>
+            <li>
+              <strong data-lang="en" data-display="block">Better UI for receipts and price details</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">По-добър интерфейс за касови бележки и ценови детайли</strong>
+              <span data-lang="en" data-display="block">Make receipt capture and stored price information easier to review during day-to-day use.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">Да направим заснемането на касови бележки и прегледа на запазените цени по-лесни в ежедневната употреба.</span>
+            </li>
+            <li>
+              <strong data-lang="en" data-display="block">Ability to share data with a centralized website</strong>
+              <strong data-lang="bg" data-display="block" style="display:none;">Възможност за споделяне на данни с централен уебсайт</strong>
+              <span data-lang="en" data-display="block">Explore sharing carefully, without turning Filetrap into a cloud-first product by accident.</span>
+              <span data-lang="bg" data-display="block" style="display:none;">Да проучим споделянето внимателно, без Filetrap неусетно да се превърне в cloud-first продукт.</span>
+            </li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-header">
+          <h2 class="section-title" data-lang="en" data-display="block">Product principles that stay constant</h2>
+          <h2 class="section-title" data-lang="bg" data-display="block" style="display:none;">Продуктови принципи, които остават постоянни</h2>
+        </div>
+
+        <div class="principles">
+          <article class="principle">
+            <h3 data-lang="en" data-display="block">Local first</h3>
+            <h3 data-lang="bg" data-display="block" style="display:none;">Първо локално</h3>
+            <p data-lang="en" data-display="block">Even future sharing features should not break the private, on-device default experience.</p>
+            <p data-lang="bg" data-display="block" style="display:none;">Дори бъдещите функции за споделяне не трябва да нарушават личното, локално изживяване по подразбиране.</p>
+          </article>
+
+          <article class="principle">
+            <h3 data-lang="en" data-display="block">Visual recall beats bureaucracy</h3>
+            <h3 data-lang="bg" data-display="block" style="display:none;">Визуалното припомняне е над бюрокрацията</h3>
+            <p data-lang="en" data-display="block">The app should help you remember quickly, not force you into heavy inventory management.</p>
+            <p data-lang="bg" data-display="block" style="display:none;">Приложението трябва да ви помага да си спомняте бързо, а не да ви товари с тежко управление на инвентар.</p>
+          </article>
+
+          <article class="principle">
+            <h3 data-lang="en" data-display="block">Spending insight should feel trustworthy</h3>
+            <h3 data-lang="bg" data-display="block" style="display:none;">Анализът на разходите трябва да вдъхва доверие</h3>
+            <p data-lang="en" data-display="block">Price records and receipt tools matter only if the information stays stable, clear, and easy to review.</p>
+            <p data-lang="bg" data-display="block" style="display:none;">Ценовите записи и инструментите за касови бележки имат значение само ако информацията остане стабилна, ясна и лесна за преглед.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="cta-band">
+          <h2 data-lang="en" data-display="block">Want the product story too?</h2>
+          <h2 data-lang="bg" data-display="block" style="display:none;">Искате и продуктовата история?</h2>
+          <p data-lang="en" data-display="block">The landing page explains what Filetrap is for, how it works, and why the product stays local-first.</p>
+          <p data-lang="bg" data-display="block" style="display:none;">Основната страница обяснява за какво е Filetrap, как работи и защо продуктът остава локално ориентиран.</p>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="index.html">
+              <span data-lang="en">Open product page</span>
+              <span data-lang="bg" style="display:none;">Отвори продуктовата страница</span>
+            </a>
+            <a class="btn btn-secondary" href="privacypolicy.html">
+              <span data-lang="en">Privacy policy</span>
+              <span data-lang="bg" style="display:none;">Политика за поверителност</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        <span data-lang="en">Last updated:</span>
+        <span data-lang="bg" style="display:none;">Последно обновяване:</span>
+        <span id="updated"></span>
+      </div>
+      <div>
+        <span data-lang="en">Feedback:</span>
+        <span data-lang="bg" style="display:none;">Обратна връзка:</span>
+        <a href="mailto:Lilly@everydaylilly.com">Lilly@everydaylilly.com</a>
+      </div>
+    </footer>
   </div>
+
+  <script>
+    const revealNodes = document.querySelectorAll(".reveal");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!prefersReducedMotion) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.18
+      });
+
+      revealNodes.forEach((node) => revealObserver.observe(node));
+    } else {
+      revealNodes.forEach((node) => node.classList.add("is-visible"));
+    }
+
+    const translatedNodes = document.querySelectorAll("[data-lang]");
+    const langButtons = document.querySelectorAll("[data-setlang]");
+
+    function setLanguage(lang) {
+      translatedNodes.forEach((node) => {
+        const shouldShow = node.dataset.lang === lang;
+        node.style.display = shouldShow ? (node.dataset.display || "") : "none";
+      });
+
+      langButtons.forEach((button) => {
+        button.dataset.active = String(button.dataset.setlang === lang);
+      });
+
+      document.documentElement.lang = lang;
+      localStorage.setItem("everyday_filetrap_lang", lang);
+    }
+
+    langButtons.forEach((button) => {
+      button.addEventListener("click", () => setLanguage(button.dataset.setlang));
+    });
+
+    const savedLanguage = localStorage.getItem("everyday_filetrap_lang");
+    setLanguage(savedLanguage === "bg" ? "bg" : "en");
+
+    document.getElementById("updated").textContent = new Date().toLocaleDateString();
+  </script>
 </body>
 </html>
