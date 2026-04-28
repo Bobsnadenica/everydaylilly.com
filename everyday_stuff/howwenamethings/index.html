@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How We Name Things | Everyday Stuff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #dff3ff;
+      --cloud: rgba(255, 255, 255, 0.72);
+      --paper: #fffdf7;
+      --ink: #28405f;
+      --soft-ink: #56718f;
+      --sun: #ffd86a;
+      --peach: #ffb28f;
+      --melon: #ff8f7e;
+      --mint: #8be0c1;
+      --berry: #6d73ff;
+      --butter: #fff0a8;
+      --border: rgba(40, 64, 95, 0.12);
+      --shadow: 0 22px 60px rgba(62, 92, 128, 0.14);
+      --shadow-soft: 0 14px 34px rgba(62, 92, 128, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Nunito", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 216, 106, 0.52), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(139, 224, 193, 0.38), transparent 24%),
+        linear-gradient(180deg, #bfe7ff 0%, #d8f2ff 24%, #fff7e9 66%, #fffdf7 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      filter: blur(10px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      top: -60px;
+      left: -90px;
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    body::after {
+      right: -80px;
+      bottom: 10%;
+      background: rgba(255, 178, 143, 0.18);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1140px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      color: var(--soft-ink);
+      font-size: 0.98rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      box-shadow: 0 10px 30px rgba(79, 117, 160, 0.1);
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .back-link:hover,
+    .back-link:focus-visible {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.9);
+      outline: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 32px;
+      align-items: center;
+      padding: 14px 0 30px;
+    }
+
+    .hero-copy h1,
+    .section-heading h2,
+    .feature-card h3,
+    .preview-panel h3,
+    .practice-card h3 {
+      font-family: "Baloo 2", "Trebuchet MS", "Avenir Next", sans-serif;
+      letter-spacing: 0.01em;
+      margin: 0;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(3rem, 7vw, 5.1rem);
+      line-height: 0.92;
+      margin-bottom: 16px;
+      max-width: 9ch;
+    }
+
+    .hero-copy p {
+      font-size: 1.16rem;
+      line-height: 1.7;
+      color: var(--soft-ink);
+      max-width: 31rem;
+      margin: 0 0 18px;
+    }
+
+    .hero-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.84);
+      box-shadow: var(--shadow-soft);
+      font-weight: 800;
+      color: #35547a;
+    }
+
+    .hero-note span {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--sun), #ffc45d);
+      font-size: 1.1rem;
+    }
+
+    .hero-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+      max-width: 40rem;
+    }
+
+    .hero-point {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      box-shadow: 0 10px 28px rgba(90, 116, 154, 0.08);
+    }
+
+    .hero-point strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .hero-point span {
+      color: var(--soft-ink);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .hero-art {
+      position: relative;
+      padding: 20px 0 8px;
+    }
+
+    .cloud {
+      position: absolute;
+      background: var(--cloud);
+      border-radius: 999px;
+      box-shadow: 0 14px 34px rgba(84, 118, 156, 0.08);
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: "";
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
+
+    .cloud::before {
+      width: 46px;
+      height: 46px;
+      left: 18px;
+      top: -20px;
+    }
+
+    .cloud::after {
+      width: 60px;
+      height: 60px;
+      right: 16px;
+      top: -24px;
+    }
+
+    .cloud-left {
+      top: -8px;
+      left: 18px;
+      width: 132px;
+      height: 46px;
+      animation: drift 7s ease-in-out infinite;
+    }
+
+    .cloud-right {
+      top: 34px;
+      right: 24px;
+      width: 164px;
+      height: 52px;
+      animation: drift 8.4s ease-in-out infinite reverse;
+    }
+
+    .showcase {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 252, 244, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.86);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+      overflow: hidden;
+    }
+
+    .showcase::before {
+      content: "";
+      position: absolute;
+      inset: 16px 16px auto;
+      height: 10px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle, rgba(255, 143, 126, 0.9) 0 28%, transparent 30%) 0 0 / 24px 10px no-repeat,
+        radial-gradient(circle, rgba(255, 216, 106, 0.9) 0 28%, transparent 30%) 34px 0 / 24px 10px no-repeat,
+        radial-gradient(circle, rgba(139, 224, 193, 0.9) 0 28%, transparent 30%) 68px 0 / 24px 10px no-repeat;
+    }
+
+    .showcase-inner {
+      margin-top: 16px;
+      padding: 22px;
+      background: linear-gradient(180deg, #e8f8ff 0%, #fffdf7 100%);
+      border-radius: 26px;
+      border: 1px solid rgba(105, 142, 187, 0.12);
+      min-height: 420px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 18px;
+    }
+
+    .showcase-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .showcase-heading h2 {
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+
+    .showcase-heading p {
+      margin: 4px 0 0;
+      color: var(--soft-ink);
+    }
+
+    .sparkles {
+      display: flex;
+      gap: 10px;
+      font-size: 1.2rem;
+      animation: bob 3.2s ease-in-out infinite;
+    }
+
+    .mini-steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini-step {
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid rgba(105, 142, 187, 0.14);
+    }
+
+    .mini-step strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .mini-step span {
+      color: var(--soft-ink);
+      font-size: 0.93rem;
+      line-height: 1.45;
+    }
+
+    .preview-scene {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .preview-card {
+      position: relative;
+      min-height: 150px;
+      border-radius: 24px;
+      padding: 18px 14px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(105, 142, 187, 0.16);
+      box-shadow: 0 18px 26px rgba(109, 115, 255, 0.07);
+      animation: floatUp 5.8s ease-in-out infinite;
+    }
+
+    .preview-card:nth-child(1) {
+      background: linear-gradient(180deg, #fff5af, #fff9dc);
+    }
+
+    .preview-card:nth-child(2) {
+      background: linear-gradient(180deg, #ffd5bf, #fff1e8);
+      animation-delay: 0.5s;
+    }
+
+    .preview-card:nth-child(3) {
+      background: linear-gradient(180deg, #cff5e3, #eefcf5);
+      animation-delay: 1s;
+    }
+
+    .preview-card:nth-child(4) {
+      background: linear-gradient(180deg, #d8ddff, #f0f2ff);
+      animation-delay: 1.5s;
+    }
+
+    .preview-card .emoji {
+      font-size: 3.3rem;
+      line-height: 1;
+      transform: translateY(-4px);
+    }
+
+    .preview-card .label {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      border: 1px solid rgba(105, 142, 187, 0.13);
+      box-shadow: 0 10px 18px rgba(109, 115, 255, 0.08);
+    }
+
+    .showcase-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      color: var(--soft-ink);
+      font-size: 0.98rem;
+    }
+
+    .showcase-footer strong {
+      color: var(--ink);
+    }
+
+    section {
+      margin-top: 44px;
+    }
+
+    .section-heading {
+      max-width: 46rem;
+      margin-bottom: 20px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--soft-ink);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .feature-card,
+    .practice-card,
+    .demo-shell,
+    .story-panel {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .feature-card {
+      padding: 24px;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 1.75rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+      background: linear-gradient(180deg, #fff1a6, #ffeec7);
+    }
+
+    .feature-card:nth-child(2) .feature-icon {
+      background: linear-gradient(180deg, #ffd3b9, #ffebdd);
+    }
+
+    .feature-card:nth-child(3) .feature-icon {
+      background: linear-gradient(180deg, #cdf4e2, #e9fbf3);
+    }
+
+    .feature-card h3 {
+      font-size: 1.55rem;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .demo-shell {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      gap: 26px;
+      align-items: start;
+    }
+
+    .preview-panel h3 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .preview-panel p {
+      color: var(--soft-ink);
+      line-height: 1.7;
+      margin: 0 0 18px;
+    }
+
+    .word-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .word-button,
+    .picture-button {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .word-button {
+      text-align: left;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 2px solid transparent;
+      box-shadow: 0 10px 24px rgba(86, 113, 143, 0.08);
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .word-button small {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--soft-ink);
+    }
+
+    .word-button:hover,
+    .word-button:focus-visible,
+    .picture-button:hover,
+    .picture-button:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .word-button.is-active {
+      background: linear-gradient(180deg, #fff8c3, #fff2b0);
+      border-color: rgba(255, 185, 63, 0.52);
+      box-shadow: 0 16px 24px rgba(255, 185, 63, 0.18);
+    }
+
+    .word-button.is-matched {
+      background: linear-gradient(180deg, #d9f8ea, #ebfcf3);
+      border-color: rgba(64, 180, 126, 0.38);
+      color: #235c49;
+    }
+
+    .picture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .picture-button {
+      min-height: 164px;
+      border-radius: 24px;
+      padding: 18px 12px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid transparent;
+      box-shadow: 0 14px 26px rgba(86, 113, 143, 0.08);
+      display: grid;
+      place-items: center;
+      gap: 10px;
+    }
+
+    .picture-emoji {
+      font-size: 3.2rem;
+      line-height: 1;
+    }
+
+    .picture-name {
+      font-weight: 800;
+      color: var(--soft-ink);
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+    }
+
+    .picture-button[data-tone="sun"] {
+      background: linear-gradient(180deg, #fff6ba, #fffcea);
+    }
+
+    .picture-button[data-tone="peach"] {
+      background: linear-gradient(180deg, #ffd8c3, #fff2e8);
+    }
+
+    .picture-button[data-tone="mint"] {
+      background: linear-gradient(180deg, #d4f6e6, #effcf7);
+    }
+
+    .picture-button[data-tone="sky"] {
+      background: linear-gradient(180deg, #dcefff, #eef7ff);
+    }
+
+    .picture-button[data-tone="berry"] {
+      background: linear-gradient(180deg, #e2e4ff, #f3f4ff);
+    }
+
+    .picture-button[data-tone="cream"] {
+      background: linear-gradient(180deg, #fff1da, #fff9f0);
+    }
+
+    .picture-button.is-match {
+      border-color: rgba(64, 180, 126, 0.4);
+      box-shadow: 0 18px 28px rgba(64, 180, 126, 0.16);
+      transform: translateY(-4px);
+    }
+
+    .picture-button.is-miss {
+      border-color: rgba(255, 143, 126, 0.46);
+      animation: wiggle 280ms ease;
+    }
+
+    .status-card {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 253, 255, 0.94));
+      border: 1px solid rgba(105, 142, 187, 0.12);
+      box-shadow: 0 12px 22px rgba(86, 113, 143, 0.08);
+    }
+
+    .status-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .status-card p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.55;
+    }
+
+    .practice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .practice-card {
+      padding: 22px;
+    }
+
+    .practice-card h3 {
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+    }
+
+    .practice-card p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.68;
+    }
+
+    .story-panels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .story-panel {
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .story-panel strong {
+      font-size: 1.05rem;
+    }
+
+    .story-panel p,
+    .story-panel li {
+      color: var(--soft-ink);
+      line-height: 1.68;
+      margin: 0;
+    }
+
+    .story-panel ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .footer-card {
+      margin-top: 48px;
+      padding: 26px 28px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 250, 236, 0.94));
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer-card p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.7;
+      max-width: 40rem;
+    }
+
+    .footer-link {
+      text-decoration: none;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #6d73ff, #575fe8);
+      color: white;
+      font-weight: 800;
+      box-shadow: 0 16px 28px rgba(109, 115, 255, 0.26);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .footer-link:hover,
+    .footer-link:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 32px rgba(109, 115, 255, 0.32);
+      outline: none;
+    }
+
+    @keyframes floatUp {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-7px);
+      }
+    }
+
+    @keyframes drift {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(10px);
+      }
+    }
+
+    @keyframes bob {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes wiggle {
+      0%, 100% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(-2deg);
+      }
+      75% {
+        transform: rotate(2deg);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .demo-shell,
+      .practice-grid,
+      .story-panels,
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-points,
+      .mini-steps,
+      .preview-scene,
+      .picture-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .practice-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page {
+        width: min(100% - 20px, 1140px);
+        padding-bottom: 56px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero {
+        gap: 22px;
+      }
+
+      .hero-copy h1 {
+        max-width: none;
+      }
+
+      .hero-points,
+      .mini-steps,
+      .preview-scene,
+      .picture-grid,
+      .practice-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .showcase,
+      .demo-shell,
+      .feature-card,
+      .practice-card,
+      .story-panel,
+      .footer-card {
+        border-radius: 24px;
+      }
+
+      .showcase {
+        padding: 18px;
+      }
+
+      .showcase-inner,
+      .demo-shell {
+        padding: 18px;
+      }
+
+      .showcase-heading,
+      .showcase-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .preview-card,
+      .picture-button {
+        min-height: 138px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="../index.html">← Back to Everyday Stuff</a>
+      <span>Made for little learners who love matching words with familiar things.</span>
+    </div>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <h1 id="page-title">How We Name Things</h1>
+        <p>
+          A bright little picture-and-word game where kids match names to everyday objects,
+          hear the right answer, and build confidence one happy tap at a time.
+        </p>
+        <div class="hero-note">
+          <span>✨</span>
+          Coming soon for families who want calm, playful early-word practice.
+        </div>
+        <div class="hero-points" aria-label="Game highlights">
+          <div class="hero-point">
+            <strong>See it</strong>
+            <span>Friendly object cards keep the focus on one clear picture at a time.</span>
+          </div>
+          <div class="hero-point">
+            <strong>Match it</strong>
+            <span>Kids tap a name, then find the picture that fits.</span>
+          </div>
+          <div class="hero-point">
+            <strong>Cheer it</strong>
+            <span>Gentle feedback makes every correct match feel like a win.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="cloud cloud-left"></div>
+        <div class="cloud cloud-right"></div>
+        <div class="showcase">
+          <div class="showcase-inner">
+            <div class="showcase-heading">
+              <div>
+                <h2>Match the name</h2>
+                <p>Tap a word, then spot the picture.</p>
+              </div>
+              <div class="sparkles">
+                <span>🌞</span>
+                <span>☁️</span>
+                <span>⭐</span>
+              </div>
+            </div>
+
+            <div class="mini-steps">
+              <div class="mini-step">
+                <strong>1. Listen</strong>
+                <span>The game says the word out loud.</span>
+              </div>
+              <div class="mini-step">
+                <strong>2. Look</strong>
+                <span>Bright object art helps kids scan with ease.</span>
+              </div>
+              <div class="mini-step">
+                <strong>3. Match</strong>
+                <span>Happy feedback celebrates the right choice.</span>
+              </div>
+            </div>
+
+            <div class="preview-scene">
+              <div class="preview-card">
+                <div class="emoji">🍎</div>
+                <div class="label">apple</div>
+              </div>
+              <div class="preview-card">
+                <div class="emoji">🧢</div>
+                <div class="label">hat</div>
+              </div>
+              <div class="preview-card">
+                <div class="emoji">🚗</div>
+                <div class="label">car</div>
+              </div>
+              <div class="preview-card">
+                <div class="emoji">🥤</div>
+                <div class="label">cup</div>
+              </div>
+            </div>
+
+            <div class="showcase-footer">
+              <span><strong>Built for quick rounds:</strong> just a few taps, a little cheer, and another match.</span>
+              <span>Calm colors. Clear choices. Everyday words.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="how-it-works">
+      <div class="section-heading">
+        <h2 id="how-it-works">How the game feels</h2>
+        <p>
+          Each round keeps the interaction simple: one word to focus on, a few cheerful objects to look through,
+          and a clear moment of success when the right picture is found.
+        </p>
+      </div>
+
+      <div class="features">
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">👀</div>
+          <h3>See the object</h3>
+          <p>
+            Large, friendly picture cards make it easy for little players to notice details and connect the name to something familiar.
+          </p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">🖐️</div>
+          <h3>Tap the name</h3>
+          <p>
+            Simple choices keep the screen calm and readable, so kids can focus on matching instead of figuring out the rules.
+          </p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">🎉</div>
+          <h3>Celebrate the match</h3>
+          <p>
+            Correct answers feel warm and encouraging, helping vocabulary practice feel more like play than homework.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="try-a-round">
+      <div class="section-heading">
+        <h2 id="try-a-round">Try a tiny round</h2>
+        <p>
+          Pick a word card first, then tap the picture you think matches it. This little preview gives the page the same calm
+          rhythm the real game is aiming for.
+        </p>
+      </div>
+
+      <div class="demo-shell">
+        <div class="preview-panel">
+          <h3>Choose a name</h3>
+          <p>When a word is glowing, it is your turn to find that picture.</p>
+          <div class="word-list" role="list" aria-label="Words to match">
+            <button class="word-button" type="button" data-match="apple" data-label="Apple">
+              Apple
+              <small>Find the red snack.</small>
+            </button>
+            <button class="word-button" type="button" data-match="hat" data-label="Hat">
+              Hat
+              <small>Look for the cozy headwear.</small>
+            </button>
+            <button class="word-button" type="button" data-match="car" data-label="Car">
+              Car
+              <small>Spot the rolling ride.</small>
+            </button>
+            <button class="word-button" type="button" data-match="cup" data-label="Cup">
+              Cup
+              <small>Pick the little drink holder.</small>
+            </button>
+            <button class="word-button" type="button" data-match="ball" data-label="Ball">
+              Ball
+              <small>Choose the bouncy toy.</small>
+            </button>
+            <button class="word-button" type="button" data-match="duck" data-label="Duck">
+              Duck
+              <small>Find the waddly friend.</small>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="picture-grid" aria-label="Object pictures">
+            <button class="picture-button" type="button" data-match="ball" data-tone="sun">
+              <span class="picture-emoji" aria-hidden="true">⚽</span>
+              <span class="picture-name">ball</span>
+            </button>
+            <button class="picture-button" type="button" data-match="apple" data-tone="peach">
+              <span class="picture-emoji" aria-hidden="true">🍎</span>
+              <span class="picture-name">apple</span>
+            </button>
+            <button class="picture-button" type="button" data-match="cup" data-tone="mint">
+              <span class="picture-emoji" aria-hidden="true">🥤</span>
+              <span class="picture-name">cup</span>
+            </button>
+            <button class="picture-button" type="button" data-match="duck" data-tone="sky">
+              <span class="picture-emoji" aria-hidden="true">🦆</span>
+              <span class="picture-name">duck</span>
+            </button>
+            <button class="picture-button" type="button" data-match="car" data-tone="berry">
+              <span class="picture-emoji" aria-hidden="true">🚗</span>
+              <span class="picture-name">car</span>
+            </button>
+            <button class="picture-button" type="button" data-match="hat" data-tone="cream">
+              <span class="picture-emoji" aria-hidden="true">🧢</span>
+              <span class="picture-name">hat</span>
+            </button>
+          </div>
+
+          <div class="status-card" aria-live="polite">
+            <strong id="status-title">Start here</strong>
+            <p id="status-text">Tap any word on the left, then choose the matching picture on the right.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="what-kids-practice">
+      <div class="section-heading">
+        <h2 id="what-kids-practice">What kids practice along the way</h2>
+        <p>
+          The game stays simple on purpose, but each round still supports recognition, vocabulary,
+          and the confidence that comes from making a good match.
+        </p>
+      </div>
+
+      <div class="practice-grid">
+        <article class="practice-card">
+          <h3>Everyday words</h3>
+          <p>Objects from home, play, and daily routines help new words feel grounded in real life.</p>
+        </article>
+        <article class="practice-card">
+          <h3>Picture scanning</h3>
+          <p>Kids compare shapes, colors, and familiar details as they search for the right answer.</p>
+        </article>
+        <article class="practice-card">
+          <h3>Listening focus</h3>
+          <p>Short prompts and simple choices keep attention on the word that matters in the moment.</p>
+        </article>
+        <article class="practice-card">
+          <h3>Confident choosing</h3>
+          <p>Small wins stack up quickly, encouraging kids to trust what they know and try again when needed.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="why-families-like-it">
+      <div class="section-heading">
+        <h2 id="why-families-like-it">Why families can settle into it fast</h2>
+        <p>
+          The page around the game is just as gentle as the game idea itself: clear, calm, and easy to understand in a few seconds.
+        </p>
+      </div>
+
+      <div class="story-panels">
+        <article class="story-panel">
+          <strong>Short rounds fit real life.</strong>
+          <p>
+            A quick matching session can feel complete in a minute or two, which works nicely for transitions, waiting rooms,
+            or one more little activity before bed.
+          </p>
+        </article>
+        <article class="story-panel">
+          <strong>The game idea stays easy to explain.</strong>
+          <ul>
+            <li>Pick the word.</li>
+            <li>Find the picture.</li>
+            <li>Celebrate the match.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <div class="footer-card">
+      <p>
+        “How We Name Things” is all about helping little learners connect words to the world around them, one cheerful object at a time.
+      </p>
+      <a class="footer-link" href="../index.html">See more Everyday Stuff</a>
+    </div>
+  </main>
+
+  <script>
+    const wordButtons = [...document.querySelectorAll(".word-button")];
+    const pictureButtons = [...document.querySelectorAll(".picture-button")];
+    const statusTitle = document.getElementById("status-title");
+    const statusText = document.getElementById("status-text");
+
+    let activeWord = null;
+
+    function updateStatus(title, text) {
+      statusTitle.textContent = title;
+      statusText.textContent = text;
+    }
+
+    function clearActiveWord() {
+      wordButtons.forEach((button) => button.classList.remove("is-active"));
+      activeWord = null;
+    }
+
+    function allMatched() {
+      return wordButtons.every((button) => button.classList.contains("is-matched"));
+    }
+
+    wordButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.classList.contains("is-matched")) {
+          updateStatus("Already matched", "That word already found its picture. Pick one of the remaining names.");
+          return;
+        }
+
+        wordButtons.forEach((item) => {
+          if (!item.classList.contains("is-matched")) {
+            item.classList.remove("is-active");
+          }
+        });
+
+        button.classList.add("is-active");
+        activeWord = button.dataset.match;
+        updateStatus("Now find it", "Great pick. Tap the picture that matches “" + button.dataset.label + "”.");
+      });
+    });
+
+    pictureButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.classList.contains("is-match")) {
+          updateStatus("Already matched", "That picture is already paired up. Try another word.");
+          return;
+        }
+
+        if (!activeWord) {
+          button.classList.add("is-miss");
+          updateStatus("Pick a word first", "Start with a word on the left, then choose the picture you want to match.");
+          setTimeout(() => button.classList.remove("is-miss"), 320);
+          return;
+        }
+
+        const selectedWord = wordButtons.find((item) => item.dataset.match === activeWord);
+        if (button.dataset.match === activeWord) {
+          button.classList.add("is-match");
+          selectedWord.classList.remove("is-active");
+          selectedWord.classList.add("is-matched");
+          const matchedName = selectedWord.dataset.label;
+          clearActiveWord();
+
+          if (allMatched()) {
+            updateStatus("You matched them all!", "Nice work. Every word found its picture, just like a full round in the game.");
+          } else {
+            updateStatus("That is a match!", "You found “" + matchedName + "”. Pick another word to keep going.");
+          }
+          return;
+        }
+
+        button.classList.add("is-miss");
+        selectedWord.classList.add("is-active");
+        updateStatus("Almost", "That picture does not match yet. Keep the word you picked and try another object.");
+        setTimeout(() => button.classList.remove("is-miss"), 320);
+      });
+    });
+  </script>
+</body>
+</html>
