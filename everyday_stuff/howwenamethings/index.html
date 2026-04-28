@@ -1028,6 +1028,7 @@
         transition-duration: 1ms !important;
       }
     }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body class="is-gated">
@@ -1604,7 +1605,7 @@
     }
 
     function closeGate() {
-      gate.hidden = true;
+      gate.style.display = "none";
       document.body.classList.remove("is-gated");
     }
 
