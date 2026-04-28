@@ -46,6 +46,10 @@
       overflow-x: hidden;
     }
 
+    body.is-gated {
+      overflow: hidden;
+    }
+
     body::before,
     body::after {
       content: "";
@@ -80,6 +84,13 @@
       width: min(1140px, calc(100% - 32px));
       margin: 0 auto;
       padding: 24px 0 72px;
+      transition: filter 220ms ease;
+    }
+
+    body.is-gated .page {
+      filter: blur(6px);
+      pointer-events: none;
+      user-select: none;
     }
 
     .topbar {
@@ -90,6 +101,14 @@
       margin-bottom: 24px;
       color: var(--soft-ink);
       font-size: 0.98rem;
+    }
+
+    .topbar-side {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .back-link {
@@ -110,6 +129,136 @@
       transform: translateY(-2px);
       background: rgba(255, 255, 255, 0.9);
       outline: none;
+    }
+
+    .language-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.84);
+      box-shadow: 0 10px 28px rgba(79, 117, 160, 0.08);
+    }
+
+    .language-switcher-label {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .language-chip,
+    .language-option {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .language-chip {
+      min-width: 48px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.84);
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1px rgba(86, 113, 143, 0.12);
+    }
+
+    .language-chip.is-active {
+      background: linear-gradient(180deg, #6d73ff, #575fe8);
+      color: #fff;
+      box-shadow: 0 12px 20px rgba(109, 115, 255, 0.25);
+    }
+
+    .language-chip:hover,
+    .language-chip:focus-visible,
+    .language-option:hover,
+    .language-option:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .language-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(39, 63, 96, 0.34);
+      backdrop-filter: blur(10px);
+    }
+
+    .language-dialog {
+      width: min(680px, 100%);
+      padding: 30px;
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 251, 242, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 30px 90px rgba(43, 69, 102, 0.22);
+      text-align: center;
+    }
+
+    .language-badge {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 16px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      background: linear-gradient(180deg, #fff0aa, #ffd2be);
+      box-shadow: inset 0 2px 12px rgba(255, 255, 255, 0.4);
+    }
+
+    .language-dialog h2 {
+      margin: 0 0 10px;
+      font-family: "Baloo 2", "Trebuchet MS", "Avenir Next", sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1;
+    }
+
+    .language-dialog p {
+      margin: 0;
+      color: var(--soft-ink);
+      line-height: 1.7;
+      font-size: 1.04rem;
+    }
+
+    .language-dialog .language-gate-alt {
+      margin-top: 8px;
+      font-weight: 700;
+    }
+
+    .language-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .language-option {
+      text-align: left;
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 16px 30px rgba(79, 117, 160, 0.12);
+      border: 1px solid rgba(86, 113, 143, 0.12);
+    }
+
+    .language-option strong {
+      display: block;
+      font-size: 1.24rem;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .language-option span {
+      display: block;
+      color: var(--soft-ink);
+      line-height: 1.55;
+      font-size: 0.98rem;
     }
 
     .hero {
@@ -137,6 +286,11 @@
       max-width: 9ch;
     }
 
+    html[lang="bg"] .hero-copy h1 {
+      max-width: 12ch;
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
+    }
+
     .hero-copy p {
       font-size: 1.16rem;
       line-height: 1.7;
@@ -158,7 +312,7 @@
       color: #35547a;
     }
 
-    .hero-note span {
+    .hero-note span:first-child {
       display: inline-grid;
       place-items: center;
       width: 34px;
@@ -166,6 +320,7 @@
       border-radius: 12px;
       background: linear-gradient(180deg, var(--sun), #ffc45d);
       font-size: 1.1rem;
+      flex: 0 0 34px;
     }
 
     .hero-points {
@@ -385,6 +540,7 @@
       font-size: 0.92rem;
       border: 1px solid rgba(105, 142, 187, 0.13);
       box-shadow: 0 10px 18px rgba(109, 115, 255, 0.08);
+      white-space: nowrap;
     }
 
     .showcase-footer {
@@ -520,12 +676,17 @@
       color: var(--ink);
     }
 
+    .word-main {
+      display: block;
+    }
+
     .word-button small {
       display: block;
       margin-top: 4px;
       font-size: 0.9rem;
       font-weight: 700;
       color: var(--soft-ink);
+      line-height: 1.45;
     }
 
     .word-button:hover,
@@ -793,6 +954,19 @@
         flex-direction: column;
       }
 
+      .topbar-side {
+        justify-content: flex-start;
+      }
+
+      .language-switcher {
+        flex-wrap: wrap;
+        border-radius: 22px;
+      }
+
+      .language-options {
+        grid-template-columns: 1fr;
+      }
+
       .hero {
         gap: 22px;
       }
@@ -814,7 +988,8 @@
       .feature-card,
       .practice-card,
       .story-panel,
-      .footer-card {
+      .footer-card,
+      .language-dialog {
         border-radius: 24px;
       }
 
@@ -823,7 +998,8 @@
       }
 
       .showcase-inner,
-      .demo-shell {
+      .demo-shell,
+      .language-dialog {
         padding: 18px;
       }
 
@@ -854,36 +1030,62 @@
     }
   </style>
 </head>
-<body>
+<body class="is-gated">
+  <div class="language-gate" id="language-gate" role="dialog" aria-modal="true" aria-labelledby="language-gate-title" aria-describedby="language-gate-text">
+    <div class="language-dialog">
+      <div class="language-badge" aria-hidden="true">🌍</div>
+      <h2 id="language-gate-title">Choose your language</h2>
+      <p id="language-gate-text">Pick the language you want for the page and the matching demo.</p>
+      <p class="language-gate-alt">Избери езика за страницата и демонстрацията.</p>
+      <div class="language-options">
+        <button class="language-option" type="button" data-language="en">
+          <strong>English</strong>
+          <span>Open the page in English and start the matching preview.</span>
+        </button>
+        <button class="language-option" type="button" data-language="bg">
+          <strong>Български</strong>
+          <span>Отвори страницата на български и започни демонстрацията.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <main class="page">
     <div class="topbar">
-      <a class="back-link" href="../index.html">← Back to Everyday Stuff</a>
-      <span>Made for little learners who love matching words with familiar things.</span>
+      <a class="back-link" href="../index.html" data-i18n="nav.back">← Back to Everyday Stuff</a>
+      <div class="topbar-side">
+        <span data-i18n="nav.tagline">Made for little learners who love matching words with familiar things.</span>
+        <div class="language-switcher" role="group" data-i18n-aria-label="nav.languageSwitcherAria" aria-label="Language switcher">
+          <span class="language-switcher-label" data-i18n="nav.languageLabel">Language</span>
+          <button class="language-chip" type="button" data-language="en" aria-pressed="true">EN</button>
+          <button class="language-chip" type="button" data-language="bg" aria-pressed="false">BG</button>
+        </div>
+      </div>
     </div>
 
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-copy">
-        <h1 id="page-title">How We Name Things</h1>
-        <p>
+        <h1 id="page-title" data-i18n="hero.title">How We Name Things</h1>
+        <p data-i18n="hero.body">
           A bright little picture-and-word game where kids match names to everyday objects,
           hear the right answer, and build confidence one happy tap at a time.
         </p>
         <div class="hero-note">
           <span>✨</span>
-          Coming soon for families who want calm, playful early-word practice.
+          <span data-i18n="hero.note">Coming soon for families who want calm, playful early-word practice.</span>
         </div>
         <div class="hero-points" aria-label="Game highlights">
           <div class="hero-point">
-            <strong>See it</strong>
-            <span>Friendly object cards keep the focus on one clear picture at a time.</span>
+            <strong data-i18n="hero.point1.title">See it</strong>
+            <span data-i18n="hero.point1.body">Friendly object cards keep the focus on one clear picture at a time.</span>
           </div>
           <div class="hero-point">
-            <strong>Match it</strong>
-            <span>Kids tap a name, then find the picture that fits.</span>
+            <strong data-i18n="hero.point2.title">Match it</strong>
+            <span data-i18n="hero.point2.body">Kids tap a name, then find the picture that fits.</span>
           </div>
           <div class="hero-point">
-            <strong>Cheer it</strong>
-            <span>Gentle feedback makes every correct match feel like a win.</span>
+            <strong data-i18n="hero.point3.title">Cheer it</strong>
+            <span data-i18n="hero.point3.body">Gentle feedback makes every correct match feel like a win.</span>
           </div>
         </div>
       </div>
@@ -895,8 +1097,8 @@
           <div class="showcase-inner">
             <div class="showcase-heading">
               <div>
-                <h2>Match the name</h2>
-                <p>Tap a word, then spot the picture.</p>
+                <h2 data-i18n="preview.heading">Match the name</h2>
+                <p data-i18n="preview.subheading">Tap a word, then spot the picture.</p>
               </div>
               <div class="sparkles">
                 <span>🌞</span>
@@ -907,41 +1109,41 @@
 
             <div class="mini-steps">
               <div class="mini-step">
-                <strong>1. Listen</strong>
-                <span>The game says the word out loud.</span>
+                <strong data-i18n="preview.step1.title">1. Listen</strong>
+                <span data-i18n="preview.step1.body">The game says the word out loud.</span>
               </div>
               <div class="mini-step">
-                <strong>2. Look</strong>
-                <span>Bright object art helps kids scan with ease.</span>
+                <strong data-i18n="preview.step2.title">2. Look</strong>
+                <span data-i18n="preview.step2.body">Bright object art helps kids scan with ease.</span>
               </div>
               <div class="mini-step">
-                <strong>3. Match</strong>
-                <span>Happy feedback celebrates the right choice.</span>
+                <strong data-i18n="preview.step3.title">3. Match</strong>
+                <span data-i18n="preview.step3.body">Happy feedback celebrates the right choice.</span>
               </div>
             </div>
 
             <div class="preview-scene">
               <div class="preview-card">
                 <div class="emoji">🍎</div>
-                <div class="label">apple</div>
+                <div class="label" data-i18n="preview.card.apple">apple</div>
               </div>
               <div class="preview-card">
                 <div class="emoji">🧢</div>
-                <div class="label">hat</div>
+                <div class="label" data-i18n="preview.card.hat">hat</div>
               </div>
               <div class="preview-card">
                 <div class="emoji">🚗</div>
-                <div class="label">car</div>
+                <div class="label" data-i18n="preview.card.car">car</div>
               </div>
               <div class="preview-card">
                 <div class="emoji">🥤</div>
-                <div class="label">cup</div>
+                <div class="label" data-i18n="preview.card.cup">cup</div>
               </div>
             </div>
 
             <div class="showcase-footer">
-              <span><strong>Built for quick rounds:</strong> just a few taps, a little cheer, and another match.</span>
-              <span>Calm colors. Clear choices. Everyday words.</span>
+              <span data-i18n-html="preview.footer.left"><strong>Built for quick rounds:</strong> just a few taps, a little cheer, and another match.</span>
+              <span data-i18n="preview.footer.right">Calm colors. Clear choices. Everyday words.</span>
             </div>
           </div>
         </div>
@@ -950,8 +1152,8 @@
 
     <section aria-labelledby="how-it-works">
       <div class="section-heading">
-        <h2 id="how-it-works">How the game feels</h2>
-        <p>
+        <h2 id="how-it-works" data-i18n="how.title">How the game feels</h2>
+        <p data-i18n="how.body">
           Each round keeps the interaction simple: one word to focus on, a few cheerful objects to look through,
           and a clear moment of success when the right picture is found.
         </p>
@@ -960,22 +1162,22 @@
       <div class="features">
         <article class="feature-card">
           <div class="feature-icon" aria-hidden="true">👀</div>
-          <h3>See the object</h3>
-          <p>
+          <h3 data-i18n="feature1.title">See the object</h3>
+          <p data-i18n="feature1.body">
             Large, friendly picture cards make it easy for little players to notice details and connect the name to something familiar.
           </p>
         </article>
         <article class="feature-card">
           <div class="feature-icon" aria-hidden="true">🖐️</div>
-          <h3>Tap the name</h3>
-          <p>
+          <h3 data-i18n="feature2.title">Tap the name</h3>
+          <p data-i18n="feature2.body">
             Simple choices keep the screen calm and readable, so kids can focus on matching instead of figuring out the rules.
           </p>
         </article>
         <article class="feature-card">
           <div class="feature-icon" aria-hidden="true">🎉</div>
-          <h3>Celebrate the match</h3>
-          <p>
+          <h3 data-i18n="feature3.title">Celebrate the match</h3>
+          <p data-i18n="feature3.body">
             Correct answers feel warm and encouraging, helping vocabulary practice feel more like play than homework.
           </p>
         </article>
@@ -984,8 +1186,8 @@
 
     <section aria-labelledby="try-a-round">
       <div class="section-heading">
-        <h2 id="try-a-round">Try a tiny round</h2>
-        <p>
+        <h2 id="try-a-round" data-i18n="demo.title">Try a tiny round</h2>
+        <p data-i18n="demo.body">
           Pick a word card first, then tap the picture you think matches it. This little preview gives the page the same calm
           rhythm the real game is aiming for.
         </p>
@@ -993,67 +1195,67 @@
 
       <div class="demo-shell">
         <div class="preview-panel">
-          <h3>Choose a name</h3>
-          <p>When a word is glowing, it is your turn to find that picture.</p>
-          <div class="word-list" role="list" aria-label="Words to match">
-            <button class="word-button" type="button" data-match="apple" data-label="Apple">
-              Apple
-              <small>Find the red snack.</small>
+          <h3 data-i18n="demo.panelTitle">Choose a name</h3>
+          <p data-i18n="demo.panelBody">When a word is glowing, it is your turn to find that picture.</p>
+          <div class="word-list" role="list" data-i18n-aria-label="demo.wordsAria" aria-label="Words to match">
+            <button class="word-button" type="button" data-match="apple">
+              <span class="word-main" data-i18n="word.apple.label">Apple</span>
+              <small data-i18n="word.apple.hint">Find the red snack.</small>
             </button>
-            <button class="word-button" type="button" data-match="hat" data-label="Hat">
-              Hat
-              <small>Look for the cozy headwear.</small>
+            <button class="word-button" type="button" data-match="hat">
+              <span class="word-main" data-i18n="word.hat.label">Hat</span>
+              <small data-i18n="word.hat.hint">Look for the cozy headwear.</small>
             </button>
-            <button class="word-button" type="button" data-match="car" data-label="Car">
-              Car
-              <small>Spot the rolling ride.</small>
+            <button class="word-button" type="button" data-match="car">
+              <span class="word-main" data-i18n="word.car.label">Car</span>
+              <small data-i18n="word.car.hint">Spot the rolling ride.</small>
             </button>
-            <button class="word-button" type="button" data-match="cup" data-label="Cup">
-              Cup
-              <small>Pick the little drink holder.</small>
+            <button class="word-button" type="button" data-match="cup">
+              <span class="word-main" data-i18n="word.cup.label">Cup</span>
+              <small data-i18n="word.cup.hint">Pick the little drink holder.</small>
             </button>
-            <button class="word-button" type="button" data-match="ball" data-label="Ball">
-              Ball
-              <small>Choose the bouncy toy.</small>
+            <button class="word-button" type="button" data-match="ball">
+              <span class="word-main" data-i18n="word.ball.label">Ball</span>
+              <small data-i18n="word.ball.hint">Choose the bouncy toy.</small>
             </button>
-            <button class="word-button" type="button" data-match="duck" data-label="Duck">
-              Duck
-              <small>Find the waddly friend.</small>
+            <button class="word-button" type="button" data-match="duck">
+              <span class="word-main" data-i18n="word.duck.label">Duck</span>
+              <small data-i18n="word.duck.hint">Find the waddly friend.</small>
             </button>
           </div>
         </div>
 
         <div>
-          <div class="picture-grid" aria-label="Object pictures">
+          <div class="picture-grid" data-i18n-aria-label="demo.picturesAria" aria-label="Object pictures">
             <button class="picture-button" type="button" data-match="ball" data-tone="sun">
               <span class="picture-emoji" aria-hidden="true">⚽</span>
-              <span class="picture-name">ball</span>
+              <span class="picture-name" data-i18n="picture.ball">ball</span>
             </button>
             <button class="picture-button" type="button" data-match="apple" data-tone="peach">
               <span class="picture-emoji" aria-hidden="true">🍎</span>
-              <span class="picture-name">apple</span>
+              <span class="picture-name" data-i18n="picture.apple">apple</span>
             </button>
             <button class="picture-button" type="button" data-match="cup" data-tone="mint">
               <span class="picture-emoji" aria-hidden="true">🥤</span>
-              <span class="picture-name">cup</span>
+              <span class="picture-name" data-i18n="picture.cup">cup</span>
             </button>
             <button class="picture-button" type="button" data-match="duck" data-tone="sky">
               <span class="picture-emoji" aria-hidden="true">🦆</span>
-              <span class="picture-name">duck</span>
+              <span class="picture-name" data-i18n="picture.duck">duck</span>
             </button>
             <button class="picture-button" type="button" data-match="car" data-tone="berry">
               <span class="picture-emoji" aria-hidden="true">🚗</span>
-              <span class="picture-name">car</span>
+              <span class="picture-name" data-i18n="picture.car">car</span>
             </button>
             <button class="picture-button" type="button" data-match="hat" data-tone="cream">
               <span class="picture-emoji" aria-hidden="true">🧢</span>
-              <span class="picture-name">hat</span>
+              <span class="picture-name" data-i18n="picture.hat">hat</span>
             </button>
           </div>
 
           <div class="status-card" aria-live="polite">
-            <strong id="status-title">Start here</strong>
-            <p id="status-text">Tap any word on the left, then choose the matching picture on the right.</p>
+            <strong id="status-title" data-i18n="status.start.title">Start here</strong>
+            <p id="status-text" data-i18n="status.start.text">Tap any word on the left, then choose the matching picture on the right.</p>
           </div>
         </div>
       </div>
@@ -1061,8 +1263,8 @@
 
     <section aria-labelledby="what-kids-practice">
       <div class="section-heading">
-        <h2 id="what-kids-practice">What kids practice along the way</h2>
-        <p>
+        <h2 id="what-kids-practice" data-i18n="practice.section.title">What kids practice along the way</h2>
+        <p data-i18n="practice.section.body">
           The game stays simple on purpose, but each round still supports recognition, vocabulary,
           and the confidence that comes from making a good match.
         </p>
@@ -1070,70 +1272,307 @@
 
       <div class="practice-grid">
         <article class="practice-card">
-          <h3>Everyday words</h3>
-          <p>Objects from home, play, and daily routines help new words feel grounded in real life.</p>
+          <h3 data-i18n="practice1.title">Everyday words</h3>
+          <p data-i18n="practice1.body">Objects from home, play, and daily routines help new words feel grounded in real life.</p>
         </article>
         <article class="practice-card">
-          <h3>Picture scanning</h3>
-          <p>Kids compare shapes, colors, and familiar details as they search for the right answer.</p>
+          <h3 data-i18n="practice2.title">Picture scanning</h3>
+          <p data-i18n="practice2.body">Kids compare shapes, colors, and familiar details as they search for the right answer.</p>
         </article>
         <article class="practice-card">
-          <h3>Listening focus</h3>
-          <p>Short prompts and simple choices keep attention on the word that matters in the moment.</p>
+          <h3 data-i18n="practice3.title">Listening focus</h3>
+          <p data-i18n="practice3.body">Short prompts and simple choices keep attention on the word that matters in the moment.</p>
         </article>
         <article class="practice-card">
-          <h3>Confident choosing</h3>
-          <p>Small wins stack up quickly, encouraging kids to trust what they know and try again when needed.</p>
+          <h3 data-i18n="practice4.title">Confident choosing</h3>
+          <p data-i18n="practice4.body">Small wins stack up quickly, encouraging kids to trust what they know and try again when needed.</p>
         </article>
       </div>
     </section>
 
     <section aria-labelledby="why-families-like-it">
       <div class="section-heading">
-        <h2 id="why-families-like-it">Why families can settle into it fast</h2>
-        <p>
+        <h2 id="why-families-like-it" data-i18n="family.title">Why families can settle into it fast</h2>
+        <p data-i18n="family.body">
           The page around the game is just as gentle as the game idea itself: clear, calm, and easy to understand in a few seconds.
         </p>
       </div>
 
       <div class="story-panels">
         <article class="story-panel">
-          <strong>Short rounds fit real life.</strong>
-          <p>
+          <strong data-i18n="family.panel1.title">Short rounds fit real life.</strong>
+          <p data-i18n="family.panel1.body">
             A quick matching session can feel complete in a minute or two, which works nicely for transitions, waiting rooms,
             or one more little activity before bed.
           </p>
         </article>
         <article class="story-panel">
-          <strong>The game idea stays easy to explain.</strong>
+          <strong data-i18n="family.panel2.title">The game idea stays easy to explain.</strong>
           <ul>
-            <li>Pick the word.</li>
-            <li>Find the picture.</li>
-            <li>Celebrate the match.</li>
+            <li data-i18n="family.list1">Pick the word.</li>
+            <li data-i18n="family.list2">Find the picture.</li>
+            <li data-i18n="family.list3">Celebrate the match.</li>
           </ul>
         </article>
       </div>
     </section>
 
     <div class="footer-card">
-      <p>
+      <p data-i18n="footer.body">
         “How We Name Things” is all about helping little learners connect words to the world around them, one cheerful object at a time.
       </p>
-      <a class="footer-link" href="../index.html">See more Everyday Stuff</a>
+      <a class="footer-link" href="../index.html" data-i18n="footer.link">See more Everyday Stuff</a>
     </div>
   </main>
 
   <script>
+    const translations = {
+      en: {
+        "meta.title": "How We Name Things | Everyday Stuff",
+        "nav.back": "← Back to Everyday Stuff",
+        "nav.tagline": "Made for little learners who love matching words with familiar things.",
+        "nav.languageLabel": "Language",
+        "nav.languageSwitcherAria": "Language switcher",
+        "hero.title": "How We Name Things",
+        "hero.body": "A bright little picture-and-word game where kids match names to everyday objects, hear the right answer, and build confidence one happy tap at a time.",
+        "hero.note": "Coming soon for families who want calm, playful early-word practice.",
+        "hero.point1.title": "See it",
+        "hero.point1.body": "Friendly object cards keep the focus on one clear picture at a time.",
+        "hero.point2.title": "Match it",
+        "hero.point2.body": "Kids tap a name, then find the picture that fits.",
+        "hero.point3.title": "Cheer it",
+        "hero.point3.body": "Gentle feedback makes every correct match feel like a win.",
+        "preview.heading": "Match the name",
+        "preview.subheading": "Tap a word, then spot the picture.",
+        "preview.step1.title": "1. Listen",
+        "preview.step1.body": "The game says the word out loud.",
+        "preview.step2.title": "2. Look",
+        "preview.step2.body": "Bright object art helps kids scan with ease.",
+        "preview.step3.title": "3. Match",
+        "preview.step3.body": "Happy feedback celebrates the right choice.",
+        "preview.card.apple": "apple",
+        "preview.card.hat": "hat",
+        "preview.card.car": "car",
+        "preview.card.cup": "cup",
+        "preview.footer.left": "<strong>Built for quick rounds:</strong> just a few taps, a little cheer, and another match.",
+        "preview.footer.right": "Calm colors. Clear choices. Everyday words.",
+        "how.title": "How the game feels",
+        "how.body": "Each round keeps the interaction simple: one word to focus on, a few cheerful objects to look through, and a clear moment of success when the right picture is found.",
+        "feature1.title": "See the object",
+        "feature1.body": "Large, friendly picture cards make it easy for little players to notice details and connect the name to something familiar.",
+        "feature2.title": "Tap the name",
+        "feature2.body": "Simple choices keep the screen calm and readable, so kids can focus on matching instead of figuring out the rules.",
+        "feature3.title": "Celebrate the match",
+        "feature3.body": "Correct answers feel warm and encouraging, helping vocabulary practice feel more like play than homework.",
+        "demo.title": "Try a tiny round",
+        "demo.body": "Pick a word card first, then tap the picture you think matches it. This little preview gives the page the same calm rhythm the real game is aiming for.",
+        "demo.panelTitle": "Choose a name",
+        "demo.panelBody": "When a word is glowing, it is your turn to find that picture.",
+        "demo.wordsAria": "Words to match",
+        "demo.picturesAria": "Object pictures",
+        "word.apple.label": "Apple",
+        "word.apple.hint": "Find the red snack.",
+        "word.hat.label": "Hat",
+        "word.hat.hint": "Look for the cozy headwear.",
+        "word.car.label": "Car",
+        "word.car.hint": "Spot the rolling ride.",
+        "word.cup.label": "Cup",
+        "word.cup.hint": "Pick the little drink holder.",
+        "word.ball.label": "Ball",
+        "word.ball.hint": "Choose the bouncy toy.",
+        "word.duck.label": "Duck",
+        "word.duck.hint": "Find the waddly friend.",
+        "picture.ball": "ball",
+        "picture.apple": "apple",
+        "picture.cup": "cup",
+        "picture.duck": "duck",
+        "picture.car": "car",
+        "picture.hat": "hat",
+        "status.start.title": "Start here",
+        "status.start.text": "Tap any word on the left, then choose the matching picture on the right.",
+        "status.wordAlready.title": "Already matched",
+        "status.wordAlready.text": "That word already found its picture. Pick one of the remaining names.",
+        "status.nowFind.title": "Now find it",
+        "status.nowFind.text": "Great pick. Tap the picture that matches “{word}”.",
+        "status.pictureAlready.title": "Already matched",
+        "status.pictureAlready.text": "That picture is already paired up. Try another word.",
+        "status.pickWordFirst.title": "Pick a word first",
+        "status.pickWordFirst.text": "Start with a word on the left, then choose the picture you want to match.",
+        "status.allMatched.title": "You matched them all!",
+        "status.allMatched.text": "Nice work. Every word found its picture, just like a full round in the game.",
+        "status.match.title": "That is a match!",
+        "status.match.text": "You found “{word}”. Pick another word to keep going.",
+        "status.almost.title": "Almost",
+        "status.almost.text": "That picture does not match yet. Keep the word you picked and try another object.",
+        "practice.section.title": "What kids practice along the way",
+        "practice.section.body": "The game stays simple on purpose, but each round still supports recognition, vocabulary, and the confidence that comes from making a good match.",
+        "practice1.title": "Everyday words",
+        "practice1.body": "Objects from home, play, and daily routines help new words feel grounded in real life.",
+        "practice2.title": "Picture scanning",
+        "practice2.body": "Kids compare shapes, colors, and familiar details as they search for the right answer.",
+        "practice3.title": "Listening focus",
+        "practice3.body": "Short prompts and simple choices keep attention on the word that matters in the moment.",
+        "practice4.title": "Confident choosing",
+        "practice4.body": "Small wins stack up quickly, encouraging kids to trust what they know and try again when needed.",
+        "family.title": "Why families can settle into it fast",
+        "family.body": "The page around the game is just as gentle as the game idea itself: clear, calm, and easy to understand in a few seconds.",
+        "family.panel1.title": "Short rounds fit real life.",
+        "family.panel1.body": "A quick matching session can feel complete in a minute or two, which works nicely for transitions, waiting rooms, or one more little activity before bed.",
+        "family.panel2.title": "The game idea stays easy to explain.",
+        "family.list1": "Pick the word.",
+        "family.list2": "Find the picture.",
+        "family.list3": "Celebrate the match.",
+        "footer.body": "“How We Name Things” is all about helping little learners connect words to the world around them, one cheerful object at a time.",
+        "footer.link": "See more Everyday Stuff"
+      },
+      bg: {
+        "meta.title": "Как наричаме нещата | Everyday Stuff",
+        "nav.back": "← Назад към Everyday Stuff",
+        "nav.tagline": "Създадена за малки деца, които обичат да свързват думите с познати предмети.",
+        "nav.languageLabel": "Език",
+        "nav.languageSwitcherAria": "Превключване на език",
+        "hero.title": "Как наричаме нещата",
+        "hero.body": "Весела игра с картини и думи, в която децата свързват имената с ежедневни предмети, чуват верния отговор и трупат увереност с всяко щастливо докосване.",
+        "hero.note": "Скоро за семейства, които искат спокойно и игриво упражняване на първите думи.",
+        "hero.point1.title": "Виж го",
+        "hero.point1.body": "Приветливите карти с предмети насочват вниманието към една ясна картинка наведнъж.",
+        "hero.point2.title": "Свържи го",
+        "hero.point2.body": "Децата докосват дума, а после намират картинката, която пасва.",
+        "hero.point3.title": "Зарадвай се",
+        "hero.point3.body": "Нежната обратна връзка прави всеки верен отговор като малка победа.",
+        "preview.heading": "Свържи думата",
+        "preview.subheading": "Докосни дума и после открий картинката.",
+        "preview.step1.title": "1. Чуй",
+        "preview.step1.body": "Играта произнася думата на глас.",
+        "preview.step2.title": "2. Погледни",
+        "preview.step2.body": "Ярките картинки помагат на децата да търсят по-лесно.",
+        "preview.step3.title": "3. Свържи",
+        "preview.step3.body": "Веселата обратна връзка празнува верния избор.",
+        "preview.card.apple": "ябълка",
+        "preview.card.hat": "шапка",
+        "preview.card.car": "кола",
+        "preview.card.cup": "чаша",
+        "preview.footer.left": "<strong>Създадена за кратки рундове:</strong> само няколко докосвания, малко радост и още едно съвпадение.",
+        "preview.footer.right": "Спокойни цветове. Ясни избори. Ежедневни думи.",
+        "how.title": "Как се усеща играта",
+        "how.body": "Всеки рунд е нарочно лесен: една дума за фокус, няколко весели предмета за разглеждане и ясен момент на успех, когато се намери правилната картинка.",
+        "feature1.title": "Виж предмета",
+        "feature1.body": "Големите и приветливи карти с картинки помагат на малките играчи да забелязват детайли и да свързват думата с нещо познато.",
+        "feature2.title": "Докосни думата",
+        "feature2.body": "Простите избори държат екрана спокоен и четим, за да могат децата да мислят за свързването, а не за правилата.",
+        "feature3.title": "Празнувай съвпадението",
+        "feature3.body": "Правилните отговори носят топло и окуражаващо усещане, така че ученето на думи да прилича повече на игра, отколкото на задача.",
+        "demo.title": "Пробвай мъничък рунд",
+        "demo.body": "Първо избери карта с дума, после докосни картинката, която според теб ѝ съответства. Тази малка демонстрация носи същия спокоен ритъм, към който се стреми истинската игра.",
+        "demo.panelTitle": "Избери дума",
+        "demo.panelBody": "Когато дадена дума свети, е твоят ред да намериш нейната картинка.",
+        "demo.wordsAria": "Думи за свързване",
+        "demo.picturesAria": "Картинки на предмети",
+        "word.apple.label": "Ябълка",
+        "word.apple.hint": "Намери червената вкусна хапка.",
+        "word.hat.label": "Шапка",
+        "word.hat.hint": "Потърси удобната шапка за глава.",
+        "word.car.label": "Кола",
+        "word.car.hint": "Открий возилото на колела.",
+        "word.cup.label": "Чаша",
+        "word.cup.hint": "Избери малката чаша за пиене.",
+        "word.ball.label": "Топка",
+        "word.ball.hint": "Намери подскачащата играчка.",
+        "word.duck.label": "Пате",
+        "word.duck.hint": "Потърси клатушкащия се приятел.",
+        "picture.ball": "топка",
+        "picture.apple": "ябълка",
+        "picture.cup": "чаша",
+        "picture.duck": "пате",
+        "picture.car": "кола",
+        "picture.hat": "шапка",
+        "status.start.title": "Започни оттук",
+        "status.start.text": "Докосни която и да е дума вляво, после избери съответната картинка вдясно.",
+        "status.wordAlready.title": "Вече е намерена",
+        "status.wordAlready.text": "Тази дума вече намери своята картинка. Избери някое от останалите имена.",
+        "status.nowFind.title": "Сега я намери",
+        "status.nowFind.text": "Чудесен избор. Докосни картинката, която съответства на „{word}“.",
+        "status.pictureAlready.title": "Вече е свързана",
+        "status.pictureAlready.text": "Тази картинка вече е свързана. Опитай с друга дума.",
+        "status.pickWordFirst.title": "Първо избери дума",
+        "status.pickWordFirst.text": "Започни с дума отляво, а после избери картинката, която искаш да свържеш.",
+        "status.allMatched.title": "Свърза всички!",
+        "status.allMatched.text": "Страхотна работа. Всяка дума намери своята картинка, точно като в цял рунд от играта.",
+        "status.match.title": "Това е съвпадение!",
+        "status.match.text": "Намери „{word}“. Избери още една дума и продължи.",
+        "status.almost.title": "Почти",
+        "status.almost.text": "Тази картинка още не съвпада. Запази избраната дума и опитай с друг предмет.",
+        "practice.section.title": "Какво упражняват децата по пътя",
+        "practice.section.body": "Играта умишлено е семпла, но всеки рунд все пак подкрепя разпознаването, речника и увереността, която идва с доброто съвпадение.",
+        "practice1.title": "Ежедневни думи",
+        "practice1.body": "Предметите от дома, играта и ежедневието помагат на новите думи да се усещат истински и близки.",
+        "practice2.title": "Разглеждане на картинки",
+        "practice2.body": "Децата сравняват форми, цветове и познати детайли, докато търсят правилния отговор.",
+        "practice3.title": "Слушане с фокус",
+        "practice3.body": "Кратките подкани и простите избори държат вниманието върху думата, която е важна в момента.",
+        "practice4.title": "Уверен избор",
+        "practice4.body": "Малките победи се натрупват бързо и насърчават децата да вярват на това, което знаят, и да опитват отново при нужда.",
+        "family.title": "Защо семействата ще свикнат с нея бързо",
+        "family.body": "Страницата около играта е също толкова нежна, колкото и самата идея: ясна, спокойна и лесна за разбиране само за няколко секунди.",
+        "family.panel1.title": "Кратките рундове пасват на истинския ден.",
+        "family.panel1.body": "Бърза игра на свързване може да се усеща завършена само за минута-две, което е чудесно за преходи, чакане или още едно малко занимание преди сън.",
+        "family.panel2.title": "Идеята на играта се обяснява лесно.",
+        "family.list1": "Избери думата.",
+        "family.list2": "Намери картинката.",
+        "family.list3": "Зарадвай се на съвпадението.",
+        "footer.body": "„Как наричаме нещата“ помага на малките деца да свързват думите със света около тях, един весел предмет наведнъж.",
+        "footer.link": "Виж още Everyday Stuff"
+      }
+    };
+
+    const textNodes = [...document.querySelectorAll("[data-i18n]")];
+    const htmlNodes = [...document.querySelectorAll("[data-i18n-html]")];
+    const ariaNodes = [...document.querySelectorAll("[data-i18n-aria-label]")];
+    const gate = document.getElementById("language-gate");
+    const gateButtons = [...document.querySelectorAll(".language-option")];
+    const chipButtons = [...document.querySelectorAll(".language-chip")];
     const wordButtons = [...document.querySelectorAll(".word-button")];
     const pictureButtons = [...document.querySelectorAll(".picture-button")];
     const statusTitle = document.getElementById("status-title");
     const statusText = document.getElementById("status-text");
 
+    let currentLanguage = "en";
     let activeWord = null;
 
-    function updateStatus(title, text) {
-      statusTitle.textContent = title;
-      statusText.textContent = text;
+    function translate(key, values = {}) {
+      let value = translations[currentLanguage][key] || key;
+
+      Object.entries(values).forEach(([name, replacement]) => {
+        value = value.replaceAll(`{${name}}`, replacement);
+      });
+
+      return value;
+    }
+
+    function applyTranslations() {
+      document.documentElement.lang = currentLanguage;
+      document.title = translate("meta.title");
+
+      textNodes.forEach((node) => {
+        node.textContent = translate(node.dataset.i18n);
+      });
+
+      htmlNodes.forEach((node) => {
+        node.innerHTML = translate(node.dataset.i18nHtml);
+      });
+
+      ariaNodes.forEach((node) => {
+        node.setAttribute("aria-label", translate(node.dataset.i18nAriaLabel));
+      });
+    }
+
+    function updateStatus(titleKey, textKey, values = {}) {
+      statusTitle.textContent = translate(titleKey, values);
+      statusText.textContent = translate(textKey, values);
+    }
+
+    function getWordLabel(match) {
+      return translate(`word.${match}.label`);
     }
 
     function clearActiveWord() {
@@ -1145,10 +1584,54 @@
       return wordButtons.every((button) => button.classList.contains("is-matched"));
     }
 
+    function resetDemoState() {
+      activeWord = null;
+      wordButtons.forEach((button) => {
+        button.classList.remove("is-active", "is-matched");
+      });
+      pictureButtons.forEach((button) => {
+        button.classList.remove("is-match", "is-miss");
+      });
+      updateStatus("status.start.title", "status.start.text");
+    }
+
+    function updateLanguageButtons() {
+      chipButtons.forEach((button) => {
+        const isActive = button.dataset.language === currentLanguage;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    }
+
+    function closeGate() {
+      gate.hidden = true;
+      document.body.classList.remove("is-gated");
+    }
+
+    function chooseLanguage(language) {
+      currentLanguage = language;
+      applyTranslations();
+      updateLanguageButtons();
+      resetDemoState();
+      closeGate();
+    }
+
+    gateButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        chooseLanguage(button.dataset.language);
+      });
+    });
+
+    chipButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        chooseLanguage(button.dataset.language);
+      });
+    });
+
     wordButtons.forEach((button) => {
       button.addEventListener("click", () => {
         if (button.classList.contains("is-matched")) {
-          updateStatus("Already matched", "That word already found its picture. Pick one of the remaining names.");
+          updateStatus("status.wordAlready.title", "status.wordAlready.text");
           return;
         }
 
@@ -1160,20 +1643,22 @@
 
         button.classList.add("is-active");
         activeWord = button.dataset.match;
-        updateStatus("Now find it", "Great pick. Tap the picture that matches “" + button.dataset.label + "”.");
+        updateStatus("status.nowFind.title", "status.nowFind.text", {
+          word: getWordLabel(button.dataset.match)
+        });
       });
     });
 
     pictureButtons.forEach((button) => {
       button.addEventListener("click", () => {
         if (button.classList.contains("is-match")) {
-          updateStatus("Already matched", "That picture is already paired up. Try another word.");
+          updateStatus("status.pictureAlready.title", "status.pictureAlready.text");
           return;
         }
 
         if (!activeWord) {
           button.classList.add("is-miss");
-          updateStatus("Pick a word first", "Start with a word on the left, then choose the picture you want to match.");
+          updateStatus("status.pickWordFirst.title", "status.pickWordFirst.text");
           setTimeout(() => button.classList.remove("is-miss"), 320);
           return;
         }
@@ -1183,23 +1668,30 @@
           button.classList.add("is-match");
           selectedWord.classList.remove("is-active");
           selectedWord.classList.add("is-matched");
-          const matchedName = selectedWord.dataset.label;
+          const matchedName = getWordLabel(selectedWord.dataset.match);
           clearActiveWord();
 
           if (allMatched()) {
-            updateStatus("You matched them all!", "Nice work. Every word found its picture, just like a full round in the game.");
+            updateStatus("status.allMatched.title", "status.allMatched.text");
           } else {
-            updateStatus("That is a match!", "You found “" + matchedName + "”. Pick another word to keep going.");
+            updateStatus("status.match.title", "status.match.text", {
+              word: matchedName
+            });
           }
           return;
         }
 
         button.classList.add("is-miss");
         selectedWord.classList.add("is-active");
-        updateStatus("Almost", "That picture does not match yet. Keep the word you picked and try another object.");
+        updateStatus("status.almost.title", "status.almost.text");
         setTimeout(() => button.classList.remove("is-miss"), 320);
       });
     });
+
+    applyTranslations();
+    updateLanguageButtons();
+    resetDemoState();
+    gateButtons[0].focus();
   </script>
 </body>
 </html>
