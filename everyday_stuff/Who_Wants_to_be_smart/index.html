@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Who Wants to Be Smart? — The Millionaire Learning Game for Kids</title>
+  <meta name="description" content="A free, classroom-ready quiz game for kids ages 3–6. Text-to-speech questions, downloadable packs, classroom leaderboards. Available on iOS & Android." />
+  <meta property="og:title"       content="Who Wants to Be Smart?" />
+  <meta property="og:description" content="Millionaire-style learning game for kids ages 3–6. Free question packs. Classroom mode." />
+  <meta property="og:type"        content="website" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bgDark:    '#0A0A2E',
+            bgCard:    '#16155A',
+            bgSurface: '#1F1D7A',
+            gold:      '#FFD700',
+            goldDim:   '#B8970A',
+            correct:   '#00C853',
+            wrong:     '#EF5350',
+          },
+          fontFamily: {
+            boogaloo: ['"Boogaloo"', 'cursive'],
+            nunito:   ['"Nunito"',   'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #0A0A2E; color: #fff; font-family: 'Nunito', sans-serif; overflow-x: hidden; }
+
+    #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .text-gold-gradient {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .glass {
+      background: rgba(22, 21, 90, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,215,0,0.14);
+    }
+
+    /* phone mockup */
+    .phone-shell {
+      width: 220px;
+      height: 440px;
+      border: 3px solid rgba(255,215,0,0.35);
+      border-radius: 36px;
+      background: #0A0A2E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 60px rgba(255,215,0,0.15), inset 0 0 40px rgba(0,0,0,0.6);
+    }
+    .phone-shell::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      width: 60px;
+      height: 6px;
+      background: rgba(255,215,0,0.3);
+      border-radius: 9999px;
+    }
+
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    @keyframes floatSlow { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-8px) rotate(2deg)} }
+    @keyframes pulse-gold { 0%,100%{box-shadow:0 0 24px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 48px rgba(255,215,0,0.6)} }
+    @keyframes badgePop { 0%{opacity:0;transform:scale(0.8) translateY(20px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
+
+    .float       { animation: float 4s ease-in-out infinite; }
+    .float-slow  { animation: floatSlow 6s ease-in-out infinite; }
+    .pulse-gold  { animation: pulse-gold 2.5s ease-in-out infinite; }
+
+    /* feature card hover */
+    .feature-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(255,215,0,0.2); }
+
+    /* step number */
+    .step-num {
+      width: 3rem; height: 3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Boogaloo', cursive;
+      font-size: 1.35rem;
+      color: #0A0A2E;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(255,215,0,0.4);
+    }
+
+    /* store badge */
+    .store-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255,215,0,0.4);
+      background: rgba(22,21,90,0.8);
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      text-decoration: none;
+    }
+    .store-badge:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,215,0,0.9);
+      background: rgba(31,29,122,0.9);
+    }
+
+    /* coming soon ribbon */
+    .coming-soon-pill {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(255,215,0,0.15);
+      color: #FFD700;
+      border: 1px solid rgba(255,215,0,0.35);
+      white-space: nowrap;
+    }
+
+    /* DLC card */
+    .pack-preview { transition: transform 0.2s ease; }
+    .pack-preview:hover { transform: scale(1.03); }
+
+    /* section divider */
+    .divider { width: 80px; height: 3px; background: linear-gradient(90deg, transparent, #FFD700, transparent); margin: 0 auto 3rem; border-radius: 9999px; }
+
+    @media (max-width: 640px) {
+      .phone-shell { width: 170px; height: 340px; }
+    }
+  </style>
+</head>
+<body class="relative min-h-screen">
+
+<canvas id="starfield"></canvas>
+
+<!-- ══════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════ -->
+<nav class="relative z-20 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+  <span class="font-boogaloo text-2xl text-gold-gradient select-none">⭐ WWTBS?</span>
+
+  <div class="hidden sm:flex items-center gap-6">
+    <a href="#features"  class="text-sm font-semibold text-white/60 hover:text-gold transition-colors">Features</a>
+    <a href="#how"       class="text-sm font-semibold text-white/60 hover:text-gold transition-colors">How It Works</a>
+    <a href="#classroom" class="text-sm font-semibold text-white/60 hover:text-gold transition-colors">Classroom</a>
+    <a href="#dlc"       class="text-sm font-semibold text-white/60 hover:text-gold transition-colors">DLC Packs</a>
+    <!-- ⚑ UPDATE: replace with your deployed DLC website URL -->
+    <a href="../dlc_website/index.html"
+       class="text-sm font-bold px-4 py-2 rounded-full text-bgDark
+              bg-gradient-to-r from-gold to-yellow-500 hover:opacity-90 transition-opacity">
+      🛍 Content Store
+    </a>
+  </div>
+
+  <!-- mobile menu (hamburger placeholder) -->
+  <button class="sm:hidden text-white/60 text-2xl" onclick="toggleMobileMenu()">☰</button>
+</nav>
+
+<!-- mobile menu -->
+<div id="mobile-menu"
+     class="hidden relative z-20 glass mx-4 rounded-2xl p-5 mb-2 flex flex-col gap-3">
+  <a href="#features"  class="text-sm font-semibold text-white/70 hover:text-gold transition-colors" onclick="toggleMobileMenu()">Features</a>
+  <a href="#how"       class="text-sm font-semibold text-white/70 hover:text-gold transition-colors" onclick="toggleMobileMenu()">How It Works</a>
+  <a href="#classroom" class="text-sm font-semibold text-white/70 hover:text-gold transition-colors" onclick="toggleMobileMenu()">Classroom</a>
+  <a href="#dlc"       class="text-sm font-semibold text-white/70 hover:text-gold transition-colors" onclick="toggleMobileMenu()">DLC Packs</a>
+  <a href="../dlc_website/index.html"
+     class="text-sm font-bold text-center py-2 rounded-xl bg-gradient-to-r from-gold to-yellow-500 text-bgDark">
+    🛍 Content Store
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section class="relative z-10 max-w-6xl mx-auto px-6 pt-10 pb-24
+                flex flex-col lg:flex-row items-center justify-between gap-16">
+
+  <!-- LEFT: copy -->
+  <div class="flex-1 text-center lg:text-left max-w-xl">
+    <div class="inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full
+                border border-correct/40 text-correct bg-correct/10 mb-6">
+      <span class="w-2 h-2 rounded-full bg-correct animate-pulse inline-block"></span>
+      Live — Free to Download
+    </div>
+
+    <h1 class="font-boogaloo text-5xl sm:text-6xl xl:text-7xl leading-[1.05] mb-6">
+      <span class="text-gold-gradient">Who Wants to<br/>Be Smart?</span>
+    </h1>
+
+    <p class="text-lg sm:text-xl text-white/65 font-nunito leading-relaxed mb-8">
+      The <strong class="text-white">Millionaire-style</strong> learning game built for
+      <strong class="text-white">kids ages 3–6</strong>.<br/>
+      Questions read aloud by a friendly voice, colorful answer buttons,
+      classroom leaderboards and free downloadable question packs.
+    </p>
+
+    <!-- store badges -->
+    <div class="flex flex-wrap gap-4 justify-center lg:justify-start mb-8">
+      <a class="store-badge" aria-label="App Store — Coming Soon">
+        <span class="text-3xl">🍎</span>
+        <div>
+          <div class="text-white/50 text-xs font-nunito">Download on the</div>
+          <div class="font-boogaloo text-lg text-white leading-none">App Store</div>
+          <div class="coming-soon-pill mt-1">Coming Soon</div>
+        </div>
+      </a>
+      <a class="store-badge" aria-label="Google Play — Coming Soon">
+        <span class="text-3xl">🤖</span>
+        <div>
+          <div class="text-white/50 text-xs font-nunito">Get it on</div>
+          <div class="font-boogaloo text-lg text-white leading-none">Google Play</div>
+          <div class="coming-soon-pill mt-1">Coming Soon</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- quick stats row -->
+    <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+      <div class="glass rounded-full px-4 py-2 text-sm font-semibold">🎓 Ages 3–6</div>
+      <div class="glass rounded-full px-4 py-2 text-sm font-semibold">🆓 Free</div>
+      <div class="glass rounded-full px-4 py-2 text-sm font-semibold">🔊 TTS Read-Aloud</div>
+      <div class="glass rounded-full px-4 py-2 text-sm font-semibold">📦 Expandable Packs</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: phone mockup -->
+  <div class="flex-shrink-0 flex items-center justify-center relative">
+    <!-- glow ring -->
+    <div class="absolute w-72 h-72 rounded-full bg-gold/5 blur-3xl"></div>
+
+    <div class="phone-shell pulse-gold float">
+      <!-- mock game screen content -->
+      <div class="w-full h-full rounded-[33px] overflow-hidden p-4 flex flex-col">
+        <!-- top bar -->
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex gap-1">
+            <span class="text-sm">❤️</span><span class="text-sm">❤️</span><span class="text-sm">❤️</span>
+          </div>
+          <div class="font-boogaloo text-gold text-sm">Score: 300</div>
+        </div>
+        <!-- host emoji -->
+        <div class="text-4xl text-center mb-2 float-slow">🎓</div>
+        <!-- question card mock -->
+        <div class="glass rounded-xl p-3 mb-3 text-center">
+          <p class="font-nunito text-xs text-white/80 leading-snug">
+            How many sides does a <strong class="text-gold">hexagon</strong> have?
+          </p>
+        </div>
+        <!-- answer buttons mock -->
+        <div class="grid grid-cols-2 gap-2 flex-1">
+          <div class="glass rounded-xl flex items-center justify-center p-2">
+            <span class="font-boogaloo text-sm text-white/70">4</span>
+          </div>
+          <div class="rounded-xl flex items-center justify-center p-2"
+               style="background:linear-gradient(135deg,#00C853,#00A040);">
+            <span class="font-boogaloo text-sm text-white">6 ✓</span>
+          </div>
+          <div class="glass rounded-xl flex items-center justify-center p-2">
+            <span class="font-boogaloo text-sm text-white/70">8</span>
+          </div>
+          <div class="glass rounded-xl flex items-center justify-center p-2">
+            <span class="font-boogaloo text-sm text-white/70">5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- floating decorations -->
+    <div class="absolute -top-6 -right-6 text-4xl float" style="animation-delay:0.8s">⭐</div>
+    <div class="absolute -bottom-4 -left-6 text-3xl float" style="animation-delay:1.4s">🎉</div>
+    <div class="absolute top-1/2 -right-10 text-2xl float" style="animation-delay:0.3s">✨</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FEATURE GRID
+══════════════════════════════════════════════ -->
+<section id="features" class="relative z-10 max-w-6xl mx-auto px-6 pb-28">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-3">Everything Kids Need to Learn</h2>
+  <div class="divider"></div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+    <!-- TTS -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">🔊</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Read-Aloud Voice</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Every question and answer is read aloud in a soft, friendly voice.
+        Early readers never feel left behind.
+      </p>
+    </div>
+
+    <!-- Classroom -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">🏫</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Classroom Mode</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Create class profiles, track each student's score and accuracy,
+        and celebrate the top 3 on a visual gold podium leaderboard.
+      </p>
+    </div>
+
+    <!-- DLC -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">📦</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Downloadable Packs</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Start with 20 free base questions. Download themed packs —
+        Animals, Colors &amp; Shapes, and more — directly inside the app.
+      </p>
+    </div>
+
+    <!-- Confetti -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">🎊</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Confetti Celebrations</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Every correct answer triggers a confetti burst.
+        Positive reinforcement that keeps kids motivated and engaged.
+      </p>
+    </div>
+
+    <!-- Arcade Name -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">🕹️</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Arcade Name Entry</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Pick your 3-letter arcade name with a retro slot-wheel spinner.
+        Kids love their gamer identity on the leaderboard.
+      </p>
+    </div>
+
+    <!-- Language -->
+    <div class="feature-card glass rounded-3xl p-6 relative overflow-hidden">
+      <div class="absolute top-3 right-3 coming-soon-pill">Coming Soon</div>
+      <div class="text-4xl mb-3">🌍</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Multi-Language</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Choose your language at startup. English and Bulgarian ready —
+        more languages on the way.
+      </p>
+    </div>
+
+    <!-- Lives system -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">❤️</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">3-Lives System</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Three hearts per game. Wrong answers cost a life —
+        but the correct answer is always shown so kids learn from mistakes.
+      </p>
+    </div>
+
+    <!-- Stars -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">⭐⭐⭐</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Star Ratings</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Earn up to 3 stars per game based on accuracy.
+        A clear visual goal that encourages replaying and improving.
+      </p>
+    </div>
+
+    <!-- Offline -->
+    <div class="feature-card glass rounded-3xl p-6">
+      <div class="text-4xl mb-3">✈️</div>
+      <h3 class="font-boogaloo text-xl text-gold mb-2">Works Offline</h3>
+      <p class="text-white/55 text-sm font-nunito leading-relaxed">
+        Base questions are always available offline.
+        Downloaded packs work without internet too. Perfect for classrooms.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════ -->
+<section id="how" class="relative z-10 max-w-3xl mx-auto px-6 pb-28">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-3">How to Play</h2>
+  <div class="divider"></div>
+
+  <div class="space-y-5">
+
+    <div class="glass rounded-2xl p-5 flex gap-5 items-start">
+      <div class="step-num">1</div>
+      <div>
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Pick your class &amp; enter your name</h3>
+        <p class="text-white/55 text-sm font-nunito leading-relaxed">
+          Teachers set up a Class Profile. Students spin the retro 3-letter wheel to enter their
+          arcade name — like <strong class="text-white">KID</strong> or <strong class="text-white">ACE</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5 flex gap-5 items-start">
+      <div class="step-num">2</div>
+      <div>
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Listen to the question</h3>
+        <p class="text-white/55 text-sm font-nunito leading-relaxed">
+          The friendly host reads the question aloud in a soft, kid-tuned voice.
+          Even non-readers can play fully independently.
+        </p>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5 flex gap-5 items-start">
+      <div class="step-num">3</div>
+      <div>
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Tap your answer</h3>
+        <p class="text-white/55 text-sm font-nunito leading-relaxed">
+          Four big, colorful buttons. Tap one — correct answers turn green and
+          trigger confetti 🎊. Wrong answers reveal the right one so kids always learn.
+        </p>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5 flex gap-5 items-start">
+      <div class="step-num">4</div>
+      <div>
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Celebrate on the leaderboard!</h3>
+        <p class="text-white/55 text-sm font-nunito leading-relaxed">
+          After 10 questions, see your stars and score. Top scorers take the
+          🥇🥈🥉 podium on the class leaderboard — a huge motivator for the whole class.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SCREENSHOTS (Coming Soon)
+══════════════════════════════════════════════ -->
+<section class="relative z-10 max-w-6xl mx-auto px-6 pb-28">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-3">Screenshots</h2>
+  <div class="divider"></div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 justify-items-center">
+    <!-- 5 placeholder phone screens -->
+    <div class="glass rounded-2xl aspect-[9/18] w-full max-w-[130px] flex flex-col items-center justify-center gap-2 opacity-50">
+      <div class="text-3xl">🏠</div>
+      <div class="text-xs text-white/40 font-nunito text-center px-2">Home Screen</div>
+    </div>
+    <div class="glass rounded-2xl aspect-[9/18] w-full max-w-[130px] flex flex-col items-center justify-center gap-2 opacity-50">
+      <div class="text-3xl">🕹️</div>
+      <div class="text-xs text-white/40 font-nunito text-center px-2">Name Entry</div>
+    </div>
+    <div class="glass rounded-2xl aspect-[9/18] w-full max-w-[130px] flex flex-col items-center justify-center gap-2 opacity-50">
+      <div class="text-3xl">❓</div>
+      <div class="text-xs text-white/40 font-nunito text-center px-2">Game Screen</div>
+    </div>
+    <div class="glass rounded-2xl aspect-[9/18] w-full max-w-[130px] flex flex-col items-center justify-center gap-2 opacity-50">
+      <div class="text-3xl">🏆</div>
+      <div class="text-xs text-white/40 font-nunito text-center px-2">Leaderboard</div>
+    </div>
+    <div class="glass rounded-2xl aspect-[9/18] w-full max-w-[130px] flex flex-col items-center justify-center gap-2 opacity-50">
+      <div class="text-3xl">📦</div>
+      <div class="text-xs text-white/40 font-nunito text-center px-2">DLC Store</div>
+    </div>
+  </div>
+
+  <p class="text-center text-white/30 text-sm font-nunito mt-8">
+    📸 Screenshots coming soon — app launching shortly!
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     CLASSROOM MODE
+══════════════════════════════════════════════ -->
+<section id="classroom" class="relative z-10 max-w-6xl mx-auto px-6 pb-28">
+  <div class="glass rounded-3xl p-8 lg:p-12 flex flex-col lg:flex-row gap-10 items-center">
+
+    <!-- podium visual -->
+    <div class="shrink-0 flex items-end justify-center gap-3">
+      <!-- 2nd -->
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-3xl">🥈</div>
+        <div class="glass rounded-t-xl w-20 flex flex-col items-center justify-end pb-3"
+             style="height:90px; background:rgba(31,29,122,0.8)">
+          <div class="font-boogaloo text-white text-sm">ACE</div>
+          <div class="font-boogaloo text-gold text-xs">800</div>
+        </div>
+      </div>
+      <!-- 1st -->
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-4xl float">🥇</div>
+        <div class="rounded-t-xl w-24 flex flex-col items-center justify-end pb-3"
+             style="height:130px; background:linear-gradient(180deg,rgba(255,215,0,0.3),rgba(31,29,122,0.9));">
+          <div class="font-boogaloo text-white">KID</div>
+          <div class="font-boogaloo text-gold text-sm">1 000</div>
+        </div>
+      </div>
+      <!-- 3rd -->
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-3xl">🥉</div>
+        <div class="glass rounded-t-xl w-20 flex flex-col items-center justify-end pb-3"
+             style="height:65px; background:rgba(31,29,122,0.8)">
+          <div class="font-boogaloo text-white text-sm">SAM</div>
+          <div class="font-boogaloo text-gold text-xs">650</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- copy -->
+    <div>
+      <h2 class="font-boogaloo text-4xl text-gold mb-3">Classroom Mode 🏫</h2>
+      <p class="text-white/60 font-nunito leading-relaxed mb-5">
+        Create named class profiles for your classroom. Every student logs in,
+        plays a round, and their score is saved automatically.
+        Long-press any class card to open the leaderboard — a full visual podium
+        with 🥇🥈🥉 for the top three, then a ranked list for everyone else.
+      </p>
+      <ul class="space-y-2 font-nunito text-sm text-white/55">
+        <li class="flex items-center gap-2"><span class="text-correct">✔</span> Unlimited class profiles</li>
+        <li class="flex items-center gap-2"><span class="text-correct">✔</span> Per-student score history</li>
+        <li class="flex items-center gap-2"><span class="text-correct">✔</span> Accuracy tracking</li>
+        <li class="flex items-center gap-2"><span class="text-correct">✔</span> Visual podium + ranked list</li>
+        <li class="flex items-center gap-2"><span class="text-correct">✔</span> All data stored locally — no accounts needed</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     DLC PACKS PREVIEW
+══════════════════════════════════════════════ -->
+<section id="dlc" class="relative z-10 max-w-6xl mx-auto px-6 pb-28">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-3">Free Question Packs</h2>
+  <div class="divider"></div>
+  <p class="text-white/50 text-center font-nunito mb-10">
+    Download themed packs directly inside the app. More packs added regularly.
+  </p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10" id="packs-preview">
+    <!-- Base pack (static) -->
+    <div class="pack-preview glass rounded-3xl p-6">
+      <div class="text-5xl mb-3">📚</div>
+      <h3 class="font-boogaloo text-2xl text-gold mb-1">Starter Pack</h3>
+      <p class="text-white/55 text-sm font-nunito mb-4">
+        20 built-in questions across Colors, Animals, Numbers, Shapes, Letters &amp; Body.
+        Always available offline — no download needed.
+      </p>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-white/40 font-nunito">🎂 Ages 3–6 · ⭐ Beginner</span>
+        <span class="text-xs font-bold px-3 py-1.5 rounded-full border border-correct/50 text-correct bg-correct/10">BUILT-IN</span>
+      </div>
+    </div>
+
+    <!-- Dynamic packs loaded from manifest -->
+  </div>
+
+  <div class="text-center">
+    <!-- ⚑ UPDATE: replace href with your deployed DLC website URL -->
+    <a href="../dlc_website/index.html"
+       class="inline-flex items-center gap-3 font-boogaloo text-xl px-8 py-4 rounded-2xl
+              bg-gradient-to-r from-gold to-yellow-500 text-bgDark
+              hover:opacity-90 transition-opacity shadow-lg">
+      🛍 Browse All Packs
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FINAL CTA
+══════════════════════════════════════════════ -->
+<section class="relative z-10 max-w-3xl mx-auto px-6 pb-32 text-center">
+  <div class="glass rounded-3xl p-10">
+    <div class="text-6xl mb-4 float">🚀</div>
+    <h2 class="font-boogaloo text-4xl text-gold-gradient mb-4">Ready to Launch?</h2>
+    <p class="text-white/60 font-nunito mb-8 leading-relaxed">
+      Who Wants to Be Smart? is free, requires no accounts,
+      and works great in classrooms or at home. Download coming soon!
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a class="store-badge" aria-label="App Store — Coming Soon">
+        <span class="text-3xl">🍎</span>
+        <div>
+          <div class="text-white/50 text-xs">Download on the</div>
+          <div class="font-boogaloo text-lg text-white">App Store</div>
+          <div class="coming-soon-pill mt-1">Coming Soon</div>
+        </div>
+      </a>
+      <a class="store-badge" aria-label="Google Play — Coming Soon">
+        <span class="text-3xl">🤖</span>
+        <div>
+          <div class="text-white/50 text-xs">Get it on</div>
+          <div class="font-boogaloo text-lg text-white">Google Play</div>
+          <div class="coming-soon-pill mt-1">Coming Soon</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer class="relative z-10 border-t border-white/10 py-10 px-6 text-center">
+  <p class="font-boogaloo text-2xl text-gold-gradient mb-2">⭐ Who Wants to Be Smart?</p>
+  <p class="text-white/40 text-sm font-nunito mb-5">
+    A free educational game for curious kids everywhere. Made with ❤️.
+  </p>
+  <div class="flex flex-wrap justify-center gap-6 text-white/30 text-xs font-nunito">
+    <a href="#features"  class="hover:text-gold transition-colors">Features</a>
+    <span>•</span>
+    <a href="#how"       class="hover:text-gold transition-colors">How It Works</a>
+    <span>•</span>
+    <a href="#classroom" class="hover:text-gold transition-colors">Classroom</a>
+    <span>•</span>
+    <!-- ⚑ UPDATE: replace with your deployed DLC website URL -->
+    <a href="../dlc_website/index.html" class="hover:text-gold transition-colors">DLC Content Store</a>
+    <span>•</span>
+    <a href="mailto:hello@example.com" class="hover:text-gold transition-colors">Contact</a>
+  </div>
+  <p class="text-white/20 text-xs font-nunito mt-6">© 2026 Who Wants to Be Smart? — All rights reserved.</p>
+</footer>
+
+<!-- ══════════════════════════════════════════════
+     JS
+══════════════════════════════════════════════ -->
+<script>
+  // ── Starfield ──────────────────────────────────────────────────────────────
+  (function () {
+    const canvas = document.getElementById('starfield');
+    const ctx    = canvas.getContext('2d');
+    let stars    = [];
+
+    function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+
+    function init(n) {
+      stars = Array.from({ length: n }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.4 + 0.3,
+        a: Math.random(),
+        da: (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1),
+        spd: Math.random() * 0.12 + 0.02,
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.a = Math.max(0.05, Math.min(1, s.a + s.da));
+        if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
+        s.y -= s.spd;
+        if (s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width; }
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+
+    resize(); init(200); draw();
+    window.addEventListener('resize', () => { resize(); init(200); });
+  })();
+
+  // ── Mobile menu toggle ────────────────────────────────────────────────────
+  function toggleMobileMenu() {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+  }
+
+  // ── Load DLC packs preview from manifest ──────────────────────────────────
+  // ⚑ UPDATE: replace this URL with your deployed manifest.json URL
+  const MANIFEST_URL = '../dlc_website/manifest.json';
+
+  async function loadPackPreviews() {
+    try {
+      const res  = await fetch(MANIFEST_URL);
+      if (!res.ok) return;
+      const data = await res.json();
+      const grid = document.getElementById('packs-preview');
+
+      data.packs.forEach(pack => {
+        const card = document.createElement('div');
+        card.className = 'pack-preview glass rounded-3xl p-6';
+
+        const pills = (pack.categories || [])
+          .map(c => `<span class="text-xs font-semibold px-3 py-1 rounded-full bg-bgSurface/60 text-gold/80">${c}</span>`)
+          .join('');
+
+        card.innerHTML = `
+          <div class="text-5xl mb-3">${pack.icon_emoji || '📦'}</div>
+          <h3 class="font-boogaloo text-2xl text-gold mb-1">${pack.name}</h3>
+          <p class="text-white/55 text-sm font-nunito mb-4 leading-relaxed">${pack.description}</p>
+          <div class="flex flex-wrap gap-2 mb-4">${pills}</div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-white/40 font-nunito">🎂 ${pack.age_range} · ❓ ${pack.question_count} Qs</span>
+            <span class="text-xs font-bold px-3 py-1.5 rounded-full border border-correct/50 text-correct bg-correct/10">FREE</span>
+          </div>`;
+        grid.appendChild(card);
+      });
+    } catch (_) {
+      // silent — the static base pack card is always shown
+    }
+  }
+
+  loadPackPreviews();
+</script>
+
+</body>
+</html>

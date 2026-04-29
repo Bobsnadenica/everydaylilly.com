@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Who Wants to Be Smart? — DLC Content Store</title>
+  <meta name="description" content="Download free question packs for Who Wants to Be Smart? — the Millionaire-style learning game for kids ages 3-6." />
+  <meta property="og:title"       content="WWTBS? Content Store" />
+  <meta property="og:description" content="Free downloadable question packs for Who Wants to Be Smart?" />
+  <meta property="og:type"        content="website" />
+
+  <!-- Tailwind CDN (play CDN for static sites) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bgDark:    '#0A0A2E',
+            bgCard:    '#16155A',
+            bgSurface: '#1F1D7A',
+            gold:      '#FFD700',
+            goldDim:   '#B8970A',
+            correct:   '#00C853',
+            wrong:     '#EF5350',
+            muted:     'rgba(255,255,255,0.55)',
+          },
+          fontFamily: {
+            boogaloo: ['"Boogaloo"', 'cursive'],
+            nunito:   ['"Nunito"',   'sans-serif'],
+          },
+          boxShadow: {
+            gold:    '0 0 24px 4px rgba(255,215,0,0.35)',
+            card:    '0 8px 32px rgba(0,0,0,0.5)',
+            correct: '0 0 16px 2px rgba(0,200,83,0.4)',
+          },
+          animation: {
+            twinkle:  'twinkle 3s ease-in-out infinite',
+            float:    'float 4s ease-in-out infinite',
+            pulse100: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
+          },
+          keyframes: {
+            twinkle: {
+              '0%,100%': { opacity: '0.2', transform: 'scale(0.8)' },
+              '50%':     { opacity: '1',   transform: 'scale(1.2)' },
+            },
+            float: {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%':     { transform: 'translateY(-12px)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0A0A2E;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── starfield canvas ─────────────────────────── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── gold gradient text ───────────────────────── */
+    .text-gold-gradient {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── glassmorphism card ───────────────────────── */
+    .glass {
+      background: rgba(22, 21, 90, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+    }
+
+    /* ── shimmer on pack cards ────────────────────── */
+    .pack-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 30%,
+        rgba(255,215,0,0.06) 50%,
+        transparent 70%
+      );
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .pack-card:hover::before { opacity: 1; }
+    .pack-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .pack-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 8px 40px rgba(255,215,0,0.25);
+    }
+
+    /* ── progress bar fill ───────────────────────── */
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD700, #FFA500);
+      border-radius: 9999px;
+      transition: width 0.6s ease;
+    }
+
+    /* ── copy button flash ───────────────────────── */
+    @keyframes flashGreen {
+      0%,100% { background-color: rgba(22,21,90,0.9); color: #FFD700; }
+      50%      { background-color: #00C853;            color: #fff; }
+    }
+    .flash-copy { animation: flashGreen 0.6s ease; }
+
+    /* ── step connector ──────────────────────────── */
+    .step-connector {
+      width: 2px;
+      flex: 1;
+      background: linear-gradient(to bottom, rgba(255,215,0,0.4), transparent);
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen">
+
+<!-- ════════════════════════════════════════════════
+     STARFIELD BACKGROUND
+════════════════════════════════════════════════ -->
+<canvas id="starfield"></canvas>
+
+<!-- ════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════ -->
+<nav class="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+  <a href="#" class="font-boogaloo text-2xl text-gold-gradient select-none">
+    ⭐ Who Wants to Be Smart?
+  </a>
+  <div class="flex items-center gap-4">
+    <!-- ⚑ UPDATE: replace with your deployed game website URL -->
+    <a href="../website/index.html"
+       class="text-sm font-semibold text-white/50 hover:text-white transition-colors hidden sm:block">
+      ← Game Site
+    </a>
+    <a href="#packs"     class="text-sm font-semibold text-white/70 hover:text-gold transition-colors hidden sm:block">Packs</a>
+    <a href="#how"       class="text-sm font-semibold text-white/70 hover:text-gold transition-colors hidden sm:block">How It Works</a>
+    <a href="#setup"     class="text-sm font-semibold text-white/70 hover:text-gold transition-colors hidden sm:block">Dev Setup</a>
+    <a href="manifest.json" target="_blank"
+       class="text-xs font-bold px-3 py-1.5 rounded-full border border-gold/40 text-gold hover:bg-gold/10 transition-colors">
+      manifest.json
+    </a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<header class="relative z-10 text-center px-6 pt-16 pb-24">
+  <!-- floating emoji mascot -->
+  <div class="text-7xl mb-6 inline-block" style="animation: float 4s ease-in-out infinite;">🎓</div>
+
+  <h1 class="font-boogaloo text-5xl sm:text-7xl leading-tight mb-4">
+    <span class="text-gold-gradient">Who Wants to Be Smart?</span>
+  </h1>
+  <p class="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 font-nunito">
+    The Millionaire-style learning game for kids ages&nbsp;3–6.<br/>
+    Download free question packs and keep the classroom fresh&nbsp;🚀
+  </p>
+
+  <!-- manifest URL copy strip -->
+  <div id="manifest-strip"
+       class="glass inline-flex items-center gap-3 rounded-2xl px-4 py-3 max-w-xl mx-auto cursor-pointer group"
+       onclick="copyManifest()"
+       title="Click to copy">
+    <span class="text-gold/70 text-xl">📋</span>
+    <code id="manifest-url" class="text-gold text-xs sm:text-sm font-mono break-all text-left flex-1">
+      <!-- filled by JS -->
+    </code>
+    <button id="copy-btn"
+            class="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl border border-gold/40 text-gold
+                   group-hover:bg-gold/10 transition-colors whitespace-nowrap">
+      Copy URL
+    </button>
+  </div>
+  <p class="text-white/40 text-xs mt-3">Paste this URL into the app's DLC settings to activate the store</p>
+
+  <!-- hero stat pills -->
+  <div class="flex justify-center gap-4 flex-wrap mt-12">
+    <div class="glass rounded-full px-5 py-2 text-sm font-semibold">
+      📦 <span id="hero-pack-count">…</span> Packs Available
+    </div>
+    <div class="glass rounded-full px-5 py-2 text-sm font-semibold">
+      ❓ <span id="hero-question-count">…</span> Questions Total
+    </div>
+    <div class="glass rounded-full px-5 py-2 text-sm font-semibold">
+      🆓 Always Free
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════
+     PACK GRID
+════════════════════════════════════════════════ -->
+<section id="packs" class="relative z-10 max-w-6xl mx-auto px-6 pb-24">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-2">Question Packs</h2>
+  <p class="text-white/50 text-center mb-10 font-nunito">Tap any card to preview the pack details</p>
+
+  <!-- loading skeleton -->
+  <div id="packs-loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="glass rounded-3xl p-6 animate-pulse h-64"></div>
+    <div class="glass rounded-3xl p-6 animate-pulse h-64"></div>
+  </div>
+
+  <!-- actual grid (hidden until loaded) -->
+  <div id="packs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+
+  <!-- error state -->
+  <div id="packs-error" class="hidden text-center py-16">
+    <div class="text-5xl mb-4">😢</div>
+    <p class="text-white/60 font-nunito">Couldn't load the manifest.<br/>Check back soon!</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════════ -->
+<section id="how" class="relative z-10 max-w-3xl mx-auto px-6 pb-28">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-12">How It Works</h2>
+
+  <div class="flex flex-col gap-0">
+    <!-- step 1 -->
+    <div class="flex gap-5 items-start">
+      <div class="flex flex-col items-center">
+        <div class="w-12 h-12 rounded-full bg-gold flex items-center justify-center
+                    font-boogaloo text-bgDark text-xl shadow-gold shrink-0">1</div>
+        <div class="step-connector mt-1 h-16"></div>
+      </div>
+      <div class="glass rounded-2xl p-5 flex-1 mb-1">
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Open the DLC Store in the app</h3>
+        <p class="text-white/60 text-sm font-nunito">
+          Tap the <strong class="text-white">🛍 Store</strong> button on the home screen.
+          The app fetches this <code class="text-gold/80">manifest.json</code> and shows
+          all available packs instantly.
+        </p>
+      </div>
+    </div>
+
+    <!-- step 2 -->
+    <div class="flex gap-5 items-start">
+      <div class="flex flex-col items-center">
+        <div class="w-12 h-12 rounded-full bg-gold flex items-center justify-center
+                    font-boogaloo text-bgDark text-xl shadow-gold shrink-0">2</div>
+        <div class="step-connector mt-1 h-16"></div>
+      </div>
+      <div class="glass rounded-2xl p-5 flex-1 mb-1">
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Tap a pack to download it</h3>
+        <p class="text-white/60 text-sm font-nunito">
+          A progress bar tracks the download.
+          Packs are extracted in the background so the UI stays smooth.
+          Once done, a ✅ badge appears — the pack is ready to play!
+        </p>
+      </div>
+    </div>
+
+    <!-- step 3 -->
+    <div class="flex gap-5 items-start">
+      <div class="flex flex-col items-center">
+        <div class="w-12 h-12 rounded-full bg-gold flex items-center justify-center
+                    font-boogaloo text-bgDark text-xl shadow-gold shrink-0">3</div>
+      </div>
+      <div class="glass rounded-2xl p-5 flex-1">
+        <h3 class="font-boogaloo text-xl text-gold mb-1">Play!</h3>
+        <p class="text-white/60 text-sm font-nunito">
+          New questions are automatically mixed into the game rotation.
+          The built-in text-to-speech reads every question aloud —
+          perfect for early readers 🎉
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     DEV SETUP
+════════════════════════════════════════════════ -->
+<section id="setup" class="relative z-10 max-w-4xl mx-auto px-6 pb-32">
+  <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-4">Developer Setup</h2>
+  <p class="text-white/50 text-center mb-10 font-nunito">
+    Point the Flutter app at this server in three steps
+  </p>
+
+  <div class="grid sm:grid-cols-3 gap-5 mb-10">
+    <!-- step A -->
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl mb-3">🍴</div>
+      <h3 class="font-boogaloo text-lg text-gold mb-2">1. Fork & Deploy</h3>
+      <p class="text-white/55 text-sm font-nunito">
+        Fork this repo, enable <strong class="text-white">GitHub Pages</strong>
+        (or deploy to Netlify) from the <code>dlc_website/</code> folder.
+        Your manifest lives at<br/>
+        <code class="text-gold/80 break-all">https://&lt;you&gt;.github.io/&lt;repo&gt;/manifest.json</code>
+      </p>
+    </div>
+
+    <!-- step B -->
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl mb-3">⚙️</div>
+      <h3 class="font-boogaloo text-lg text-gold mb-2">2. Update app_constants.dart</h3>
+      <p class="text-white/55 text-sm font-nunito mb-3">
+        Set <code class="text-gold/80">dlcManifestUrl</code> to your deployed URL:
+      </p>
+      <pre class="bg-black/40 rounded-xl p-3 text-xs text-green-300 overflow-x-auto font-mono leading-relaxed">// lib/core/constants/
+// app_constants.dart
+
+static const dlcManifestUrl =
+  'https://YOU.github.io'
+  '/wwtbs-dlc/manifest.json';</pre>
+    </div>
+
+    <!-- step C -->
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl mb-3">📦</div>
+      <h3 class="font-boogaloo text-lg text-gold mb-2">3. Build the ZIPs</h3>
+      <p class="text-white/55 text-sm font-nunito mb-3">
+        Run the bundled Python script to zip every pack source directory:
+      </p>
+      <pre class="bg-black/40 rounded-xl p-3 text-xs text-green-300 overflow-x-auto font-mono leading-relaxed">cd dlc_website
+python3 scripts/build_packs.py
+
+# outputs:
+# packs/animals_v1.zip
+# packs/colors_shapes_v1.zip</pre>
+    </div>
+  </div>
+
+  <!-- adding a new pack -->
+  <div class="glass rounded-2xl p-6">
+    <h3 class="font-boogaloo text-xl text-gold mb-3">➕ Adding a New Pack</h3>
+    <ol class="text-white/60 text-sm font-nunito space-y-2 list-decimal list-inside">
+      <li>Create <code class="text-gold/80">dlc_website/packs/&lt;pack_id&gt;/questions.json</code> following the schema below.</li>
+      <li>Run <code class="text-gold/80">python3 scripts/build_packs.py</code> — it zips the folder automatically.</li>
+      <li>Add an entry to <code class="text-gold/80">manifest.json</code> (increment <code class="text-gold/80">total_packs</code> and bump <code class="text-gold/80">manifest_version</code>).</li>
+      <li>Commit &amp; push — GitHub Pages redeploys in ~60 seconds.</li>
+      <li>The app will see the new pack on next store refresh 🚀</li>
+    </ol>
+
+    <!-- schema block -->
+    <h4 class="font-boogaloo text-lg text-gold mt-5 mb-2">questions.json schema</h4>
+    <pre class="bg-black/50 rounded-xl p-4 text-xs text-emerald-300 overflow-x-auto font-mono leading-relaxed">{
+  "pack_id":   "my_pack",
+  "pack_name": "My Amazing Pack",
+  "version":   1,
+  "questions": [
+    {
+      "id":         "mp_q01",
+      "text":       "What color is the sky?",
+      "difficulty": 1,
+      "category":   "Colors",
+      "choices": [
+        { "id": "c1", "text": "Blue",   "is_correct": true  },
+        { "id": "c2", "text": "Green",  "is_correct": false },
+        { "id": "c3", "text": "Red",    "is_correct": false },
+        { "id": "c4", "text": "Purple", "is_correct": false }
+      ]
+    }
+  ]
+}</pre>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="relative z-10 border-t border-white/10 py-10 px-6 text-center">
+  <p class="font-boogaloo text-2xl text-gold-gradient mb-2">⭐ Who Wants to Be Smart?</p>
+  <p class="text-white/40 text-sm font-nunito">
+    Made with ❤️ for curious kids everywhere.
+    Questions? Open an issue on GitHub.
+  </p>
+  <div class="flex justify-center gap-6 mt-4 text-white/30 text-xs font-nunito flex-wrap">
+    <!-- ⚑ UPDATE: replace href with your deployed game website URL -->
+    <a href="../website/index.html" class="hover:text-gold transition-colors">← Game Site</a>
+    <span>•</span>
+    <a href="manifest.json" class="hover:text-gold transition-colors">manifest.json</a>
+    <span>•</span>
+    <a href="#packs" class="hover:text-gold transition-colors">Packs</a>
+    <span>•</span>
+    <a href="#setup" class="hover:text-gold transition-colors">Setup Guide</a>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════
+     PACK DETAIL MODAL
+════════════════════════════════════════════════ -->
+<div id="modal-backdrop"
+     class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center
+            justify-center px-4 py-8 hidden"
+     onclick="closeModal(event)">
+  <div id="modal-box"
+       class="glass rounded-3xl w-full max-w-md p-6 relative
+              translate-y-8 opacity-0 transition-all duration-300"
+       onclick="event.stopPropagation()">
+    <button onclick="closeModal()"
+            class="absolute top-4 right-4 text-white/40 hover:text-white text-2xl leading-none">✕</button>
+    <div id="modal-icon"   class="text-6xl mb-3 text-center"></div>
+    <h3 id="modal-title"   class="font-boogaloo text-3xl text-gold text-center mb-1"></h3>
+    <p  id="modal-desc"    class="text-white/60 text-sm font-nunito text-center mb-5"></p>
+
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="bg-black/30 rounded-2xl p-3 text-center">
+        <div id="modal-questions" class="font-boogaloo text-3xl text-gold"></div>
+        <div class="text-white/40 text-xs font-nunito">Questions</div>
+      </div>
+      <div class="bg-black/30 rounded-2xl p-3 text-center">
+        <div id="modal-size" class="font-boogaloo text-3xl text-gold"></div>
+        <div class="text-white/40 text-xs font-nunito">Download Size</div>
+      </div>
+    </div>
+
+    <div class="mb-5">
+      <p class="text-white/40 text-xs font-nunito mb-2">Categories</p>
+      <div id="modal-categories" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 text-center text-sm">
+      <div>
+        <div class="text-white/40 text-xs font-nunito">Age Range</div>
+        <div id="modal-age" class="font-bold text-white mt-0.5"></div>
+      </div>
+      <div>
+        <div class="text-white/40 text-xs font-nunito">Difficulty</div>
+        <div id="modal-difficulty" class="font-bold text-white mt-0.5"></div>
+      </div>
+      <div>
+        <div class="text-white/40 text-xs font-nunito">Author</div>
+        <div id="modal-author" class="font-bold text-white mt-0.5 text-xs truncate"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════ -->
+<script>
+  // ── Configuration ────────────────────────────────────────────────────────────
+  // IMPORTANT: update this to your deployed URL before shipping.
+  const MANIFEST_URL = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + 'manifest.json';
+
+  // ── Starfield ─────────────────────────────────────────────────────────────────
+  (function () {
+    const canvas = document.getElementById('starfield');
+    const ctx    = canvas.getContext('2d');
+    let stars    = [];
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initStars(n) {
+      stars = Array.from({ length: n }, () => ({
+        x:    Math.random() * canvas.width,
+        y:    Math.random() * canvas.height,
+        r:    Math.random() * 1.5 + 0.3,
+        a:    Math.random(),
+        da:   (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1),
+        spd:  Math.random() * 0.15 + 0.03,
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.a  = Math.max(0.05, Math.min(1, s.a + s.da));
+        if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
+        s.y -= s.spd;
+        if (s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width; }
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    initStars(220);
+    draw();
+    window.addEventListener('resize', () => { resize(); initStars(220); });
+  })();
+
+  // ── Manifest loading ──────────────────────────────────────────────────────────
+  let loadedManifest = null;
+
+  async function loadManifest() {
+    try {
+      const res  = await fetch(MANIFEST_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      loadedManifest = await res.json();
+      renderHeroStats(loadedManifest);
+      renderPacks(loadedManifest.packs);
+    } catch (e) {
+      console.error('Manifest fetch failed:', e);
+      document.getElementById('packs-loading').classList.add('hidden');
+      document.getElementById('packs-error').classList.remove('hidden');
+    }
+  }
+
+  function renderHeroStats(manifest) {
+    const totalQ = manifest.packs.reduce((s, p) => s + p.question_count, 0);
+    document.getElementById('hero-pack-count').textContent     = manifest.total_packs;
+    document.getElementById('hero-question-count').textContent = totalQ;
+  }
+
+  function difficultyLabel(d) {
+    return d <= 1 ? '⭐ Beginner' : d === 2 ? '⭐⭐ Easy' : d === 3 ? '⭐⭐⭐ Medium' : '⭐⭐⭐⭐ Hard';
+  }
+
+  function sizeMb(bytes) {
+    return bytes < 1024 * 1024
+      ? `${(bytes / 1024).toFixed(0)} KB`
+      : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  function renderPacks(packs) {
+    const grid = document.getElementById('packs-grid');
+    grid.innerHTML = '';
+
+    packs.forEach(pack => {
+      const card = document.createElement('div');
+      card.className = 'pack-card glass rounded-3xl p-6 relative overflow-hidden cursor-pointer';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `View details for ${pack.name}`);
+
+      // category pills HTML
+      const pillsHtml = (pack.categories || []).map(c =>
+        `<span class="text-xs font-semibold px-3 py-1 rounded-full bg-bgSurface/60 text-gold/80">${c}</span>`
+      ).join('');
+
+      // stats bar (fills to question_count as a visual, capped at 100%)
+      const barW = Math.min(100, (pack.question_count / 25) * 100);
+
+      card.innerHTML = `
+        <div class="text-5xl mb-3">${pack.icon_emoji || '📦'}</div>
+        <h3 class="font-boogaloo text-2xl text-gold mb-1">${pack.name}</h3>
+        <p class="text-white/55 text-sm font-nunito leading-relaxed mb-4">${pack.description}</p>
+
+        <div class="flex flex-wrap gap-2 mb-5">${pillsHtml}</div>
+
+        <div class="mb-3">
+          <div class="flex justify-between text-xs text-white/40 font-nunito mb-1.5">
+            <span>❓ ${pack.question_count} questions</span>
+            <span>${sizeMb(pack.size_bytes)}</span>
+          </div>
+          <div class="h-1.5 rounded-full bg-white/10">
+            <div class="bar-fill" style="width: ${barW}%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs text-white/40 font-nunito">
+            <span>🎂 ${pack.age_range}</span>
+            <span>•</span>
+            <span>${difficultyLabel(pack.difficulty)}</span>
+          </div>
+          <span class="text-xs font-bold px-3 py-1.5 rounded-full
+                       border border-correct/50 text-correct bg-correct/10">
+            FREE
+          </span>
+        </div>
+      `;
+
+      card.addEventListener('click',   () => openModal(pack));
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(pack); });
+      grid.appendChild(card);
+    });
+
+    document.getElementById('packs-loading').classList.add('hidden');
+    grid.classList.remove('hidden');
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────────
+  function openModal(pack) {
+    const box = document.getElementById('modal-box');
+    document.getElementById('modal-icon').textContent       = pack.icon_emoji || '📦';
+    document.getElementById('modal-title').textContent      = pack.name;
+    document.getElementById('modal-desc').textContent       = pack.description;
+    document.getElementById('modal-questions').textContent  = pack.question_count;
+    document.getElementById('modal-size').textContent       = sizeMb(pack.size_bytes);
+    document.getElementById('modal-age').textContent        = pack.age_range;
+    document.getElementById('modal-difficulty').textContent = difficultyLabel(pack.difficulty);
+    document.getElementById('modal-author').textContent     = pack.author || 'WWTBS Team';
+
+    const catEl = document.getElementById('modal-categories');
+    catEl.innerHTML = (pack.categories || []).map(c =>
+      `<span class="text-xs font-semibold px-3 py-1.5 rounded-full bg-bgSurface/70 text-gold/80">${c}</span>`
+    ).join('');
+
+    document.getElementById('modal-backdrop').classList.remove('hidden');
+    requestAnimationFrame(() => {
+      box.classList.remove('translate-y-8', 'opacity-0');
+      box.classList.add('translate-y-0', 'opacity-100');
+    });
+    document.addEventListener('keydown', handleEsc);
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal-backdrop') && e.type === 'click') return;
+    const box = document.getElementById('modal-box');
+    box.classList.add('translate-y-8', 'opacity-0');
+    box.classList.remove('translate-y-0', 'opacity-100');
+    setTimeout(() => document.getElementById('modal-backdrop').classList.add('hidden'), 300);
+    document.removeEventListener('keydown', handleEsc);
+  }
+
+  function handleEsc(e) { if (e.key === 'Escape') closeModal(); }
+
+  // ── Manifest URL copy ─────────────────────────────────────────────────────────
+  function copyManifest() {
+    navigator.clipboard.writeText(MANIFEST_URL).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('flash-copy');
+      setTimeout(() => {
+        btn.textContent = 'Copy URL';
+        btn.classList.remove('flash-copy');
+      }, 1800);
+    });
+  }
+
+  // ── Set manifest URL display ──────────────────────────────────────────────────
+  document.getElementById('manifest-url').textContent = MANIFEST_URL;
+
+  // ── Init ──────────────────────────────────────────────────────────────────────
+  loadManifest();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+{
+  "pack_id": "animals",
+  "pack_name": "Animal Kingdom",
+  "version": 1,
+  "questions": [
+    {
+      "id": "ani_q01",
+      "text": "What sound does a lion make?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Roar",  "is_correct": true  },
+        { "id": "c2", "text": "Moo",   "is_correct": false },
+        { "id": "c3", "text": "Woof",  "is_correct": false },
+        { "id": "c4", "text": "Meow",  "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q02",
+      "text": "Where do birds build their home?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Nest",   "is_correct": true  },
+        { "id": "c2", "text": "Den",    "is_correct": false },
+        { "id": "c3", "text": "Burrow", "is_correct": false },
+        { "id": "c4", "text": "Hive",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q03",
+      "text": "What do we call a baby cat?",
+      "difficulty": 1,
+      "category": "Baby Animals",
+      "choices": [
+        { "id": "c1", "text": "Kitten", "is_correct": true  },
+        { "id": "c2", "text": "Cub",    "is_correct": false },
+        { "id": "c3", "text": "Puppy",  "is_correct": false },
+        { "id": "c4", "text": "Calf",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q04",
+      "text": "Which animal has a long trunk?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Elephant", "is_correct": true  },
+        { "id": "c2", "text": "Hippo",    "is_correct": false },
+        { "id": "c3", "text": "Rhino",    "is_correct": false },
+        { "id": "c4", "text": "Giraffe",  "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q05",
+      "text": "What do we call a baby dog?",
+      "difficulty": 1,
+      "category": "Baby Animals",
+      "choices": [
+        { "id": "c1", "text": "Puppy",  "is_correct": true  },
+        { "id": "c2", "text": "Kitten", "is_correct": false },
+        { "id": "c3", "text": "Cub",    "is_correct": false },
+        { "id": "c4", "text": "Lamb",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q06",
+      "text": "Which animal carries its home on its back?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Turtle",   "is_correct": true  },
+        { "id": "c2", "text": "Frog",     "is_correct": false },
+        { "id": "c3", "text": "Rabbit",   "is_correct": false },
+        { "id": "c4", "text": "Squirrel", "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q07",
+      "text": "What sound does a sheep make?",
+      "difficulty": 1,
+      "category": "Sounds",
+      "choices": [
+        { "id": "c1", "text": "Baa",   "is_correct": true  },
+        { "id": "c2", "text": "Oink",  "is_correct": false },
+        { "id": "c3", "text": "Moo",   "is_correct": false },
+        { "id": "c4", "text": "Cluck", "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q08",
+      "text": "Which animal lives in a hive and makes honey?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Bee",         "is_correct": true  },
+        { "id": "c2", "text": "Ant",         "is_correct": false },
+        { "id": "c3", "text": "Spider",      "is_correct": false },
+        { "id": "c4", "text": "Butterfly",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q09",
+      "text": "What do we call a baby cow?",
+      "difficulty": 1,
+      "category": "Baby Animals",
+      "choices": [
+        { "id": "c1", "text": "Calf",   "is_correct": true  },
+        { "id": "c2", "text": "Cub",    "is_correct": false },
+        { "id": "c3", "text": "Piglet", "is_correct": false },
+        { "id": "c4", "text": "Foal",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q10",
+      "text": "Which animal has black and white stripes?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Zebra",   "is_correct": true  },
+        { "id": "c2", "text": "Tiger",   "is_correct": false },
+        { "id": "c3", "text": "Cheetah", "is_correct": false },
+        { "id": "c4", "text": "Panda",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q11",
+      "text": "What sound does a frog make?",
+      "difficulty": 1,
+      "category": "Sounds",
+      "choices": [
+        { "id": "c1", "text": "Ribbit", "is_correct": true  },
+        { "id": "c2", "text": "Buzz",   "is_correct": false },
+        { "id": "c3", "text": "Hiss",   "is_correct": false },
+        { "id": "c4", "text": "Chirp",  "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q12",
+      "text": "Which is the tallest animal in the world?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Giraffe",  "is_correct": true  },
+        { "id": "c2", "text": "Elephant", "is_correct": false },
+        { "id": "c3", "text": "Horse",    "is_correct": false },
+        { "id": "c4", "text": "Bear",     "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q13",
+      "text": "What do we call a baby sheep?",
+      "difficulty": 1,
+      "category": "Baby Animals",
+      "choices": [
+        { "id": "c1", "text": "Lamb",   "is_correct": true  },
+        { "id": "c2", "text": "Kid",    "is_correct": false },
+        { "id": "c3", "text": "Piglet", "is_correct": false },
+        { "id": "c4", "text": "Foal",   "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q14",
+      "text": "Which animal has a big bushy mane around its face?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Lion",    "is_correct": true  },
+        { "id": "c2", "text": "Tiger",   "is_correct": false },
+        { "id": "c3", "text": "Cheetah", "is_correct": false },
+        { "id": "c4", "text": "Leopard", "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q15",
+      "text": "What sound does a horse make?",
+      "difficulty": 1,
+      "category": "Sounds",
+      "choices": [
+        { "id": "c1", "text": "Neigh", "is_correct": true  },
+        { "id": "c2", "text": "Moo",   "is_correct": false },
+        { "id": "c3", "text": "Grunt", "is_correct": false },
+        { "id": "c4", "text": "Bark",  "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q16",
+      "text": "Which animal uses a web to catch its food?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Spider",      "is_correct": true  },
+        { "id": "c2", "text": "Caterpillar", "is_correct": false },
+        { "id": "c3", "text": "Worm",        "is_correct": false },
+        { "id": "c4", "text": "Bee",         "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q17",
+      "text": "What do we call a baby duck?",
+      "difficulty": 1,
+      "category": "Baby Animals",
+      "choices": [
+        { "id": "c1", "text": "Duckling", "is_correct": true  },
+        { "id": "c2", "text": "Gosling",  "is_correct": false },
+        { "id": "c3", "text": "Chick",    "is_correct": false },
+        { "id": "c4", "text": "Owlet",    "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q18",
+      "text": "Which animal has one or two humps on its back?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Camel",    "is_correct": true  },
+        { "id": "c2", "text": "Elephant", "is_correct": false },
+        { "id": "c3", "text": "Hippo",    "is_correct": false },
+        { "id": "c4", "text": "Buffalo",  "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q19",
+      "text": "What sound does a pig make?",
+      "difficulty": 1,
+      "category": "Sounds",
+      "choices": [
+        { "id": "c1", "text": "Oink",  "is_correct": true  },
+        { "id": "c2", "text": "Moo",   "is_correct": false },
+        { "id": "c3", "text": "Baa",   "is_correct": false },
+        { "id": "c4", "text": "Cluck", "is_correct": false }
+      ]
+    },
+    {
+      "id": "ani_q20",
+      "text": "Which animal carries its baby in a pouch?",
+      "difficulty": 1,
+      "category": "Animals",
+      "choices": [
+        { "id": "c1", "text": "Kangaroo", "is_correct": true  },
+        { "id": "c2", "text": "Zebra",    "is_correct": false },
+        { "id": "c3", "text": "Giraffe",  "is_correct": false },
+        { "id": "c4", "text": "Elephant", "is_correct": false }
+      ]
+    }
+  ]
+}
