@@ -6,241 +6,261 @@
     {
       "id": "cs_q01",
       "text": "Which shape has 4 equal sides?",
+      "text_bg": "Коя фигура има 4 равни страни?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "Square",    "is_correct": true  },
-        { "id": "c2", "text": "Rectangle", "is_correct": false },
-        { "id": "c3", "text": "Triangle",  "is_correct": false },
-        { "id": "c4", "text": "Circle",    "is_correct": false }
+        { "id": "c1", "text": "Square",    "text_bg": "Квадрат",      "is_correct": true  },
+        { "id": "c2", "text": "Rectangle", "text_bg": "Правоъгълник", "is_correct": false },
+        { "id": "c3", "text": "Triangle",  "text_bg": "Триъгълник",   "is_correct": false },
+        { "id": "c4", "text": "Circle",    "text_bg": "Кръг",         "is_correct": false }
       ]
     },
     {
       "id": "cs_q02",
       "text": "What color do you get when you mix red and blue?",
+      "text_bg": "Какъв цвят получаваш като смесиш червено и синьо?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Purple", "is_correct": true  },
-        { "id": "c2", "text": "Green",  "is_correct": false },
-        { "id": "c3", "text": "Orange", "is_correct": false },
-        { "id": "c4", "text": "Pink",   "is_correct": false }
+        { "id": "c1", "text": "Purple", "text_bg": "Лилаво",   "is_correct": true  },
+        { "id": "c2", "text": "Green",  "text_bg": "Зелено",   "is_correct": false },
+        { "id": "c3", "text": "Orange", "text_bg": "Оранжево", "is_correct": false },
+        { "id": "c4", "text": "Pink",   "text_bg": "Розово",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q03",
       "text": "How many sides does a pentagon have?",
+      "text_bg": "Колко страни има петоъгълникът?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "5", "is_correct": true  },
-        { "id": "c2", "text": "4", "is_correct": false },
-        { "id": "c3", "text": "6", "is_correct": false },
-        { "id": "c4", "text": "3", "is_correct": false }
+        { "id": "c1", "text": "5", "text_bg": "5", "is_correct": true  },
+        { "id": "c2", "text": "4", "text_bg": "4", "is_correct": false },
+        { "id": "c3", "text": "6", "text_bg": "6", "is_correct": false },
+        { "id": "c4", "text": "3", "text_bg": "3", "is_correct": false }
       ]
     },
     {
       "id": "cs_q04",
       "text": "What color is an orange fruit?",
+      "text_bg": "Какъв цвят е плодът портокал?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Orange", "is_correct": true  },
-        { "id": "c2", "text": "Red",    "is_correct": false },
-        { "id": "c3", "text": "Yellow", "is_correct": false },
-        { "id": "c4", "text": "Green",  "is_correct": false }
+        { "id": "c1", "text": "Orange", "text_bg": "Оранжево", "is_correct": true  },
+        { "id": "c2", "text": "Red",    "text_bg": "Червено",  "is_correct": false },
+        { "id": "c3", "text": "Yellow", "text_bg": "Жълто",    "is_correct": false },
+        { "id": "c4", "text": "Green",  "text_bg": "Зелено",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q05",
       "text": "What shape is a pizza?",
+      "text_bg": "Каква форма има пицата?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "Circle",    "is_correct": true  },
-        { "id": "c2", "text": "Square",    "is_correct": false },
-        { "id": "c3", "text": "Rectangle", "is_correct": false },
-        { "id": "c4", "text": "Oval",      "is_correct": false }
+        { "id": "c1", "text": "Circle",    "text_bg": "Кръг",         "is_correct": true  },
+        { "id": "c2", "text": "Square",    "text_bg": "Квадрат",      "is_correct": false },
+        { "id": "c3", "text": "Rectangle", "text_bg": "Правоъгълник", "is_correct": false },
+        { "id": "c4", "text": "Oval",      "text_bg": "Овал",         "is_correct": false }
       ]
     },
     {
       "id": "cs_q06",
       "text": "What color do you get when you mix yellow and blue?",
+      "text_bg": "Какъв цвят получаваш като смесиш жълто и синьо?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Green",  "is_correct": true  },
-        { "id": "c2", "text": "Purple", "is_correct": false },
-        { "id": "c3", "text": "Orange", "is_correct": false },
-        { "id": "c4", "text": "Pink",   "is_correct": false }
+        { "id": "c1", "text": "Green",  "text_bg": "Зелено",   "is_correct": true  },
+        { "id": "c2", "text": "Purple", "text_bg": "Лилаво",   "is_correct": false },
+        { "id": "c3", "text": "Orange", "text_bg": "Оранжево", "is_correct": false },
+        { "id": "c4", "text": "Pink",   "text_bg": "Розово",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q07",
       "text": "How many corners does a triangle have?",
+      "text_bg": "Колко ъгъла има триъгълникът?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "3", "is_correct": true  },
-        { "id": "c2", "text": "4", "is_correct": false },
-        { "id": "c3", "text": "2", "is_correct": false },
-        { "id": "c4", "text": "5", "is_correct": false }
+        { "id": "c1", "text": "3", "text_bg": "3", "is_correct": true  },
+        { "id": "c2", "text": "4", "text_bg": "4", "is_correct": false },
+        { "id": "c3", "text": "2", "text_bg": "2", "is_correct": false },
+        { "id": "c4", "text": "5", "text_bg": "5", "is_correct": false }
       ]
     },
     {
       "id": "cs_q08",
       "text": "What color is a ripe strawberry?",
+      "text_bg": "Какъв цвят е узрялата ягода?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Red",    "is_correct": true  },
-        { "id": "c2", "text": "Pink",   "is_correct": false },
-        { "id": "c3", "text": "Orange", "is_correct": false },
-        { "id": "c4", "text": "Purple", "is_correct": false }
+        { "id": "c1", "text": "Red",    "text_bg": "Червено",  "is_correct": true  },
+        { "id": "c2", "text": "Pink",   "text_bg": "Розово",   "is_correct": false },
+        { "id": "c3", "text": "Orange", "text_bg": "Оранжево", "is_correct": false },
+        { "id": "c4", "text": "Purple", "text_bg": "Лилаво",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q09",
       "text": "Which shape has 4 sides but the sides are NOT all equal?",
+      "text_bg": "Коя фигура има 4 страни, но те не са всички равни?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "Rectangle", "is_correct": true  },
-        { "id": "c2", "text": "Circle",    "is_correct": false },
-        { "id": "c3", "text": "Triangle",  "is_correct": false },
-        { "id": "c4", "text": "Pentagon",  "is_correct": false }
+        { "id": "c1", "text": "Rectangle", "text_bg": "Правоъгълник", "is_correct": true  },
+        { "id": "c2", "text": "Circle",    "text_bg": "Кръг",         "is_correct": false },
+        { "id": "c3", "text": "Triangle",  "text_bg": "Триъгълник",   "is_correct": false },
+        { "id": "c4", "text": "Pentagon",  "text_bg": "Петоъгълник",  "is_correct": false }
       ]
     },
     {
       "id": "cs_q10",
       "text": "What color do you get when you mix red and yellow?",
+      "text_bg": "Какъв цвят получаваш като смесиш червено и жълто?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Orange", "is_correct": true  },
-        { "id": "c2", "text": "Purple", "is_correct": false },
-        { "id": "c3", "text": "Green",  "is_correct": false },
-        { "id": "c4", "text": "Brown",  "is_correct": false }
+        { "id": "c1", "text": "Orange", "text_bg": "Оранжево", "is_correct": true  },
+        { "id": "c2", "text": "Purple", "text_bg": "Лилаво",   "is_correct": false },
+        { "id": "c3", "text": "Green",  "text_bg": "Зелено",   "is_correct": false },
+        { "id": "c4", "text": "Brown",  "text_bg": "Кафяво",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q11",
       "text": "How many sides does a hexagon have?",
+      "text_bg": "Колко страни има шестоъгълникът?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "6", "is_correct": true  },
-        { "id": "c2", "text": "5", "is_correct": false },
-        { "id": "c3", "text": "8", "is_correct": false },
-        { "id": "c4", "text": "4", "is_correct": false }
+        { "id": "c1", "text": "6", "text_bg": "6", "is_correct": true  },
+        { "id": "c2", "text": "5", "text_bg": "5", "is_correct": false },
+        { "id": "c3", "text": "8", "text_bg": "8", "is_correct": false },
+        { "id": "c4", "text": "4", "text_bg": "4", "is_correct": false }
       ]
     },
     {
       "id": "cs_q12",
       "text": "What color are most grapes?",
+      "text_bg": "Какъв цвят са повечето грозде?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Purple", "is_correct": true  },
-        { "id": "c2", "text": "Orange", "is_correct": false },
-        { "id": "c3", "text": "Yellow", "is_correct": false },
-        { "id": "c4", "text": "White",  "is_correct": false }
+        { "id": "c1", "text": "Purple", "text_bg": "Лилаво",   "is_correct": true  },
+        { "id": "c2", "text": "Orange", "text_bg": "Оранжево", "is_correct": false },
+        { "id": "c3", "text": "Yellow", "text_bg": "Жълто",    "is_correct": false },
+        { "id": "c4", "text": "White",  "text_bg": "Бяло",     "is_correct": false }
       ]
     },
     {
       "id": "cs_q13",
       "text": "Which shape has NO corners at all?",
+      "text_bg": "Коя фигура няма нито един ъгъл?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "Circle",    "is_correct": true  },
-        { "id": "c2", "text": "Square",    "is_correct": false },
-        { "id": "c3", "text": "Triangle",  "is_correct": false },
-        { "id": "c4", "text": "Rectangle", "is_correct": false }
+        { "id": "c1", "text": "Circle",    "text_bg": "Кръг",         "is_correct": true  },
+        { "id": "c2", "text": "Square",    "text_bg": "Квадрат",      "is_correct": false },
+        { "id": "c3", "text": "Triangle",  "text_bg": "Триъгълник",   "is_correct": false },
+        { "id": "c4", "text": "Rectangle", "text_bg": "Правоъгълник", "is_correct": false }
       ]
     },
     {
       "id": "cs_q14",
       "text": "What color is a carrot?",
+      "text_bg": "Какъв цвят е морковът?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Orange", "is_correct": true  },
-        { "id": "c2", "text": "Red",    "is_correct": false },
-        { "id": "c3", "text": "Yellow", "is_correct": false },
-        { "id": "c4", "text": "Green",  "is_correct": false }
+        { "id": "c1", "text": "Orange", "text_bg": "Оранжево", "is_correct": true  },
+        { "id": "c2", "text": "Red",    "text_bg": "Червено",  "is_correct": false },
+        { "id": "c3", "text": "Yellow", "text_bg": "Жълто",    "is_correct": false },
+        { "id": "c4", "text": "Green",  "text_bg": "Зелено",   "is_correct": false }
       ]
     },
     {
       "id": "cs_q15",
       "text": "How many sides does an octagon have?",
+      "text_bg": "Колко страни има осмоъгълникът?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "8", "is_correct": true  },
-        { "id": "c2", "text": "6", "is_correct": false },
-        { "id": "c3", "text": "4", "is_correct": false },
-        { "id": "c4", "text": "5", "is_correct": false }
+        { "id": "c1", "text": "8", "text_bg": "8", "is_correct": true  },
+        { "id": "c2", "text": "6", "text_bg": "6", "is_correct": false },
+        { "id": "c3", "text": "4", "text_bg": "4", "is_correct": false },
+        { "id": "c4", "text": "5", "text_bg": "5", "is_correct": false }
       ]
     },
     {
       "id": "cs_q16",
       "text": "What color do you get when you mix black and white?",
+      "text_bg": "Какъв цвят получаваш като смесиш черно и бяло?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Gray",   "is_correct": true  },
-        { "id": "c2", "text": "Brown",  "is_correct": false },
-        { "id": "c3", "text": "Beige",  "is_correct": false },
-        { "id": "c4", "text": "Purple", "is_correct": false }
+        { "id": "c1", "text": "Gray",   "text_bg": "Сиво",    "is_correct": true  },
+        { "id": "c2", "text": "Brown",  "text_bg": "Кафяво",  "is_correct": false },
+        { "id": "c3", "text": "Beige",  "text_bg": "Бежово",  "is_correct": false },
+        { "id": "c4", "text": "Purple", "text_bg": "Лилаво",  "is_correct": false }
       ]
     },
     {
       "id": "cs_q17",
       "text": "How many sides does a square have?",
+      "text_bg": "Колко страни има квадратът?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "4", "is_correct": true  },
-        { "id": "c2", "text": "3", "is_correct": false },
-        { "id": "c3", "text": "5", "is_correct": false },
-        { "id": "c4", "text": "6", "is_correct": false }
+        { "id": "c1", "text": "4", "text_bg": "4", "is_correct": true  },
+        { "id": "c2", "text": "3", "text_bg": "3", "is_correct": false },
+        { "id": "c3", "text": "5", "text_bg": "5", "is_correct": false },
+        { "id": "c4", "text": "6", "text_bg": "6", "is_correct": false }
       ]
     },
     {
       "id": "cs_q18",
       "text": "What color is a sunflower?",
+      "text_bg": "Какъв цвят е слънчогледът?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Yellow", "is_correct": true  },
-        { "id": "c2", "text": "Orange", "is_correct": false },
-        { "id": "c3", "text": "Red",    "is_correct": false },
-        { "id": "c4", "text": "White",  "is_correct": false }
+        { "id": "c1", "text": "Yellow", "text_bg": "Жълто",   "is_correct": true  },
+        { "id": "c2", "text": "Orange", "text_bg": "Оранжево","is_correct": false },
+        { "id": "c3", "text": "Red",    "text_bg": "Червено", "is_correct": false },
+        { "id": "c4", "text": "White",  "text_bg": "Бяло",    "is_correct": false }
       ]
     },
     {
       "id": "cs_q19",
       "text": "What shape looks like a stretched circle?",
+      "text_bg": "Каква форма прилича на издължен кръг?",
       "difficulty": 1,
       "category": "Shapes",
       "choices": [
-        { "id": "c1", "text": "Oval",      "is_correct": true  },
-        { "id": "c2", "text": "Circle",    "is_correct": false },
-        { "id": "c3", "text": "Square",    "is_correct": false },
-        { "id": "c4", "text": "Triangle",  "is_correct": false }
+        { "id": "c1", "text": "Oval",      "text_bg": "Овал",       "is_correct": true  },
+        { "id": "c2", "text": "Circle",    "text_bg": "Кръг",       "is_correct": false },
+        { "id": "c3", "text": "Square",    "text_bg": "Квадрат",    "is_correct": false },
+        { "id": "c4", "text": "Triangle",  "text_bg": "Триъгълник", "is_correct": false }
       ]
     },
     {
       "id": "cs_q20",
       "text": "Which two colors do you mix to make green?",
+      "text_bg": "Кои два цвята смесваш, за да получиш зелено?",
       "difficulty": 1,
       "category": "Colors",
       "choices": [
-        { "id": "c1", "text": "Yellow and Blue", "is_correct": true  },
-        { "id": "c2", "text": "Red and Blue",    "is_correct": false },
-        { "id": "c3", "text": "Red and Yellow",  "is_correct": false },
-        { "id": "c4", "text": "White and Blue",  "is_correct": false }
+        { "id": "c1", "text": "Yellow and Blue", "text_bg": "Жълто и синьо",   "is_correct": true  },
+        { "id": "c2", "text": "Red and Blue",    "text_bg": "Червено и синьо", "is_correct": false },
+        { "id": "c3", "text": "Red and Yellow",  "text_bg": "Червено и жълто", "is_correct": false },
+        { "id": "c4", "text": "White and Blue",  "text_bg": "Бяло и синьо",    "is_correct": false }
       ]
     }
   ]

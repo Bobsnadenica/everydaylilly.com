@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact • Who Wants to Be Smart?</title>
+  <meta name="description" content="Contact page for Who Wants to Be Smart?" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-orb orb-c"></div>
+
+  <main class="shell">
+    <header class="topbar">
+      <a href="./index.html" class="logo">⭐ Who Wants to Be Smart?</a>
+
+      <nav class="nav" aria-label="Main Navigation">
+        <a class="nav-link" href="./index.html">Home</a>
+        <a class="nav-link" href="./how-it-works.html">How It Works</a>
+        <a class="nav-link" href="./privacy.html">Privacy</a>
+        <a class="nav-dlc" href="./dlc_website/index.html">DLC</a>
+      </nav>
+
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu">☰</button>
+    </header>
+
+    <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation">
+      <a data-close-menu class="nav-link" href="./index.html">Home</a>
+      <a data-close-menu class="nav-link" href="./how-it-works.html">How It Works</a>
+      <a data-close-menu class="nav-link" href="./privacy.html">Privacy</a>
+      <a data-close-menu class="nav-dlc" href="./dlc_website/index.html">DLC</a>
+    </nav>
+
+    <section class="panel">
+      <h1 class="page-title">Contact</h1>
+      <p class="subtle">
+        We are happy to help with support, feedback, classroom questions, or partnership requests.
+      </p>
+
+      <div class="article">
+        <article class="card">
+          <h3>Email</h3>
+          <p>Use this address for all inquiries:</p>
+          <p style="margin-top: 12px;">
+            <a class="contact-box" href="mailto:contactus@everydaylilly.com">
+              ✉️ contactus@everydaylilly.com
+            </a>
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>What to include</h3>
+          <p>
+            Please include your device type (iOS/Android), a short description of the issue,
+            and screenshots if possible. This helps us reply faster.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> Who Wants to Be Smart?</span>
+      <div class="footer-links">
+        <a href="./index.html">Home</a>
+        <a href="./how-it-works.html">How It Works</a>
+        <a href="./privacy.html">Privacy</a>
+      </div>
+    </footer>
+  </main>
+
+  <script src="./assets/site.js"></script>
+</body>
+</html>

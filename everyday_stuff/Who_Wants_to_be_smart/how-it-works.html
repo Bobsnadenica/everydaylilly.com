@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works • Who Wants to Be Smart?</title>
+  <meta name="description" content="Learn how Who Wants to Be Smart? works for kids, parents, and classrooms." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-orb orb-c"></div>
+
+  <main class="shell">
+    <header class="topbar">
+      <a href="./index.html" class="logo">⭐ Who Wants to Be Smart?</a>
+
+      <nav class="nav" aria-label="Main Navigation">
+        <a class="nav-link" href="./index.html">Home</a>
+        <a class="nav-link" href="./privacy.html">Privacy</a>
+        <a class="nav-link" href="./contact.html">Contact</a>
+        <a class="nav-dlc" href="./dlc_website/index.html">DLC</a>
+      </nav>
+
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu">☰</button>
+    </header>
+
+    <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation">
+      <a data-close-menu class="nav-link" href="./index.html">Home</a>
+      <a data-close-menu class="nav-link" href="./privacy.html">Privacy</a>
+      <a data-close-menu class="nav-link" href="./contact.html">Contact</a>
+      <a data-close-menu class="nav-dlc" href="./dlc_website/index.html">DLC</a>
+    </nav>
+
+    <section class="panel">
+      <h1 class="page-title">How It Works</h1>
+      <p class="subtle">
+        The game is designed so young kids can play independently while still learning from every answer.
+      </p>
+
+      <div class="article">
+        <article class="card">
+          <h3>1) Choose a mode</h3>
+          <p>
+            Start with <strong>Quick Play</strong> at home, or pick <strong>Classroom Mode</strong> to save scores for a group.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>2) Enter a short name</h3>
+          <p>
+            Kids pick a 3-letter arcade name so their progress is easy to track and fun to recognize.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>3) Listen, then answer</h3>
+          <p>
+            The host reads each question and answer choices in a gentle voice with extra pacing for comprehension.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>4) Climb to the top</h3>
+          <p>
+            Each correct answer moves the character up the climb track.
+            Reach the target and trigger a full celebration.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>5) Review score and progress</h3>
+          <p>
+            Rounds end with score, stars, and performance summary so kids can replay and improve.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> Who Wants to Be Smart?</span>
+      <div class="footer-links">
+        <a href="./index.html">Home</a>
+        <a href="./privacy.html">Privacy</a>
+        <a href="./contact.html">Contact</a>
+      </div>
+    </footer>
+  </main>
+
+  <script src="./assets/site.js"></script>
+</body>
+</html>

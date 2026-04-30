@@ -6,241 +6,261 @@
     {
       "id": "ani_q01",
       "text": "What sound does a lion make?",
+      "text_bg": "Какъв звук издава лъвът?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Roar",  "is_correct": true  },
-        { "id": "c2", "text": "Moo",   "is_correct": false },
-        { "id": "c3", "text": "Woof",  "is_correct": false },
-        { "id": "c4", "text": "Meow",  "is_correct": false }
+        { "id": "c1", "text": "Roar", "text_bg": "Рев",      "is_correct": true  },
+        { "id": "c2", "text": "Moo",  "text_bg": "Му-у",     "is_correct": false },
+        { "id": "c3", "text": "Woof", "text_bg": "Хав-хав",  "is_correct": false },
+        { "id": "c4", "text": "Meow", "text_bg": "Мяу",      "is_correct": false }
       ]
     },
     {
       "id": "ani_q02",
       "text": "Where do birds build their home?",
+      "text_bg": "Къде птиците строят дома си?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Nest",   "is_correct": true  },
-        { "id": "c2", "text": "Den",    "is_correct": false },
-        { "id": "c3", "text": "Burrow", "is_correct": false },
-        { "id": "c4", "text": "Hive",   "is_correct": false }
+        { "id": "c1", "text": "Nest",   "text_bg": "Гнездо",    "is_correct": true  },
+        { "id": "c2", "text": "Den",    "text_bg": "Леговище",  "is_correct": false },
+        { "id": "c3", "text": "Burrow", "text_bg": "Дупка",     "is_correct": false },
+        { "id": "c4", "text": "Hive",   "text_bg": "Кошер",     "is_correct": false }
       ]
     },
     {
       "id": "ani_q03",
       "text": "What do we call a baby cat?",
+      "text_bg": "Как се казва малкото на котката?",
       "difficulty": 1,
       "category": "Baby Animals",
       "choices": [
-        { "id": "c1", "text": "Kitten", "is_correct": true  },
-        { "id": "c2", "text": "Cub",    "is_correct": false },
-        { "id": "c3", "text": "Puppy",  "is_correct": false },
-        { "id": "c4", "text": "Calf",   "is_correct": false }
+        { "id": "c1", "text": "Kitten", "text_bg": "Коте",     "is_correct": true  },
+        { "id": "c2", "text": "Cub",    "text_bg": "Малко",    "is_correct": false },
+        { "id": "c3", "text": "Puppy",  "text_bg": "Кученце",  "is_correct": false },
+        { "id": "c4", "text": "Calf",   "text_bg": "Теле",     "is_correct": false }
       ]
     },
     {
       "id": "ani_q04",
       "text": "Which animal has a long trunk?",
+      "text_bg": "Кое животно има дълъг хобот?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Elephant", "is_correct": true  },
-        { "id": "c2", "text": "Hippo",    "is_correct": false },
-        { "id": "c3", "text": "Rhino",    "is_correct": false },
-        { "id": "c4", "text": "Giraffe",  "is_correct": false }
+        { "id": "c1", "text": "Elephant", "text_bg": "Слон",        "is_correct": true  },
+        { "id": "c2", "text": "Hippo",    "text_bg": "Хипопотам",   "is_correct": false },
+        { "id": "c3", "text": "Rhino",    "text_bg": "Носорог",     "is_correct": false },
+        { "id": "c4", "text": "Giraffe",  "text_bg": "Жираф",       "is_correct": false }
       ]
     },
     {
       "id": "ani_q05",
       "text": "What do we call a baby dog?",
+      "text_bg": "Как се казва малкото на кучето?",
       "difficulty": 1,
       "category": "Baby Animals",
       "choices": [
-        { "id": "c1", "text": "Puppy",  "is_correct": true  },
-        { "id": "c2", "text": "Kitten", "is_correct": false },
-        { "id": "c3", "text": "Cub",    "is_correct": false },
-        { "id": "c4", "text": "Lamb",   "is_correct": false }
+        { "id": "c1", "text": "Puppy",  "text_bg": "Кученце",  "is_correct": true  },
+        { "id": "c2", "text": "Kitten", "text_bg": "Коте",     "is_correct": false },
+        { "id": "c3", "text": "Cub",    "text_bg": "Малко",    "is_correct": false },
+        { "id": "c4", "text": "Lamb",   "text_bg": "Агне",     "is_correct": false }
       ]
     },
     {
       "id": "ani_q06",
       "text": "Which animal carries its home on its back?",
+      "text_bg": "Кое животно носи дома си на гърба?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Turtle",   "is_correct": true  },
-        { "id": "c2", "text": "Frog",     "is_correct": false },
-        { "id": "c3", "text": "Rabbit",   "is_correct": false },
-        { "id": "c4", "text": "Squirrel", "is_correct": false }
+        { "id": "c1", "text": "Turtle",   "text_bg": "Костенурка",  "is_correct": true  },
+        { "id": "c2", "text": "Frog",     "text_bg": "Жаба",        "is_correct": false },
+        { "id": "c3", "text": "Rabbit",   "text_bg": "Заек",        "is_correct": false },
+        { "id": "c4", "text": "Squirrel", "text_bg": "Катерица",    "is_correct": false }
       ]
     },
     {
       "id": "ani_q07",
       "text": "What sound does a sheep make?",
+      "text_bg": "Какъв звук издава овцата?",
       "difficulty": 1,
       "category": "Sounds",
       "choices": [
-        { "id": "c1", "text": "Baa",   "is_correct": true  },
-        { "id": "c2", "text": "Oink",  "is_correct": false },
-        { "id": "c3", "text": "Moo",   "is_correct": false },
-        { "id": "c4", "text": "Cluck", "is_correct": false }
+        { "id": "c1", "text": "Baa",   "text_bg": "Бе-е",  "is_correct": true  },
+        { "id": "c2", "text": "Oink",  "text_bg": "Хрю",   "is_correct": false },
+        { "id": "c3", "text": "Moo",   "text_bg": "Му-у",  "is_correct": false },
+        { "id": "c4", "text": "Cluck", "text_bg": "Ко-ко", "is_correct": false }
       ]
     },
     {
       "id": "ani_q08",
       "text": "Which animal lives in a hive and makes honey?",
+      "text_bg": "Кое животно живее в кошер и прави мед?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Bee",         "is_correct": true  },
-        { "id": "c2", "text": "Ant",         "is_correct": false },
-        { "id": "c3", "text": "Spider",      "is_correct": false },
-        { "id": "c4", "text": "Butterfly",   "is_correct": false }
+        { "id": "c1", "text": "Bee",       "text_bg": "Пчела",    "is_correct": true  },
+        { "id": "c2", "text": "Ant",       "text_bg": "Мравка",   "is_correct": false },
+        { "id": "c3", "text": "Spider",    "text_bg": "Паяк",     "is_correct": false },
+        { "id": "c4", "text": "Butterfly", "text_bg": "Пеперуда", "is_correct": false }
       ]
     },
     {
       "id": "ani_q09",
       "text": "What do we call a baby cow?",
+      "text_bg": "Как се казва малкото на кравата?",
       "difficulty": 1,
       "category": "Baby Animals",
       "choices": [
-        { "id": "c1", "text": "Calf",   "is_correct": true  },
-        { "id": "c2", "text": "Cub",    "is_correct": false },
-        { "id": "c3", "text": "Piglet", "is_correct": false },
-        { "id": "c4", "text": "Foal",   "is_correct": false }
+        { "id": "c1", "text": "Calf",   "text_bg": "Теле",     "is_correct": true  },
+        { "id": "c2", "text": "Cub",    "text_bg": "Малко",    "is_correct": false },
+        { "id": "c3", "text": "Piglet", "text_bg": "Прасенце", "is_correct": false },
+        { "id": "c4", "text": "Foal",   "text_bg": "Жребче",   "is_correct": false }
       ]
     },
     {
       "id": "ani_q10",
       "text": "Which animal has black and white stripes?",
+      "text_bg": "Кое животно има черно-бели ивици?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Zebra",   "is_correct": true  },
-        { "id": "c2", "text": "Tiger",   "is_correct": false },
-        { "id": "c3", "text": "Cheetah", "is_correct": false },
-        { "id": "c4", "text": "Panda",   "is_correct": false }
+        { "id": "c1", "text": "Zebra",   "text_bg": "Зебра",  "is_correct": true  },
+        { "id": "c2", "text": "Tiger",   "text_bg": "Тигър",  "is_correct": false },
+        { "id": "c3", "text": "Cheetah", "text_bg": "Гепард", "is_correct": false },
+        { "id": "c4", "text": "Panda",   "text_bg": "Панда",  "is_correct": false }
       ]
     },
     {
       "id": "ani_q11",
       "text": "What sound does a frog make?",
+      "text_bg": "Какъв звук издава жабата?",
       "difficulty": 1,
       "category": "Sounds",
       "choices": [
-        { "id": "c1", "text": "Ribbit", "is_correct": true  },
-        { "id": "c2", "text": "Buzz",   "is_correct": false },
-        { "id": "c3", "text": "Hiss",   "is_correct": false },
-        { "id": "c4", "text": "Chirp",  "is_correct": false }
+        { "id": "c1", "text": "Ribbit", "text_bg": "Кра-кра",     "is_correct": true  },
+        { "id": "c2", "text": "Buzz",   "text_bg": "Бръм-бръм",   "is_correct": false },
+        { "id": "c3", "text": "Hiss",   "text_bg": "Със",         "is_correct": false },
+        { "id": "c4", "text": "Chirp",  "text_bg": "Чурулукане",  "is_correct": false }
       ]
     },
     {
       "id": "ani_q12",
       "text": "Which is the tallest animal in the world?",
+      "text_bg": "Кое е най-високото животно в света?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Giraffe",  "is_correct": true  },
-        { "id": "c2", "text": "Elephant", "is_correct": false },
-        { "id": "c3", "text": "Horse",    "is_correct": false },
-        { "id": "c4", "text": "Bear",     "is_correct": false }
+        { "id": "c1", "text": "Giraffe",  "text_bg": "Жираф",  "is_correct": true  },
+        { "id": "c2", "text": "Elephant", "text_bg": "Слон",   "is_correct": false },
+        { "id": "c3", "text": "Horse",    "text_bg": "Кон",    "is_correct": false },
+        { "id": "c4", "text": "Bear",     "text_bg": "Мечка",  "is_correct": false }
       ]
     },
     {
       "id": "ani_q13",
       "text": "What do we call a baby sheep?",
+      "text_bg": "Как се казва малкото на овцата?",
       "difficulty": 1,
       "category": "Baby Animals",
       "choices": [
-        { "id": "c1", "text": "Lamb",   "is_correct": true  },
-        { "id": "c2", "text": "Kid",    "is_correct": false },
-        { "id": "c3", "text": "Piglet", "is_correct": false },
-        { "id": "c4", "text": "Foal",   "is_correct": false }
+        { "id": "c1", "text": "Lamb",   "text_bg": "Агне",     "is_correct": true  },
+        { "id": "c2", "text": "Kid",    "text_bg": "Яре",      "is_correct": false },
+        { "id": "c3", "text": "Piglet", "text_bg": "Прасенце", "is_correct": false },
+        { "id": "c4", "text": "Foal",   "text_bg": "Жребче",   "is_correct": false }
       ]
     },
     {
       "id": "ani_q14",
       "text": "Which animal has a big bushy mane around its face?",
+      "text_bg": "Кое животно има голяма пухкава грива около лицето?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Lion",    "is_correct": true  },
-        { "id": "c2", "text": "Tiger",   "is_correct": false },
-        { "id": "c3", "text": "Cheetah", "is_correct": false },
-        { "id": "c4", "text": "Leopard", "is_correct": false }
+        { "id": "c1", "text": "Lion",    "text_bg": "Лъв",     "is_correct": true  },
+        { "id": "c2", "text": "Tiger",   "text_bg": "Тигър",   "is_correct": false },
+        { "id": "c3", "text": "Cheetah", "text_bg": "Гепард",  "is_correct": false },
+        { "id": "c4", "text": "Leopard", "text_bg": "Леопард", "is_correct": false }
       ]
     },
     {
       "id": "ani_q15",
       "text": "What sound does a horse make?",
+      "text_bg": "Какъв звук издава конят?",
       "difficulty": 1,
       "category": "Sounds",
       "choices": [
-        { "id": "c1", "text": "Neigh", "is_correct": true  },
-        { "id": "c2", "text": "Moo",   "is_correct": false },
-        { "id": "c3", "text": "Grunt", "is_correct": false },
-        { "id": "c4", "text": "Bark",  "is_correct": false }
+        { "id": "c1", "text": "Neigh", "text_bg": "Ц-и-и",   "is_correct": true  },
+        { "id": "c2", "text": "Moo",   "text_bg": "Му-у",    "is_correct": false },
+        { "id": "c3", "text": "Grunt", "text_bg": "Хрухтене","is_correct": false },
+        { "id": "c4", "text": "Bark",  "text_bg": "Лай",     "is_correct": false }
       ]
     },
     {
       "id": "ani_q16",
       "text": "Which animal uses a web to catch its food?",
+      "text_bg": "Кое животно използва мрежа, за да хваща храна?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Spider",      "is_correct": true  },
-        { "id": "c2", "text": "Caterpillar", "is_correct": false },
-        { "id": "c3", "text": "Worm",        "is_correct": false },
-        { "id": "c4", "text": "Bee",         "is_correct": false }
+        { "id": "c1", "text": "Spider",      "text_bg": "Паяк",     "is_correct": true  },
+        { "id": "c2", "text": "Caterpillar", "text_bg": "Гъсеница", "is_correct": false },
+        { "id": "c3", "text": "Worm",        "text_bg": "Червей",   "is_correct": false },
+        { "id": "c4", "text": "Bee",         "text_bg": "Пчела",    "is_correct": false }
       ]
     },
     {
       "id": "ani_q17",
       "text": "What do we call a baby duck?",
+      "text_bg": "Как се казва малкото патенце?",
       "difficulty": 1,
       "category": "Baby Animals",
       "choices": [
-        { "id": "c1", "text": "Duckling", "is_correct": true  },
-        { "id": "c2", "text": "Gosling",  "is_correct": false },
-        { "id": "c3", "text": "Chick",    "is_correct": false },
-        { "id": "c4", "text": "Owlet",    "is_correct": false }
+        { "id": "c1", "text": "Duckling", "text_bg": "Патенце",  "is_correct": true  },
+        { "id": "c2", "text": "Gosling",  "text_bg": "Гъсенце",  "is_correct": false },
+        { "id": "c3", "text": "Chick",    "text_bg": "Пиленце",  "is_correct": false },
+        { "id": "c4", "text": "Owlet",    "text_bg": "Бухалче",  "is_correct": false }
       ]
     },
     {
       "id": "ani_q18",
       "text": "Which animal has one or two humps on its back?",
+      "text_bg": "Кое животно има една или две гърбици?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Camel",    "is_correct": true  },
-        { "id": "c2", "text": "Elephant", "is_correct": false },
-        { "id": "c3", "text": "Hippo",    "is_correct": false },
-        { "id": "c4", "text": "Buffalo",  "is_correct": false }
+        { "id": "c1", "text": "Camel",    "text_bg": "Камила",    "is_correct": true  },
+        { "id": "c2", "text": "Elephant", "text_bg": "Слон",      "is_correct": false },
+        { "id": "c3", "text": "Hippo",    "text_bg": "Хипопотам", "is_correct": false },
+        { "id": "c4", "text": "Buffalo",  "text_bg": "Бивол",     "is_correct": false }
       ]
     },
     {
       "id": "ani_q19",
       "text": "What sound does a pig make?",
+      "text_bg": "Какъв звук издава прасето?",
       "difficulty": 1,
       "category": "Sounds",
       "choices": [
-        { "id": "c1", "text": "Oink",  "is_correct": true  },
-        { "id": "c2", "text": "Moo",   "is_correct": false },
-        { "id": "c3", "text": "Baa",   "is_correct": false },
-        { "id": "c4", "text": "Cluck", "is_correct": false }
+        { "id": "c1", "text": "Oink",  "text_bg": "Хрю",   "is_correct": true  },
+        { "id": "c2", "text": "Moo",   "text_bg": "Му-у",  "is_correct": false },
+        { "id": "c3", "text": "Baa",   "text_bg": "Бе-е",  "is_correct": false },
+        { "id": "c4", "text": "Cluck", "text_bg": "Ко-ко", "is_correct": false }
       ]
     },
     {
       "id": "ani_q20",
       "text": "Which animal carries its baby in a pouch?",
+      "text_bg": "Кое животно носи малкото си в торбичка?",
       "difficulty": 1,
       "category": "Animals",
       "choices": [
-        { "id": "c1", "text": "Kangaroo", "is_correct": true  },
-        { "id": "c2", "text": "Zebra",    "is_correct": false },
-        { "id": "c3", "text": "Giraffe",  "is_correct": false },
-        { "id": "c4", "text": "Elephant", "is_correct": false }
+        { "id": "c1", "text": "Kangaroo", "text_bg": "Кенгуру", "is_correct": true  },
+        { "id": "c2", "text": "Zebra",    "text_bg": "Зебра",   "is_correct": false },
+        { "id": "c3", "text": "Giraffe",  "text_bg": "Жираф",   "is_correct": false },
+        { "id": "c4", "text": "Elephant", "text_bg": "Слон",    "is_correct": false }
       ]
     }
   ]
