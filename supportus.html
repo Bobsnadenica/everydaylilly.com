@@ -26,6 +26,30 @@
       transform: translateY(-3px);
       box-shadow: 0 6px 14px rgba(0,0,0,0.08);
     }
+    .coin-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.95rem;
+      font-weight: 800;
+      vertical-align: middle;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+    .coin-btc  { background: #f7931a; color: #fff; }
+    .coin-eth  { background: #627eea; color: #fff; }
+    .coin-sol  { background: linear-gradient(135deg,#9945ff,#14f195); color: #fff; }
+    .coin-xrp  { background: #00aae4; color: #fff; }
+    .coin-doge { background: #c2a633; color: #fff; }
+    .coin-rev  { background: #191c1f; color: #fff; }
+    .wallet-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -39,7 +63,7 @@
       <!-- BTC -->
       <div class="wallet-box text-center">
         <img src="images/supportus/btc.png" alt="Bitcoin" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Bitcoin (BTC)</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-btc">₿</span>Bitcoin (BTC)</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">bc1q9jh0w4w8ug59qdt2e9lxw54c9sz2aw5q2njxgl</p>
         <button onclick="copyWallet('bc1q9jh0w4w8ug59qdt2e9lxw54c9sz2aw5q2njxgl')" class="btn-primary px-4 py-2 rounded text-sm">Copy Address</button>
       </div>
@@ -47,7 +71,7 @@
       <!-- Ethereum -->
       <div class="wallet-box text-center">
         <img src="images/supportus/ethereum.png" alt="Ethereum" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Ethereum (ETH)</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-eth">Ξ</span>Ethereum (ETH)</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">0xF00716eDAF7Aca38Db93228D3372B3c642F03b03</p>
         <button onclick="copyWallet('0xF00716eDAF7Aca38Db93228D3372B3c642F03b03')" class="btn-primary px-4 py-2 rounded text-sm">Copy Address</button>
       </div>
@@ -55,7 +79,7 @@
       <!-- Solana -->
       <div class="wallet-box text-center">
         <img src="images/supportus/sol.png" alt="Solana" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Solana (SOL)</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-sol">◎</span>Solana (SOL)</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">5dnwFVsjHcrCSNzA4wy88pFq1o57kKU9gm8C8JzmMwBa</p>
         <button onclick="copyWallet('5dnwFVsjHcrCSNzA4wy88pFq1o57kKU9gm8C8JzmMwBa')" class="btn-primary px-4 py-2 rounded text-sm">Copy Address</button>
       </div>
@@ -63,7 +87,7 @@
       <!-- XRP -->
       <div class="wallet-box text-center">
         <img src="images/supportus/XRP.png" alt="XRP" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Ripple (XRP)</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-xrp">✕</span>Ripple (XRP)</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">r3y1du8c8BZrxcX45vehoz2rSkEFqjD154</p>
         <button onclick="copyWallet('r3y1du8c8BZrxcX45vehoz2rSkEFqjD154')" class="btn-primary px-4 py-2 rounded text-sm">Copy Address</button>
       </div>
@@ -71,14 +95,14 @@
       <!-- Dogecoin -->
       <div class="wallet-box text-center">
         <img src="images/supportus/doge.png" alt="Dogecoin" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Dogecoin (DOGE)</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-doge">Ð</span>Dogecoin (DOGE)</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">bnb1a4aye09zl258qjt8laqggqhd86j6g8chelgwv9</p>
         <button onclick="copyWallet('bnb1a4aye09zl258qjt8laqggqhd86j6g8chelgwv9')" class="btn-primary px-4 py-2 rounded text-sm">Copy Address</button>
       </div>
       <!-- Revolut -->
       <div class="wallet-box text-center">
         <img src="images/supportus/revolut.jpg" alt="Revolut" class="w-24 h-24 mx-auto mb-4" />
-        <h2 class="text-xl font-semibold mb-2">Revolut</h2>
+        <h2 class="text-xl font-semibold mb-2 wallet-title"><span class="coin-icon coin-rev">R</span>Revolut</h2>
         <p class="text-sm text-gray-500 mb-2 break-all">Support us directly via Revolut</p>
         <a href="https://revolut.me/privileged" target="_blank" rel="noopener" class="btn-primary px-4 py-2 rounded text-sm inline-flex items-center justify-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
