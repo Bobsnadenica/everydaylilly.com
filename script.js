@@ -247,10 +247,56 @@ if (window.innerWidth > 640) {
     });
 }
 
-// Keyboard arrow support
+// Keyboard arrow support — skip when lightbox or modal is open
 document.addEventListener('keydown', e => {
+  if (lightbox.classList.contains('open')) return;
+  if (loginModal?.style.display === 'flex') return;
   if (e.key === 'ArrowRight') nextBtn?.click();
   if (e.key === 'ArrowLeft') prevBtn?.click();
+});
+
+// === Profile / Login Modal ===
+const profileBtn = document.getElementById('profile-btn');
+const loginModal = document.getElementById('login-modal');
+const modalClose = document.getElementById('modal-close');
+const modalBackdrop = document.getElementById('modal-backdrop');
+const loginForm = document.getElementById('login-form');
+const loginSubmit = document.getElementById('login-submit');
+
+function openLoginModal() {
+    loginModal.style.display = 'flex';
+    document.getElementById('login-email')?.focus();
+}
+
+function closeLoginModal() {
+    loginModal.style.display = 'none';
+    if (loginSubmit) {
+        loginSubmit.textContent = loginSubmit.dataset.originalText || 'Sign In';
+        loginSubmit.style.background = '#10b981';
+    }
+}
+
+profileBtn?.addEventListener('click', openLoginModal);
+modalClose?.addEventListener('click', closeLoginModal);
+modalBackdrop?.addEventListener('click', closeLoginModal);
+
+loginForm?.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!loginSubmit) return;
+    if (!loginSubmit.dataset.originalText) {
+        loginSubmit.dataset.originalText = loginSubmit.textContent.trim();
+    }
+    loginSubmit.textContent = 'Coming Soon ✨';
+    loginSubmit.style.background = '#6ee7b7';
+    loginSubmit.disabled = true;
+    setTimeout(() => {
+        loginSubmit.disabled = false;
+        closeLoginModal();
+    }, 1800);
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && loginModal?.style.display === 'flex') closeLoginModal();
 });
 
 updateCarousel();
