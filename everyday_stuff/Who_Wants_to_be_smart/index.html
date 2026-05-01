@@ -12,6 +12,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css" />
+  <style>
+    .lang-bar {
+      display: flex;
+      gap: 6px;
+      margin-left: auto;
+    }
+    .lang-btn {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
+      color: rgba(239,247,255,0.8);
+      border-radius: 999px;
+      padding: 5px 13px;
+      font-family: "Nunito", sans-serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .lang-btn[data-active="true"] {
+      background: #ffd447;
+      color: #1a1200;
+      border-color: transparent;
+    }
+  </style>
 </head>
 <body>
   <div class="bg-orb orb-a"></div>
@@ -20,51 +44,62 @@
 
   <main class="shell">
     <header class="topbar">
-      <a href="./index.html" class="logo">⭐ Who Wants to Be Smart?</a>
+      <a href="./index.html" class="logo">⭐ <span data-lang="en">Who Wants to Be Smart?</span><span data-lang="bg" style="display:none;">Кой Иска да Бъде Умен?</span></a>
 
       <nav class="nav" aria-label="Main Navigation">
-        <a class="nav-link" href="./how-it-works.html">How It Works</a>
-        <a class="nav-link" href="./privacy.html">Privacy</a>
-        <a class="nav-link" href="./contact.html">Contact</a>
+        <a class="nav-link" href="./how-it-works.html"><span data-lang="en">How It Works</span><span data-lang="bg" style="display:none;">Как работи</span></a>
+        <a class="nav-link" href="./privacy.html"><span data-lang="en">Privacy</span><span data-lang="bg" style="display:none;">Поверителност</span></a>
+        <a class="nav-link" href="./contact.html"><span data-lang="en">Contact</span><span data-lang="bg" style="display:none;">Контакт</span></a>
         <a class="nav-dlc" href="./dlc_website/index.html">DLC</a>
       </nav>
+
+      <div class="lang-bar">
+        <button class="lang-btn" data-setlang="en" data-active="true">EN</button>
+        <button class="lang-btn" data-setlang="bg" data-active="false">BG</button>
+      </div>
 
       <button class="menu-btn" onclick="toggleMenu()" aria-label="Open menu">☰</button>
     </header>
 
     <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation">
-      <a data-close-menu class="nav-link" href="./how-it-works.html">How It Works</a>
-      <a data-close-menu class="nav-link" href="./privacy.html">Privacy</a>
-      <a data-close-menu class="nav-link" href="./contact.html">Contact</a>
+      <a data-close-menu class="nav-link" href="./how-it-works.html"><span data-lang="en">How It Works</span><span data-lang="bg" style="display:none;">Как работи</span></a>
+      <a data-close-menu class="nav-link" href="./privacy.html"><span data-lang="en">Privacy</span><span data-lang="bg" style="display:none;">Поверителност</span></a>
+      <a data-close-menu class="nav-link" href="./contact.html"><span data-lang="en">Contact</span><span data-lang="bg" style="display:none;">Контакт</span></a>
       <a data-close-menu class="nav-dlc" href="./dlc_website/index.html">DLC</a>
     </nav>
 
     <section class="hero">
       <article class="panel">
-        <span class="eyebrow">Ages 3-6 • English + Bulgarian</span>
-        <h1>Learning feels like game night.</h1>
+        <span class="eyebrow">
+          <span data-lang="en">Ages 3-6 • English + Bulgarian</span>
+          <span data-lang="bg" style="display:none;">Възрасти 3-6 • Английски + Български</span>
+        </span>
+        <h1>
+          <span data-lang="en">Learning feels like game night.</span>
+          <span data-lang="bg" style="display:none;">Ученето се чувства като игровечер.</span>
+        </h1>
         <p class="lead">
-          Who Wants to Be Smart? is a bright, kid-first quiz experience with gentle voice narration,
-          celebratory animations, and clear answer feedback so every round feels encouraging.
+          <span data-lang="en">Who Wants to Be Smart? is a bright, kid-first quiz experience with gentle voice narration, celebratory animations, and clear answer feedback so every round feels encouraging.</span>
+          <span data-lang="bg" style="display:none;">Кой Иска да Бъде Умен? е ярко, ориентирано към децата викторина преживяване с нежно гласово разказване, тържествени анимации и ясна обратна връзка, така че всеки кръг да е насърчаващ.</span>
         </p>
 
         <div class="store-row">
           <div class="store-chip">
             <strong>🍎 App Store</strong>
-            <span>Coming Soon</span>
+            <span><span data-lang="en">Coming Soon</span><span data-lang="bg" style="display:none;">Очаква се</span></span>
           </div>
           <div class="store-chip">
             <strong>🤖 Google Play</strong>
-            <span>Coming Soon</span>
+            <span><span data-lang="en">Coming Soon</span><span data-lang="bg" style="display:none;">Очаква се</span></span>
           </div>
         </div>
 
         <div class="pill-row">
-          <span class="pill">🔊 Read-aloud questions</span>
-          <span class="pill">🎉 Positive answer feedback</span>
-          <span class="pill">🧒 Quick Play mode</span>
-          <span class="pill">🏫 Optional classroom mode</span>
-          <span class="pill">📚 50 starter questions</span>
+          <span class="pill"><span data-lang="en">🔊 Read-aloud questions</span><span data-lang="bg" style="display:none;">🔊 Въпроси с гласово четене</span></span>
+          <span class="pill"><span data-lang="en">🎉 Positive answer feedback</span><span data-lang="bg" style="display:none;">🎉 Положителна обратна връзка</span></span>
+          <span class="pill"><span data-lang="en">🧒 Quick Play mode</span><span data-lang="bg" style="display:none;">🧒 Режим Бърза игра</span></span>
+          <span class="pill"><span data-lang="en">🏫 Optional classroom mode</span><span data-lang="bg" style="display:none;">🏫 Незадължителен класен режим</span></span>
+          <span class="pill"><span data-lang="en">📚 50 starter questions</span><span data-lang="bg" style="display:none;">📚 50 начални въпроса</span></span>
         </div>
       </article>
 
@@ -82,58 +117,127 @@
           <div class="kid">🧒</div>
         </div>
         <p class="subtle" style="text-align:center; margin: 0;">
-          Every correct answer helps kids climb to the top.
+          <span data-lang="en">Every correct answer helps kids climb to the top.</span>
+          <span data-lang="bg" style="display:none;">Всеки верен отговор помага на децата да се изкачат на върха.</span>
         </p>
       </aside>
     </section>
 
     <section class="section panel">
-      <span class="kicker">Why Kids Keep Playing</span>
-      <h2>Simple flow, joyful feedback, real progress</h2>
+      <span class="kicker">
+        <span data-lang="en">Why Kids Keep Playing</span>
+        <span data-lang="bg" style="display:none;">Защо Децата Продължават да Играят</span>
+      </span>
+      <h2>
+        <span data-lang="en">Simple flow, joyful feedback, real progress</span>
+        <span data-lang="bg" style="display:none;">Прост поток, радостна обратна връзка, реален напредък</span>
+      </h2>
       <p class="subtle">
-        The game is designed for short attention spans: clear prompts, big answer targets,
-        calm pacing, and instant encouragement.
+        <span data-lang="en">The game is designed for short attention spans: clear prompts, big answer targets, calm pacing, and instant encouragement.</span>
+        <span data-lang="bg" style="display:none;">Играта е проектирана за кратка концентрация: ясни подсказки, големи цели за отговори, спокойно темпо и незабавно насърчение.</span>
       </p>
 
       <div class="grid-3">
         <article class="card">
-          <div class="kicker">Voice</div>
-          <h3>Gentle read-aloud host</h3>
-          <p>Questions and options are spoken in a kid-friendly pace and tone.</p>
+          <div class="kicker">
+            <span data-lang="en">Voice</span>
+            <span data-lang="bg" style="display:none;">Глас</span>
+          </div>
+          <h3>
+            <span data-lang="en">Gentle read-aloud host</span>
+            <span data-lang="bg" style="display:none;">Нежен водещ с гласово четене</span>
+          </h3>
+          <p>
+            <span data-lang="en">Questions and options are spoken in a kid-friendly pace and tone.</span>
+            <span data-lang="bg" style="display:none;">Въпросите и вариантите се четат на темпо и тон, подходящи за деца.</span>
+          </p>
         </article>
         <article class="card">
-          <div class="kicker">Play</div>
-          <h3>Quick rounds</h3>
-          <p>Fast game sessions keep kids focused while still rewarding improvement.</p>
+          <div class="kicker">
+            <span data-lang="en">Play</span>
+            <span data-lang="bg" style="display:none;">Игра</span>
+          </div>
+          <h3>
+            <span data-lang="en">Quick rounds</span>
+            <span data-lang="bg" style="display:none;">Бързи кръгове</span>
+          </h3>
+          <p>
+            <span data-lang="en">Fast game sessions keep kids focused while still rewarding improvement.</span>
+            <span data-lang="bg" style="display:none;">Бързите сесии поддържат децата съсредоточени, като същевременно награждават напредъка.</span>
+          </p>
         </article>
         <article class="card">
-          <div class="kicker">Celebrate</div>
-          <h3>Animated reactions</h3>
-          <p>Correct and wrong answers both give clear, fun visual feedback.</p>
+          <div class="kicker">
+            <span data-lang="en">Celebrate</span>
+            <span data-lang="bg" style="display:none;">Отпразнувай</span>
+          </div>
+          <h3>
+            <span data-lang="en">Animated reactions</span>
+            <span data-lang="bg" style="display:none;">Анимирани реакции</span>
+          </h3>
+          <p>
+            <span data-lang="en">Correct and wrong answers both give clear, fun visual feedback.</span>
+            <span data-lang="bg" style="display:none;">Правилните и грешните отговори дават ясна, забавна визуална обратна връзка.</span>
+          </p>
         </article>
       </div>
     </section>
 
     <section class="section panel">
-      <span class="kicker">Built for Families and Teachers</span>
-      <h2>Use it your way</h2>
+      <span class="kicker">
+        <span data-lang="en">Built for Families and Teachers</span>
+        <span data-lang="bg" style="display:none;">Създадена за Семейства и Учители</span>
+      </span>
+      <h2>
+        <span data-lang="en">Use it your way</span>
+        <span data-lang="bg" style="display:none;">Използвайте я по свой начин</span>
+      </h2>
       <ul class="info">
-        <li><strong>Quick Play:</strong> Start instantly at home without class setup.</li>
-        <li><strong>Classroom Mode:</strong> Create class groups and keep leaderboard momentum.</li>
-        <li><strong>Bilingual Ready:</strong> English and Bulgarian support across gameplay and voice.</li>
+        <li>
+          <span data-lang="en"><strong>Quick Play:</strong> Start instantly at home without class setup.</span>
+          <span data-lang="bg" style="display:none;"><strong>Бърза игра:</strong> Стартирайте незабавно у дома без класна настройка.</span>
+        </li>
+        <li>
+          <span data-lang="en"><strong>Classroom Mode:</strong> Create class groups and keep leaderboard momentum.</span>
+          <span data-lang="bg" style="display:none;"><strong>Класен режим:</strong> Създайте класни групи и поддържайте импулса на класацията.</span>
+        </li>
+        <li>
+          <span data-lang="en"><strong>Bilingual Ready:</strong> English and Bulgarian support across gameplay and voice.</span>
+          <span data-lang="bg" style="display:none;"><strong>Двуезична поддръжка:</strong> Английски и Български в играта и гласовото озвучаване.</span>
+        </li>
       </ul>
     </section>
 
     <footer class="footer">
-      <span>© <span id="year"></span> Who Wants to Be Smart?</span>
+      <span>© <span id="year"></span> <span data-lang="en">Who Wants to Be Smart?</span><span data-lang="bg" style="display:none;">Кой Иска да Бъде Умен?</span></span>
       <div class="footer-links">
-        <a href="./how-it-works.html">How It Works</a>
-        <a href="./privacy.html">Privacy</a>
-        <a href="./contact.html">Contact</a>
+        <a href="./how-it-works.html"><span data-lang="en">How It Works</span><span data-lang="bg" style="display:none;">Как работи</span></a>
+        <a href="./privacy.html"><span data-lang="en">Privacy</span><span data-lang="bg" style="display:none;">Поверителност</span></a>
+        <a href="./contact.html"><span data-lang="en">Contact</span><span data-lang="bg" style="display:none;">Контакт</span></a>
       </div>
     </footer>
   </main>
 
   <script src="./assets/site.js"></script>
+  <script>
+    const langNodes = document.querySelectorAll("[data-lang]");
+    const langBtns = document.querySelectorAll("[data-setlang]");
+
+    function setLang(lang) {
+      langNodes.forEach(n => {
+        n.style.display = n.dataset.lang === lang ? "" : "none";
+      });
+      langBtns.forEach(b => {
+        b.dataset.active = String(b.dataset.setlang === lang);
+      });
+      document.documentElement.lang = lang;
+      localStorage.setItem("wwtbs_lang", lang);
+    }
+
+    langBtns.forEach(b => b.addEventListener("click", () => setLang(b.dataset.setlang)));
+
+    const saved = localStorage.getItem("wwtbs_lang");
+    setLang(saved === "bg" ? "bg" : "en");
+  </script>
 </body>
 </html>
