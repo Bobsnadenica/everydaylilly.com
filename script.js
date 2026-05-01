@@ -262,6 +262,8 @@ const modalClose = document.getElementById('modal-close');
 const modalBackdrop = document.getElementById('modal-backdrop');
 const loginForm = document.getElementById('login-form');
 const loginSubmit = document.getElementById('login-submit');
+const togglePassword = document.getElementById('toggle-password');
+const loginPasswordInput = document.getElementById('login-password');
 
 function openLoginModal() {
     loginModal.style.display = 'flex';
@@ -271,8 +273,9 @@ function openLoginModal() {
 function closeLoginModal() {
     loginModal.style.display = 'none';
     if (loginSubmit) {
-        loginSubmit.textContent = loginSubmit.dataset.originalText || 'Sign In';
+        loginSubmit.textContent = 'Sign In';
         loginSubmit.style.background = '#10b981';
+        loginSubmit.disabled = false;
     }
 }
 
@@ -280,14 +283,22 @@ profileBtn?.addEventListener('click', openLoginModal);
 modalClose?.addEventListener('click', closeLoginModal);
 modalBackdrop?.addEventListener('click', closeLoginModal);
 
+togglePassword?.addEventListener('click', () => {
+    const isPassword = loginPasswordInput.type === 'password';
+    loginPasswordInput.type = isPassword ? 'text' : 'password';
+    const eyeIcon = document.getElementById('eye-icon');
+    if (eyeIcon) {
+        eyeIcon.innerHTML = isPassword
+            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+});
+
 loginForm?.addEventListener('submit', e => {
     e.preventDefault();
     if (!loginSubmit) return;
-    if (!loginSubmit.dataset.originalText) {
-        loginSubmit.dataset.originalText = loginSubmit.textContent.trim();
-    }
-    loginSubmit.textContent = 'Coming Soon ✨';
-    loginSubmit.style.background = '#6ee7b7';
+    loginSubmit.textContent = 'Signing in…';
+    loginSubmit.style.background = '#059669';
     loginSubmit.disabled = true;
     setTimeout(() => {
         loginSubmit.disabled = false;
