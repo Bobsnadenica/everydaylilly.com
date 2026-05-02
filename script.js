@@ -322,6 +322,11 @@ function renderAuthSession(session) {
 }
 
 function openLoginModal() {
+    if (currentAuthSession && auth) {
+        window.location.assign(auth.getGalleryDestination(currentAuthSession));
+        return;
+    }
+
     lastFocusedElement = document.activeElement;
     setLoginMode(currentAuthSession ? 'account' : 'login');
     loginModal.style.display = 'flex';

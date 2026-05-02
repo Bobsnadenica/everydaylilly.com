@@ -147,7 +147,7 @@ Suggested GitHub variable set for later frontend/app wiring:
 ## Current Scope
 
 This first Terraform cut provisions the durable storage and auth foundation.
-The landing page is now wired into Cognito Hosted UI with a browser callback flow, but it still does not mint signed image URLs/cookies for the private gallery.
+The landing page is now wired into Cognito Hosted UI with a browser callback flow, and signed-in users are routed into the browser gallery. The gallery still does not mint signed image URLs/cookies.
 
 For the real website login, the safest first implementation is to use Cognito hosted UI rather than handling password challenges entirely inside the current custom modal. Hosted UI already handles flows like:
 
@@ -171,8 +171,15 @@ Until that is built end to end, the best-practice website behavior is:
 - send real sign-in, first-login password change, and forgot-password actions to Cognito hosted UI
 - return to your site only after Cognito finishes those flows
 
+The current gallery routing rules are:
+
+- standard accounts load images from `months/`
+- accounts in the Cognito group `test` load images from `test/`
+- accounts with a tag-like claim of `test` also load images from `test/`
+  Supported claim keys in the browser flow are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`
+
 That next step should likely be:
 
-1. add a gallery endpoint or signed-content flow
-2. render the monthly gallery from your flat numeric keys like `months/0.jpg`, `months/1.jpg`, and `months/11.jpg`
-3. decide whether the gallery will read from signed CloudFront cookies, signed URLs, or an app-backed proxy
+1. decide whether the gallery will read from signed CloudFront cookies, signed URLs, or an app-backed proxy
+2. replace browser-side image probing with a small manifest or API response
+3. keep the `months/` and `test/` collections aligned with your upload conventions

@@ -91,7 +91,7 @@
     <main class="card" aria-live="polite">
         <div class="badge">✓</div>
         <h1 id="callback-title">Completing secure sign-in</h1>
-        <p id="callback-copy">Please wait while we finish your Lilly's Vault session and bring you back.</p>
+        <p id="callback-copy">Please wait while we finish your Lilly's Vault session and route you to the right gallery.</p>
         <p id="callback-status" class="status">Exchanging your secure sign-in code.</p>
         <a id="callback-link" class="link" href="/" hidden>Return to Everyday Lilly</a>
     </main>
@@ -115,7 +115,7 @@
             try {
                 const result = await auth.handleCallback();
                 status.textContent = "Secure sign-in finished. Redirecting you back now.";
-                const destination = result.returnTo || "/";
+                const destination = auth.getGalleryDestination(result.session);
                 window.setTimeout(() => {
                     window.location.replace(destination);
                 }, 450);

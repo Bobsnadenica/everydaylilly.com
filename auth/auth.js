@@ -128,6 +128,69 @@
     return `${window.location.pathname}${window.location.search}${window.location.hash}` || "/";
   }
 
+  function normalizeClaimValues(value) {
+    if (Array.isArray(value)) {
+      return value
+        .map((entry) => String(entry).trim().toLowerCase())
+        .filter(Boolean);
+    }
+
+    if (typeof value === "string") {
+      return value
+        .split(/[\s,;|]+/)
+        .map((entry) => entry.trim().toLowerCase())
+        .filter(Boolean);
+    }
+
+    if (typeof value === "number" || typeof value === "boolean") {
+      return [String(value).trim().toLowerCase()];
+    }
+
+    return [];
+  }
+
+  function sessionClaims(input) {
+    return input?.claims || input || {};
+  }
+
+  function hasMatchingClaim(values, target) {
+    return values.some((value) => value === target);
+  }
+
+  function isTestAccount(input) {
+    const claims = sessionClaims(input);
+    const target = "test";
+    const groups = normalizeClaimValues(claims["cognito:groups"]);
+
+    if (hasMatchingClaim(groups, target)) {
+      return true;
+    }
+
+    const tagKeys = ["custom:tag", "custom:tags", "tag", "tags"];
+    const tagValues = tagKeys.flatMap((key) => normalizeClaimValues(claims[key]));
+
+    if (hasMatchingClaim(tagValues, target)) {
+      return true;
+    }
+
+    const booleanStyleKeys = ["custom:test", "test"];
+    return booleanStyleKeys.some((key) => {
+      const values = normalizeClaimValues(claims[key]);
+      return hasMatchingClaim(values, "true") || hasMatchingClaim(values, target);
+    });
+  }
+
+  function getGalleryCollection(input) {
+    return isTestAccount(input) ? "test" : "months";
+  }
+
+  function getGalleryDestination(input) {
+    const collection = getGalleryCollection(input);
+    return collection === "test"
+      ? "/gallery/index.html?collection=test"
+      : "/gallery/index.html";
+  }
+
   async function startLogin(options = {}) {
     const config = getConfig(options);
 
@@ -315,8 +378,11 @@
     clearPendingState,
     clearSession,
     getConfig,
+    getGalleryCollection,
+    getGalleryDestination,
     getSession,
     handleCallback,
+    isTestAccount,
     signOut,
     startLogin,
   };
