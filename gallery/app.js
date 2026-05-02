@@ -110,6 +110,7 @@
   function buildPhotoCardMarkup(photo, options = {}) {
     const title = options.title || `Photo ${getPhotoStem(photo)}`;
     const caption = options.caption || photo.key;
+    const showMeta = options.showMeta !== false;
     const priority = options.priority ? ' fetchpriority="high"' : "";
 
     return `
@@ -125,10 +126,12 @@
         >
           <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"${priority}>
         </a>
-        <div class="photo-meta">
-          <p class="photo-label">${escapeHtml(title)}</p>
-          <p class="photo-caption">${escapeHtml(caption)}</p>
-        </div>
+        ${showMeta ? `
+          <div class="photo-meta">
+            <p class="photo-label">${escapeHtml(title)}</p>
+            <p class="photo-caption">${escapeHtml(caption)}</p>
+          </div>
+        ` : ""}
       </article>
     `;
   }
@@ -179,7 +182,7 @@
         return buildPhotoCardMarkup(photo, {
           cardClass: "test-card",
           title: `Test photo ${getPhotoStem(photo)}`,
-          caption: "Randomized collage card from the test collection.",
+          showMeta: false,
           style: `--col-span:${style.col}; --row-span:${style.row}; --tilt:${style.tilt}deg; --accent-wash:${style.wash};`,
           priority: index < 2,
         });
@@ -205,6 +208,8 @@
       <div class="viewer-backdrop" data-viewer-close></div>
       <div class="viewer-card">
         <button class="viewer-close" type="button" aria-label="Close image viewer" data-viewer-close>&times;</button>
+        <button class="viewer-nav viewer-nav-prev" type="button" aria-label="Previous image" data-viewer-nav="-1">&#10094;</button>
+        <button class="viewer-nav viewer-nav-next" type="button" aria-label="Next image" data-viewer-nav="1">&#10095;</button>
         <div class="viewer-frame">
           <img id="viewer-image" alt="">
           <div class="viewer-meta">
@@ -231,7 +236,56 @@
     const viewerTitle = viewer.querySelector("#viewer-title");
     const viewerKey = viewer.querySelector("#viewer-key");
     const viewerOpenLink = viewer.querySelector("#viewer-open-link");
+    const viewerFrame = viewer.querySelector(".viewer-frame");
+    const viewerPrev = viewer.querySelector(".viewer-nav-prev");
+    const viewerNext = viewer.querySelector(".viewer-nav-next");
     let lastTrigger = null;
+    let currentIndex = -1;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    function getTriggers() {
+      return [...content.querySelectorAll("[data-photo-trigger]")];
+    }
+
+    function updateViewerNavigation(total) {
+      if (viewerPrev) {
+        viewerPrev.disabled = currentIndex <= 0;
+      }
+
+      if (viewerNext) {
+        viewerNext.disabled = currentIndex >= total - 1;
+      }
+    }
+
+    function renderViewerAt(index) {
+      const triggers = getTriggers();
+
+      if (!triggers.length) {
+        return;
+      }
+
+      currentIndex = Math.max(0, Math.min(index, triggers.length - 1));
+      const trigger = triggers[currentIndex];
+      lastTrigger = trigger;
+      viewerImage.src = trigger.dataset.photoSrc || trigger.href;
+      viewerImage.alt = trigger.dataset.photoLabel || "Gallery image";
+      viewerTitle.textContent = trigger.dataset.photoLabel || "Gallery image";
+      viewerKey.textContent = trigger.dataset.photoKey || "";
+      viewerOpenLink.href = trigger.dataset.photoSrc || trigger.href;
+      updateViewerNavigation(triggers.length);
+    }
+
+    function moveViewer(direction) {
+      const triggers = getTriggers();
+      const nextIndex = currentIndex + direction;
+
+      if (nextIndex < 0 || nextIndex >= triggers.length) {
+        return;
+      }
+
+      renderViewerAt(nextIndex);
+    }
 
     function closeViewer() {
       viewer.hidden = true;
@@ -239,16 +293,14 @@
       if (viewerImage) {
         viewerImage.removeAttribute("src");
       }
+      currentIndex = -1;
       lastTrigger?.focus?.();
     }
 
     function openViewer(trigger) {
-      lastTrigger = trigger;
-      viewerImage.src = trigger.dataset.photoSrc || trigger.href;
-      viewerImage.alt = trigger.dataset.photoLabel || "Gallery image";
-      viewerTitle.textContent = trigger.dataset.photoLabel || "Gallery image";
-      viewerKey.textContent = trigger.dataset.photoKey || "";
-      viewerOpenLink.href = trigger.dataset.photoSrc || trigger.href;
+      const triggers = getTriggers();
+      const index = triggers.indexOf(trigger);
+      renderViewerAt(index >= 0 ? index : 0);
       viewer.hidden = false;
       document.body.style.overflow = "hidden";
       viewer.querySelector(".viewer-close")?.focus();
@@ -272,12 +324,53 @@
     viewer.addEventListener("click", (event) => {
       if (event.target.closest("[data-viewer-close]")) {
         closeViewer();
+        return;
+      }
+
+      const navButton = event.target.closest("[data-viewer-nav]");
+      if (navButton) {
+        moveViewer(Number.parseInt(navButton.dataset.viewerNav || "0", 10));
       }
     });
 
+    viewerFrame?.addEventListener("touchstart", (event) => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    }, { passive: true });
+
+    viewerFrame?.addEventListener("touchend", (event) => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+
+      if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) {
+        return;
+      }
+
+      moveViewer(deltaX < 0 ? 1 : -1);
+    }, { passive: true });
+
     document.addEventListener("keydown", (event) => {
-      if (!viewer.hidden && event.key === "Escape") {
+      if (viewer.hidden) {
+        return;
+      }
+
+      if (event.key === "Escape") {
         closeViewer();
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        moveViewer(1);
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        moveViewer(-1);
       }
     });
   }

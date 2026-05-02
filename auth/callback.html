@@ -115,6 +115,20 @@
 
             try {
                 const result = await auth.handleCallback();
+                if (window.opener && !window.opener.closed) {
+                    status.textContent = "Secure sign-in finished. Closing this window now.";
+                    window.opener.postMessage({
+                        type: "everydayLillyAuth:popupResult",
+                        session: result.session,
+                        remember: result.remember,
+                        returnTo: result.returnTo
+                    }, window.location.origin);
+                    window.setTimeout(() => {
+                        window.close();
+                    }, 250);
+                    return;
+                }
+
                 status.textContent = "Secure sign-in finished. Redirecting you back now.";
                 const destination = auth.getGalleryDestination(result.session);
                 window.setTimeout(() => {
@@ -122,6 +136,18 @@
                 }, 450);
             } catch (error) {
                 console.error(error);
+
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({
+                        type: "everydayLillyAuth:popupResult",
+                        error: error.message || "Something went wrong while completing sign-in."
+                    }, window.location.origin);
+                    window.setTimeout(() => {
+                        window.close();
+                    }, 250);
+                    return;
+                }
+
                 title.textContent = "We could not finish sign-in";
                 copy.textContent = "The secure sign-in flow returned an error. You can head back and try again.";
                 status.textContent = error.message || "Something went wrong while completing sign-in.";

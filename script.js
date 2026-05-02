@@ -272,6 +272,7 @@ const rememberMe = document.getElementById('remember-me');
 const forgotPasswordButton = document.querySelector('[data-login-placeholder="forgot-password"]');
 const loginSubmit = document.getElementById('login-submit');
 const loginEmailInput = document.getElementById('login-email');
+const loginFeedback = document.getElementById('login-feedback');
 const loginSubmitIdleLabel =
   loginSubmit?.dataset.idleText || loginSubmit?.textContent?.trim() || 'Sign In';
 const loginSubmitLoadingLabel =
@@ -282,6 +283,18 @@ const signedInProfileLabel =
   profileButtons[0]?.dataset.signedInText || 'Vault';
 let lastFocusedElement = null;
 let currentAuthSession = null;
+
+function setLoginFeedback(message) {
+    if (!loginFeedback) return;
+    if (!message) {
+        loginFeedback.hidden = true;
+        loginFeedback.textContent = '';
+        return;
+    }
+
+    loginFeedback.hidden = false;
+    loginFeedback.textContent = message;
+}
 
 function getLoginModalFocusableElements() {
     if (!loginModal) return [];
@@ -346,6 +359,7 @@ function openLoginModal() {
         return;
     }
 
+    setLoginFeedback('');
     loginEmailInput?.focus();
 }
 
@@ -362,24 +376,37 @@ function closeLoginModal() {
         loginSubmit.disabled = false;
     }
 
+    setLoginFeedback('');
+
     lastFocusedElement?.focus?.();
 }
 
 async function beginHostedLogin() {
     if (!auth || !loginSubmit) return;
 
+    setLoginFeedback('');
     loginSubmit.textContent = loginSubmitLoadingLabel;
     loginSubmit.style.background = '#059669';
     loginSubmit.disabled = true;
 
     try {
-        await auth.startLogin({
+        const result = await auth.startLogin({
             loginHint: loginEmailInput?.value?.trim() || '',
             remember: rememberMe?.checked,
             returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+            popup: true,
         });
+
+        if (result?.session) {
+            const session = auth.completePopupLogin(result);
+            renderAuthSession(session);
+            closeLoginModal();
+            window.location.assign(auth.getGalleryDestination(session));
+            return;
+        }
     } catch (error) {
         console.error(error);
+        setLoginFeedback(error.message || 'We could not finish secure sign-in.');
         loginSubmit.textContent = loginSubmitIdleLabel;
         loginSubmit.style.background = '#10b981';
         loginSubmit.disabled = false;

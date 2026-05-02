@@ -3,6 +3,9 @@
   const LOCAL_BASE_URL = "http://localhost:8000";
   const SESSION_KEY = "everydayLillyAuth:session";
   const PENDING_KEY = "everydayLillyAuth:pending";
+  const POPUP_PENDING_KEY = "everydayLillyAuth:pendingPopup";
+  const POPUP_MESSAGE_TYPE = "everydayLillyAuth:popupResult";
+  const POPUP_NAME = "everydayLillyAuthPopup";
   const EXPIRY_SKEW_MS = 60 * 1000;
   const PKCE_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
@@ -55,10 +58,39 @@
 
   function clearPendingState() {
     sessionStorage.removeItem(PENDING_KEY);
+    localStorage.removeItem(POPUP_PENDING_KEY);
   }
 
   function getPendingState() {
     return getStoragePayload(sessionStorage, PENDING_KEY);
+  }
+
+  function getPopupPendingState() {
+    return getStoragePayload(localStorage, POPUP_PENDING_KEY);
+  }
+
+  function getMatchingPendingState(expectedState) {
+    const directPending = getPendingState();
+    const popupPending = getPopupPendingState();
+
+    if (popupPending?.state === expectedState) {
+      return { pending: popupPending, kind: "popup" };
+    }
+
+    if (directPending?.state === expectedState) {
+      return { pending: directPending, kind: "direct" };
+    }
+
+    return null;
+  }
+
+  function clearStoredPending(kind) {
+    if (kind === "popup") {
+      localStorage.removeItem(POPUP_PENDING_KEY);
+      return;
+    }
+
+    sessionStorage.removeItem(PENDING_KEY);
   }
 
   function clearSession() {
@@ -81,6 +113,16 @@
     clearSession();
     const storage = remember ? localStorage : sessionStorage;
     setStoragePayload(storage, SESSION_KEY, session);
+  }
+
+  function completePopupLogin(payload) {
+    if (!payload?.session) {
+      throw new Error("Missing popup session payload.");
+    }
+
+    saveSession(payload.session, Boolean(payload.remember));
+    localStorage.removeItem(POPUP_PENDING_KEY);
+    return payload.session;
   }
 
   function generateRandomString(length) {
@@ -206,11 +248,61 @@
     return collection === "test" ? "/gallery/test/" : "/gallery/months/";
   }
 
+  function getPopupFeatures() {
+    const width = 460;
+    const height = 760;
+    const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
+    const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
+
+    return [
+      `width=${width}`,
+      `height=${height}`,
+      `left=${left}`,
+      `top=${top}`,
+      "popup=yes",
+      "resizable=yes",
+      "scrollbars=yes",
+    ].join(",");
+  }
+
+  function openAuthPopup() {
+    const popup = window.open("", POPUP_NAME, getPopupFeatures());
+
+    if (!popup) {
+      return null;
+    }
+
+    try {
+      popup.document.title = "Lilly's Vault Sign In";
+      popup.document.body.style.margin = "0";
+      popup.document.body.style.fontFamily = "Inter, sans-serif";
+      popup.document.body.style.minHeight = "100vh";
+      popup.document.body.style.display = "grid";
+      popup.document.body.style.placeItems = "center";
+      popup.document.body.style.background = "linear-gradient(180deg, #f6fff9 0%, #ffffff 100%)";
+      popup.document.body.innerHTML =
+        '<div style="padding:24px 28px;border-radius:24px;background:white;box-shadow:0 24px 60px -24px rgba(15,23,42,0.24);text-align:center;color:#065f46;font-size:15px;line-height:1.6;">Opening secure sign-in…</div>';
+    } catch (error) {
+      console.warn("Unable to paint popup loading state.", error);
+    }
+
+    return popup;
+  }
+
   async function startLogin(options = {}) {
     const config = getConfig(options);
+    const usePopup = Boolean(options.popup);
+    const popupWindow = usePopup ? openAuthPopup() : null;
 
     if (!config.baseUrl || !config.clientId) {
+      if (popupWindow && !popupWindow.closed) {
+        popupWindow.close();
+      }
       throw new Error("Missing Cognito Hosted UI configuration.");
+    }
+
+    if (usePopup && !popupWindow) {
+      throw new Error("Please allow the secure sign-in popup to continue.");
     }
 
     const verifier = generateRandomString(96);
@@ -218,13 +310,19 @@
     const state = generateRandomString(48);
     const nonce = generateRandomString(48);
 
-    setStoragePayload(sessionStorage, PENDING_KEY, {
+    const pendingPayload = {
       verifier,
       state,
       remember: Boolean(options.remember),
       returnTo: options.returnTo || getReturnPath(),
       createdAt: Date.now(),
-    });
+    };
+
+    if (usePopup) {
+      setStoragePayload(localStorage, POPUP_PENDING_KEY, pendingPayload);
+    } else {
+      setStoragePayload(sessionStorage, PENDING_KEY, pendingPayload);
+    }
 
     const url = new URL(`${config.baseUrl}/oauth2/authorize`);
     url.searchParams.set("client_id", config.clientId);
@@ -238,6 +336,55 @@
 
     if (options.loginHint) {
       url.searchParams.set("login_hint", options.loginHint);
+    }
+
+    if (usePopup) {
+      return await new Promise((resolve, reject) => {
+        let finished = false;
+        let closePoll = null;
+
+        function cleanup() {
+          finished = true;
+          window.removeEventListener("message", onMessage);
+          if (closePoll) {
+            window.clearInterval(closePoll);
+          }
+        }
+
+        function onMessage(event) {
+          if (event.origin !== window.location.origin) {
+            return;
+          }
+
+          if (event.data?.type !== POPUP_MESSAGE_TYPE) {
+            return;
+          }
+
+          cleanup();
+
+          if (popupWindow && !popupWindow.closed) {
+            popupWindow.close();
+          }
+
+          if (event.data.error) {
+            reject(new Error(event.data.error));
+            return;
+          }
+
+          resolve(event.data);
+        }
+
+        window.addEventListener("message", onMessage);
+        closePoll = window.setInterval(() => {
+          if (!finished && popupWindow?.closed) {
+            cleanup();
+            localStorage.removeItem(POPUP_PENDING_KEY);
+            reject(new Error("Secure sign-in was closed before it finished."));
+          }
+        }, 350);
+
+        popupWindow.location.assign(url.toString());
+      });
     }
 
     window.location.assign(url.toString());
@@ -278,14 +425,16 @@
       throw new Error("Missing authorization code.");
     }
 
-    const pending = getPendingState();
+    const matchedPending = getMatchingPendingState(state);
 
-    if (!pending) {
+    if (!matchedPending?.pending) {
       throw new Error("Missing stored login state.");
     }
 
+    const { pending, kind } = matchedPending;
+
     if (pending.state !== state) {
-      clearPendingState();
+      clearStoredPending(kind);
       throw new Error("State mismatch during secure sign-in.");
     }
 
@@ -310,12 +459,18 @@
       logoutUri: config.logoutUri,
     };
 
-    saveSession(session, pending.remember);
-    clearPendingState();
+    if (kind === "popup") {
+      clearStoredPending(kind);
+    } else {
+      saveSession(session, pending.remember);
+      clearStoredPending(kind);
+    }
 
     return {
       session,
       returnTo: pending.returnTo || "/",
+      remember: Boolean(pending.remember),
+      popup: kind === "popup",
     };
   }
 
@@ -392,6 +547,7 @@
   window.EverydayLillyAuth = {
     clearPendingState,
     clearSession,
+    completePopupLogin,
     getConfig,
     getGalleryCollection,
     getGalleryDestination,
