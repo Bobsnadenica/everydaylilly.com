@@ -28,8 +28,9 @@ Important:
 - The landing page now opens Cognito Hosted UI in a dedicated secure popup and finishes the session back through `auth/callback.html`.
 - After login, users now land in the private gallery route that matches their Cognito-backed account type.
 - The backend, not the browser, decides whether that account can see the standard `months/` collection or the `test/` collection, and the frontend corrects the route if someone opens the wrong page directly.
-- Gallery images are still served from CloudFront, but the signed URLs are now bucketed for longer-lived browser caching instead of changing on every single manifest refresh.
-- Gallery photos now open in a swipeable full-bleed viewer, and the `test/` route keeps its collage cards text-free.
+- Gallery media is still served from CloudFront, but the signed URLs now stay stable with an immutable cache profile and only change when you manually refresh or intentionally bump the gallery cache version.
+- Gallery routes now support pictures, GIFs, and movies with filter chips, and the fullscreen viewer uses a contained stage with swipe navigation instead of crop-heavy zoom.
+- The `test/` route keeps its collage cards text-free while the `months/` route preserves the custom numeric month ordering.
 - Login abuse protection now lives mostly at the Cognito edge: username existence suppression stays enabled, Cognito keeps its built-in failed-password lockout, and AWS WAF quietly adds CAPTCHA plus temporary blocking for suspicious login bursts.
 - If the callback page shows `invalid_scope`, the deployed Cognito app client needs a fresh Terraform apply so its allowed scopes match the website code.
 

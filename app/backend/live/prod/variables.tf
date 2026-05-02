@@ -54,10 +54,16 @@ variable "gallery_public_base_url" {
   type        = string
 }
 
+variable "gallery_cache_version" {
+  description = "Stable cache version string for gallery media URLs. Change it only when you intentionally want every client to fetch fresh originals again."
+  type        = string
+  default     = "v1"
+}
+
 variable "gallery_signed_url_ttl_seconds" {
-  description = "Lifetime in seconds for the signed gallery image URLs returned by the backend. Defaults to 7 days for better browser caching."
+  description = "Lifetime in seconds for the signed gallery media URLs returned by the backend. Defaults to one year so gallery URLs stay stable until you manually refresh or bump the cache version."
   type        = number
-  default     = 604800
+  default     = 31536000
 }
 
 variable "gallery_api_allowed_origins" {

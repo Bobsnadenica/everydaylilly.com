@@ -54,7 +54,11 @@ resource "aws_cloudfront_origin_request_policy" "gallery_api" {
   }
 
   query_strings_config {
-    query_string_behavior = "none"
+    query_string_behavior = "whitelist"
+
+    query_strings {
+      items = ["refresh"]
+    }
   }
 }
 
@@ -121,6 +125,7 @@ resource "aws_lambda_function" "gallery_manifest" {
       GALLERY_DEFAULT_PREFIX     = var.gallery_month_prefix
       GALLERY_TEST_PREFIX        = var.gallery_test_prefix
       GALLERY_PUBLIC_BASE_URL    = trimsuffix(var.gallery_public_base_url, "/")
+      GALLERY_CACHE_VERSION      = var.gallery_cache_version
       GALLERY_SIGNED_URL_TTL     = tostring(var.gallery_signed_url_ttl_seconds)
       GALLERY_SIGNER_KEY_PAIR_ID = aws_cloudfront_public_key.gallery.id
       GALLERY_SIGNER_KMS_KEY_ID  = aws_kms_key.gallery_signer.key_id

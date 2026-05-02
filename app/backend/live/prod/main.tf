@@ -1,10 +1,6 @@
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
-data "aws_cloudfront_cache_policy" "caching_optimized" {
-  name = "Managed-CachingOptimized"
-}
-
 data "aws_cloudfront_cache_policy" "caching_disabled" {
   name = "Managed-CachingDisabled"
 }
@@ -159,13 +155,42 @@ resource "aws_cloudfront_origin_access_control" "gallery" {
 
 resource "aws_cloudfront_response_headers_policy" "gallery_images" {
   name    = "${local.prefix}-gallery-images"
-  comment = "Long-lived browser caching headers for signed gallery images."
+  comment = "Immutable browser caching headers for signed gallery media."
 
   custom_headers_config {
     items {
       header   = "Cache-Control"
       override = true
-      value    = "public, max-age=${max(var.gallery_signed_url_ttl_seconds, 604800)}, stale-while-revalidate=86400"
+      value    = "public, max-age=31536000, immutable"
+    }
+  }
+}
+
+resource "aws_cloudfront_cache_policy" "gallery_media" {
+  name        = "${local.prefix}-gallery-media"
+  comment     = "Long-lived media cache with explicit manual busting through the v query string."
+  default_ttl = var.gallery_signed_url_ttl_seconds
+  max_ttl     = var.gallery_signed_url_ttl_seconds
+  min_ttl     = var.gallery_signed_url_ttl_seconds
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
+
+    cookies_config {
+      cookie_behavior = "none"
+    }
+
+    headers_config {
+      header_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "whitelist"
+
+      query_strings {
+        items = ["v"]
+      }
     }
   }
 }
@@ -205,7 +230,7 @@ resource "aws_cloudfront_distribution" "gallery" {
     allowed_methods            = ["GET", "HEAD", "OPTIONS"]
     cached_methods             = ["GET", "HEAD"]
     compress                   = true
-    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    cache_policy_id            = aws_cloudfront_cache_policy.gallery_media.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.gallery_images.id
     trusted_key_groups         = [aws_cloudfront_key_group.gallery.id]
   }

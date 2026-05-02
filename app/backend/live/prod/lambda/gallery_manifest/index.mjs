@@ -10,17 +10,36 @@ const testPrefix = normalizePrefix(process.env.GALLERY_TEST_PREFIX || "test");
 const publicBaseUrl = (process.env.GALLERY_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
 const signerKeyPairId = process.env.GALLERY_SIGNER_KEY_PAIR_ID || "";
 const signerKmsKeyId = process.env.GALLERY_SIGNER_KMS_KEY_ID || "";
-const minimumSignedUrlTtlSeconds = 7 * 24 * 60 * 60;
-const configuredSignedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED_URL_TTL || "604800", 10);
+const defaultCacheVersion = normalizeCacheVersion(process.env.GALLERY_CACHE_VERSION || "v1");
+const minimumSignedUrlTtlSeconds = 365 * 24 * 60 * 60;
+const configuredSignedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED_URL_TTL || "31536000", 10);
 const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
   ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
   : minimumSignedUrlTtlSeconds;
-const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
+const mediaExtensionPattern = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
 
 function normalizePrefix(prefix) {
   return String(prefix || "")
     .trim()
     .replace(/^\/+|\/+$/g, "");
+}
+
+function normalizeCacheVersion(value) {
+  const normalized = String(value || "")
+    .trim()
+    .replace(/[^A-Za-z0-9._-]/g, "")
+    .slice(0, 64);
+
+  return normalized || "v1";
+}
+
+function sanitizeOptionalCacheVersion(value) {
+  const normalized = String(value || "")
+    .trim()
+    .replace(/[^A-Za-z0-9._-]/g, "")
+    .slice(0, 64);
+
+  return normalized || "";
 }
 
 function json(statusCode, body) {
@@ -67,6 +86,18 @@ function normalizeClaimValues(value) {
   }
 
   return [];
+}
+
+function getMediaKind(key) {
+  if (/\.gif$/i.test(key)) {
+    return "gif";
+  }
+
+  if (/\.(m4v|mov|mp4|webm)$/i.test(key)) {
+    return "movie";
+  }
+
+  return "picture";
 }
 
 function isTestAccount(claims) {
@@ -151,7 +182,7 @@ async function listGalleryKeys(prefix) {
     );
 
     for (const item of response.Contents || []) {
-      if (item.Key && !item.Key.endsWith("/") && imageExtensionPattern.test(item.Key)) {
+      if (item.Key && !item.Key.endsWith("/") && mediaExtensionPattern.test(item.Key)) {
         keys.push(item.Key);
       }
     }
@@ -182,11 +213,15 @@ function buildLabel(key) {
   return filename.replace(/\.[^.]+$/, "");
 }
 
-async function buildSignedPhoto(key, expiresAtEpochSeconds) {
-  const resourceUrl = `${publicBaseUrl}/${encodePathSegments(key)}`;
-  const policy = buildCannedPolicy(resourceUrl, expiresAtEpochSeconds);
+async function buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion) {
+  const signedUrl = new URL(`${publicBaseUrl}/${encodePathSegments(key)}`);
+
+  if (cacheVersion) {
+    signedUrl.searchParams.set("v", cacheVersion);
+  }
+
+  const policy = buildCannedPolicy(signedUrl.toString(), expiresAtEpochSeconds);
   const signature = await signPolicy(policy);
-  const signedUrl = new URL(resourceUrl);
 
   signedUrl.searchParams.set("Expires", String(expiresAtEpochSeconds));
   signedUrl.searchParams.set("Signature", signature);
@@ -196,6 +231,7 @@ async function buildSignedPhoto(key, expiresAtEpochSeconds) {
   return {
     key,
     label: buildLabel(key),
+    kind: getMediaKind(key),
     url: signedUrl.toString(),
   };
 }
@@ -214,6 +250,10 @@ export const handler = async (event) => {
     }
 
     const claims = event?.requestContext?.authorizer?.jwt?.claims || {};
+    const refreshToken = sanitizeOptionalCacheVersion(event?.queryStringParameters?.refresh || "");
+    const cacheVersion = refreshToken
+      ? `${defaultCacheVersion}.${refreshToken}`
+      : defaultCacheVersion;
 
     if (claims.token_use !== "id") {
       return json(403, {
@@ -228,7 +268,7 @@ export const handler = async (event) => {
     const photos = [];
 
     for (const key of keys) {
-      photos.push(await buildSignedPhoto(key, expiresAtEpochSeconds));
+      photos.push(await buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion));
     }
 
     return json(200, {
@@ -236,6 +276,7 @@ export const handler = async (event) => {
       prefix,
       expiresAt: expiresAtEpochSeconds,
       cacheTtlSeconds: signedUrlTtlSeconds,
+      cacheVersion,
       user: {
         email: claims.email || null,
       },

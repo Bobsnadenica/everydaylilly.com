@@ -18,7 +18,7 @@ This backend stack now owns the secure gallery access path:
 - private gallery bucket
 - CloudFront distribution in front of the gallery bucket
 - JWT-protected gallery manifest API
-- CloudFront signed URLs minted on demand in stable cache windows
+- CloudFront signed URLs minted on demand with a stable cache version plus optional manual refresh busting
 - AWS WAF on the Cognito user pool for quiet login abuse protection
 
 ## Folder Layout
@@ -217,13 +217,15 @@ The current website routing model is:
 - the backend manifest remains authoritative and the frontend corrects the route if someone opens the wrong page manually
 - `months/` is rendered as a month-by-month ordered gallery
 - `test/` is rendered as a randomized collage on each page load
+- both gallery routes now support pictures, GIFs, and movies through the same signed manifest feed, with frontend media filters layered on top
 
 The current caching model is:
 
-- CloudFront remains the image delivery layer
-- signed URLs are generated in stable time buckets instead of changing on every manifest request
-- the default TTL now targets a 7-day cache window for better browser reuse
-- if you replace an image under the same key and need it to show immediately, use a CloudFront invalidation or temporarily clear browser cache
+- CloudFront remains the media delivery layer
+- signed URLs now include a stable cache version so they stay the same across normal page loads
+- CloudFront now keeps gallery media in a long-lived immutable cache profile and the browser gets `Cache-Control: public, max-age=31536000, immutable`
+- the gallery UI includes a manual refresh button that requests a fresh cache-busting version on that device without reopening public access
+- if you want to force every client to switch to a new stable cache version, bump `gallery_cache_version` in Terraform and apply again
 
 ## Cleanup Script
 

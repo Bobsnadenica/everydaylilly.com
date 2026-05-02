@@ -4,6 +4,22 @@
     test: "/gallery/test/",
   };
 
+  const FILTERS = [
+    { id: "all", label: "Everything" },
+    { id: "picture", label: "Pictures" },
+    { id: "gif", label: "GIFs" },
+    { id: "movie", label: "Movies" },
+  ];
+
+  const MEDIA_LABELS = {
+    all: "everything",
+    picture: "pictures",
+    gif: "GIFs",
+    movie: "movies",
+  };
+
+  const REFRESH_STORAGE_PREFIX = "everyday-lilly.gallery-refresh.";
+
   function normalizeCollection(value) {
     return value === "test" ? "test" : "months";
   }
@@ -24,6 +40,12 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function escapeCssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"');
   }
 
   function getPhotoStem(photo) {
@@ -107,11 +129,130 @@
     return palette[index % palette.length];
   }
 
+  function isKnownMediaKind(value) {
+    return value === "picture" || value === "gif" || value === "movie";
+  }
+
+  function normalizeFilterKind(value) {
+    return isKnownMediaKind(value) ? value : "all";
+  }
+
+  function inferMediaKindFromKey(key) {
+    if (/\.gif$/i.test(key)) {
+      return "gif";
+    }
+
+    if (/\.(m4v|mov|mp4|webm)$/i.test(key)) {
+      return "movie";
+    }
+
+    return "picture";
+  }
+
+  function getMediaKind(photo) {
+    const explicit = String(photo?.kind || "").trim().toLowerCase();
+    return isKnownMediaKind(explicit) ? explicit : inferMediaKindFromKey(photo?.key || "");
+  }
+
+  function getRefreshStorageKey(collection) {
+    return `${REFRESH_STORAGE_PREFIX}${collection}`;
+  }
+
+  function sanitizeRefreshToken(value) {
+    return String(value || "")
+      .trim()
+      .replace(/[^A-Za-z0-9._-]/g, "")
+      .slice(0, 64);
+  }
+
+  function readRefreshToken(collection) {
+    try {
+      return sanitizeRefreshToken(localStorage.getItem(getRefreshStorageKey(collection)));
+    } catch (error) {
+      console.warn("Unable to read gallery refresh token from localStorage.", error);
+      return "";
+    }
+  }
+
+  function writeRefreshToken(collection, value) {
+    const nextValue = sanitizeRefreshToken(value);
+
+    try {
+      if (nextValue) {
+        localStorage.setItem(getRefreshStorageKey(collection), nextValue);
+      } else {
+        localStorage.removeItem(getRefreshStorageKey(collection));
+      }
+    } catch (error) {
+      console.warn("Unable to write gallery refresh token to localStorage.", error);
+    }
+  }
+
+  function createRefreshToken() {
+    return `manual-${Date.now()}`;
+  }
+
+  function buildMediaCounts(photos) {
+    return photos.reduce(
+      (counts, photo) => {
+        const kind = getMediaKind(photo);
+        counts.all += 1;
+        counts[kind] += 1;
+        return counts;
+      },
+      { all: 0, picture: 0, gif: 0, movie: 0 }
+    );
+  }
+
+  function ensureAvailableFilter(filter, photos) {
+    const counts = buildMediaCounts(photos);
+    return filter === "all" || counts[filter] > 0 ? filter : "all";
+  }
+
+  function filterPhotos(photos, filter) {
+    const activeFilter = normalizeFilterKind(filter);
+
+    if (activeFilter === "all") {
+      return [...photos];
+    }
+
+    return photos.filter((photo) => getMediaKind(photo) === activeFilter);
+  }
+
+  function buildMediaMarkup(photo, title, priority) {
+    const kind = getMediaKind(photo);
+
+    if (kind === "movie") {
+      return `
+        <div class="media-shell media-shell-video">
+          <video
+            src="${escapeHtml(photo.url)}"
+            muted
+            loop
+            autoplay
+            playsinline
+            preload="metadata"
+            aria-label="${escapeHtml(title)}"
+          ></video>
+          <span class="photo-play" aria-hidden="true">&#9654;</span>
+        </div>
+      `;
+    }
+
+    const fetchPriority = priority ? ' fetchpriority="high"' : "";
+
+    return `
+      <div class="media-shell">
+        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"${fetchPriority}>
+      </div>
+    `;
+  }
+
   function buildPhotoCardMarkup(photo, options = {}) {
     const title = options.title || `Photo ${getPhotoStem(photo)}`;
     const caption = options.caption || photo.key;
     const showMeta = options.showMeta !== false;
-    const priority = options.priority ? ' fetchpriority="high"' : "";
+    const kind = getMediaKind(photo);
 
     return `
       <article class="${escapeHtml(options.cardClass || "photo-card")}" style="${escapeHtml(options.style || "")}">
@@ -119,12 +260,14 @@
           class="photo-link"
           href="${escapeHtml(photo.url)}"
           data-photo-trigger
+          data-photo-kind="${escapeHtml(kind)}"
           data-photo-label="${escapeHtml(title)}"
           data-photo-key="${escapeHtml(photo.key)}"
           data-photo-src="${escapeHtml(photo.url)}"
+          data-photo-backdrop="${escapeHtml(kind === "movie" ? "" : photo.url)}"
           aria-label="${escapeHtml(`Open ${title}`)}"
         >
-          <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"${priority}>
+          ${buildMediaMarkup(photo, title, options.priority)}
         </a>
         ${showMeta ? `
           <div class="photo-meta">
@@ -136,8 +279,8 @@
     `;
   }
 
-  function renderMonthsGallery(content, manifest) {
-    const groups = buildMonthGroups(manifest.photos);
+  function renderMonthsGallery(content, manifest, visiblePhotos) {
+    const groups = buildMonthGroups(visiblePhotos);
 
     content.className = "months-stack";
     content.innerHTML = groups
@@ -145,7 +288,7 @@
         const cards = items
           .map((photo, photoIndex) =>
             buildPhotoCardMarkup(photo, {
-              title: `Month ${month} · Photo ${getPhotoStem(photo)}`,
+              title: `Month ${month} · ${getPhotoStem(photo)}`,
               caption: photo.key,
               priority: groupIndex === 0 && photoIndex === 0,
             })
@@ -160,7 +303,7 @@
               <div>
                 <span class="month-kicker">Calendar lane</span>
                 <h2 class="month-title">Month ${escapeHtml(month)}</h2>
-                <p class="month-note">Following your numeric naming order so 0 comes first, then 1, 11, and the rest of that month group.</p>
+                <p class="month-note">Numeric names stay in your custom order, so 0 comes first, then 1, 11, and the rest of that month lane.</p>
               </div>
               <p class="month-count">${items.length} ${plural}</p>
             </div>
@@ -171,8 +314,8 @@
       .join("");
   }
 
-  function renderTestGallery(content, manifest) {
-    const randomized = shufflePhotos(manifest.photos);
+  function renderTestGallery(content, manifest, visiblePhotos) {
+    const randomized = shufflePhotos(visiblePhotos);
 
     content.className = "test-collage";
     content.innerHTML = randomized
@@ -207,11 +350,16 @@
     viewer.innerHTML = `
       <div class="viewer-backdrop" data-viewer-close></div>
       <div class="viewer-card">
-        <button class="viewer-close" type="button" aria-label="Close image viewer" data-viewer-close>&times;</button>
-        <button class="viewer-nav viewer-nav-prev" type="button" aria-label="Previous image" data-viewer-nav="-1">&#10094;</button>
-        <button class="viewer-nav viewer-nav-next" type="button" aria-label="Next image" data-viewer-nav="1">&#10095;</button>
+        <button class="viewer-close" type="button" aria-label="Close media viewer" data-viewer-close>&times;</button>
+        <button class="viewer-nav viewer-nav-prev" type="button" aria-label="Previous item" data-viewer-nav="-1">&#10094;</button>
+        <button class="viewer-nav viewer-nav-next" type="button" aria-label="Next item" data-viewer-nav="1">&#10095;</button>
         <div class="viewer-frame">
-          <img id="viewer-image" alt="">
+          <div class="viewer-stage" id="viewer-stage">
+            <div class="viewer-media">
+              <img id="viewer-image" alt="" hidden>
+              <video id="viewer-video" playsinline controls preload="metadata" hidden></video>
+            </div>
+          </div>
           <div class="viewer-meta">
             <div>
               <p id="viewer-title" class="viewer-title"></p>
@@ -230,9 +378,46 @@
     return viewer;
   }
 
-  function enableViewer(content) {
-    const viewer = ensureViewer();
+  function dismissViewer() {
+    const viewer = document.getElementById("gallery-viewer");
+
+    if (!viewer) {
+      return;
+    }
+
     const viewerImage = viewer.querySelector("#viewer-image");
+    const viewerVideo = viewer.querySelector("#viewer-video");
+    const viewerStage = viewer.querySelector("#viewer-stage");
+
+    viewer.hidden = true;
+    document.body.style.overflow = "";
+
+    if (viewerImage) {
+      viewerImage.removeAttribute("src");
+      viewerImage.hidden = true;
+    }
+
+    if (viewerVideo) {
+      viewerVideo.pause();
+      viewerVideo.removeAttribute("src");
+      viewerVideo.load();
+      viewerVideo.hidden = true;
+    }
+
+    viewerStage?.style.removeProperty("--viewer-backdrop-image");
+  }
+
+  function enableViewer(content) {
+    if (content.dataset.viewerEnabled === "true") {
+      return;
+    }
+
+    content.dataset.viewerEnabled = "true";
+
+    const viewer = ensureViewer();
+    const viewerStage = viewer.querySelector("#viewer-stage");
+    const viewerImage = viewer.querySelector("#viewer-image");
+    const viewerVideo = viewer.querySelector("#viewer-video");
     const viewerTitle = viewer.querySelector("#viewer-title");
     const viewerKey = viewer.querySelector("#viewer-key");
     const viewerOpenLink = viewer.querySelector("#viewer-open-link");
@@ -258,6 +443,17 @@
       }
     }
 
+    function resetViewerVideo() {
+      if (!viewerVideo) {
+        return;
+      }
+
+      viewerVideo.pause();
+      viewerVideo.removeAttribute("src");
+      viewerVideo.load();
+      viewerVideo.hidden = true;
+    }
+
     function renderViewerAt(index) {
       const triggers = getTriggers();
 
@@ -267,12 +463,55 @@
 
       currentIndex = Math.max(0, Math.min(index, triggers.length - 1));
       const trigger = triggers[currentIndex];
+      const kind = normalizeFilterKind(trigger.dataset.photoKind);
+      const src = trigger.dataset.photoSrc || trigger.href;
+      const label = trigger.dataset.photoLabel || "Gallery item";
+      const key = trigger.dataset.photoKey || "";
+      const backdrop = trigger.dataset.photoBackdrop || src;
       lastTrigger = trigger;
-      viewerImage.src = trigger.dataset.photoSrc || trigger.href;
-      viewerImage.alt = trigger.dataset.photoLabel || "Gallery image";
-      viewerTitle.textContent = trigger.dataset.photoLabel || "Gallery image";
-      viewerKey.textContent = trigger.dataset.photoKey || "";
-      viewerOpenLink.href = trigger.dataset.photoSrc || trigger.href;
+
+      if (viewerTitle) {
+        viewerTitle.textContent = label;
+      }
+
+      if (viewerKey) {
+        viewerKey.textContent = key;
+      }
+
+      if (viewerOpenLink) {
+        viewerOpenLink.href = src;
+        viewerOpenLink.textContent = kind === "movie" ? "Open movie" : "Open original";
+      }
+
+      if (kind === "movie") {
+        if (viewerImage) {
+          viewerImage.hidden = true;
+          viewerImage.removeAttribute("src");
+        }
+
+        viewerStage?.style.removeProperty("--viewer-backdrop-image");
+        resetViewerVideo();
+
+        if (viewerVideo) {
+          viewerVideo.hidden = false;
+          viewerVideo.src = src;
+          viewerVideo.load();
+          viewerVideo.play().catch(() => {});
+        }
+      } else {
+        resetViewerVideo();
+
+        if (viewerImage) {
+          viewerImage.hidden = false;
+          viewerImage.src = src;
+          viewerImage.alt = label;
+        }
+
+        if (viewerStage) {
+          viewerStage.style.setProperty("--viewer-backdrop-image", `url("${escapeCssUrl(backdrop)}")`);
+        }
+      }
+
       updateViewerNavigation(triggers.length);
     }
 
@@ -288,11 +527,7 @@
     }
 
     function closeViewer() {
-      viewer.hidden = true;
-      document.body.style.overflow = "";
-      if (viewerImage) {
-        viewerImage.removeAttribute("src");
-      }
+      dismissViewer();
       currentIndex = -1;
       lastTrigger?.focus?.();
     }
@@ -335,14 +570,19 @@
 
     viewerFrame?.addEventListener("touchstart", (event) => {
       const touch = event.changedTouches?.[0];
-      if (!touch) return;
+      if (!touch) {
+        return;
+      }
+
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
     }, { passive: true });
 
     viewerFrame?.addEventListener("touchend", (event) => {
       const touch = event.changedTouches?.[0];
-      if (!touch) return;
+      if (!touch) {
+        return;
+      }
 
       const deltaX = touch.clientX - touchStartX;
       const deltaY = touch.clientY - touchStartY;
@@ -375,8 +615,14 @@
     });
   }
 
-  async function fetchManifest(session) {
-    const response = await fetch(getManifestUrl(), {
+  async function fetchManifest(session, options = {}) {
+    const requestUrl = new URL(getManifestUrl());
+
+    if (options.refreshToken) {
+      requestUrl.searchParams.set("refresh", sanitizeRefreshToken(options.refreshToken));
+    }
+
+    const response = await fetch(requestUrl.toString(), {
       headers: {
         Authorization: `Bearer ${session.tokens?.id_token || ""}`,
       },
@@ -392,7 +638,39 @@
     return manifest;
   }
 
-  function applyCollectionCopy(collection, manifest) {
+  function renderFilters(container, photos, activeFilter) {
+    if (!container) {
+      return;
+    }
+
+    const counts = buildMediaCounts(photos);
+    const filters = FILTERS.filter((filter) => filter.id === "all" || counts[filter.id] > 0);
+
+    container.innerHTML = filters
+      .map((filter) => `
+        <button
+          class="filter-chip${filter.id === activeFilter ? " is-active" : ""}"
+          type="button"
+          data-gallery-filter="${escapeHtml(filter.id)}"
+          aria-pressed="${filter.id === activeFilter ? "true" : "false"}"
+        >
+          <span>${escapeHtml(filter.label)}</span>
+          <span class="filter-count">${counts[filter.id]}</span>
+        </button>
+      `)
+      .join("");
+  }
+
+  function updateRefreshButton(button, isRefreshing) {
+    if (!button) {
+      return;
+    }
+
+    button.disabled = isRefreshing;
+    button.textContent = isRefreshing ? "Refreshing gallery..." : "Manual refresh";
+  }
+
+  function applyCollectionCopy(collection, manifest, state) {
     const eyebrow = document.getElementById("gallery-eyebrow");
     const title = document.getElementById("gallery-title");
     const copy = document.getElementById("gallery-copy");
@@ -400,15 +678,27 @@
     const cachePill = document.getElementById("gallery-cache");
 
     if (collection === "test") {
-      if (eyebrow) eyebrow.textContent = "Creative test collection";
-      if (title) title.textContent = "Surprise collage vault";
+      if (eyebrow) {
+        eyebrow.textContent = "Creative test collection";
+      }
+
+      if (title) {
+        title.textContent = "Surprise collage vault";
+      }
+
       if (copy) {
         copy.textContent =
-          "This signed-in route keeps the test collection playful with a fresh arrangement every time while the backend still decides who can see it.";
+          "This signed-in route stays playful with a reshuffled layout while the backend still decides exactly who can see it.";
       }
     } else {
-      if (eyebrow) eyebrow.textContent = "Month-by-month vault";
-      if (title) title.textContent = "Calendar memory gallery";
+      if (eyebrow) {
+        eyebrow.textContent = "Month-by-month vault";
+      }
+
+      if (title) {
+        title.textContent = "Calendar memory gallery";
+      }
+
       if (copy) {
         copy.textContent =
           "This route follows your custom month naming convention and keeps the selected memories grouped in calendar order.";
@@ -420,29 +710,75 @@
     }
 
     if (cachePill) {
-      const ttl = Number.parseInt(manifest.cacheTtlSeconds, 10);
-      const cacheLabel = Number.isFinite(ttl) && ttl >= 86400
-        ? `CloudFront cached for ${Math.round(ttl / 86400)} day${Math.round(ttl / 86400) === 1 ? "" : "s"}`
-        : "CloudFront cached delivery";
-      cachePill.textContent = cacheLabel;
+      cachePill.textContent = state.refreshToken
+        ? "Manual refresh active on this device"
+        : "Immutable cache with manual refresh";
+    }
+  }
+
+  function renderGalleryState(content, status, state) {
+    dismissViewer();
+
+    const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
+    const filterLabel = MEDIA_LABELS[state.activeFilter] || MEDIA_LABELS.all;
+    const visibleSummary = state.activeFilter === "all"
+      ? "everything in this view"
+      : `${visiblePhotos.length} ${filterLabel}`;
+
+    if (!visiblePhotos.length) {
+      if (status) {
+        status.textContent = `No ${filterLabel} were found under ${state.manifest.prefix}/ right now.`;
+      }
+
+      if (content) {
+        content.className = "empty-state";
+        content.textContent =
+          state.actualCollection === "test"
+            ? `Upload pictures, GIFs, or movies under ${state.manifest.prefix}/ and use manual refresh when you want the collage to pick them up.`
+            : `Upload pictures, GIFs, or movies under ${state.manifest.prefix}/ using your flat numbering like 0.jpg, 1.jpg, or 11.mp4, then use manual refresh when you want the month view to update.`;
+      }
+
+      return;
+    }
+
+    if (status) {
+      status.textContent = `Loaded ${state.manifest.photos.length} signed CloudFront items from ${state.manifest.prefix}/. Showing ${visibleSummary}.`;
+    }
+
+    if (state.actualCollection === "test") {
+      renderTestGallery(content, state.manifest, visiblePhotos);
+    } else {
+      renderMonthsGallery(content, state.manifest, visiblePhotos);
     }
   }
 
   async function initGalleryPage() {
     const auth = window.EverydayLillyAuth;
+    const requestedCollection = getRequestedCollection();
     const signoutButton = document.getElementById("gallery-signout");
+    const refreshButton = document.getElementById("gallery-refresh");
+    const filterContainer = document.getElementById("gallery-media-filters");
     const status = document.getElementById("gallery-status");
     const content = document.getElementById("gallery-content");
     const userPill = document.getElementById("gallery-user");
+    const state = {
+      requestedCollection,
+      actualCollection: requestedCollection,
+      activeFilter: "all",
+      refreshToken: readRefreshToken(requestedCollection),
+      manifest: null,
+    };
 
     if (!auth) {
       if (status) {
         status.textContent = "The secure gallery helper could not load.";
       }
+
       if (content) {
         content.className = "empty-state";
         content.textContent = "Please return to the home page and try again.";
       }
+
       return;
     }
 
@@ -464,60 +800,81 @@
     }
 
     if (status) {
-      status.textContent = "Checking your private manifest and preparing CloudFront photo delivery.";
+      status.textContent = "Checking your private manifest and preparing CloudFront media delivery.";
     }
 
-    let manifest;
+    async function loadManifest(options = {}) {
+      updateRefreshButton(refreshButton, true);
 
-    try {
-      manifest = await fetchManifest(session);
-    } catch (error) {
-      console.error(error);
-      if (status) {
-        status.textContent = "The private gallery backend could not load your photos.";
+      try {
+        state.manifest = await fetchManifest(session, {
+          refreshToken: state.refreshToken,
+        });
+      } catch (error) {
+        console.error(error);
+
+        if (status) {
+          status.textContent = "The private gallery backend could not load your media.";
+        }
+
+        if (content) {
+          content.className = "empty-state";
+          content.textContent = error.message || "Please return to the home page and try signing in again.";
+        }
+
+        updateRefreshButton(refreshButton, false);
+        return false;
       }
+
+      const actualCollection = normalizeCollection(state.manifest.collection);
+
+      if (state.requestedCollection !== actualCollection) {
+        window.location.replace(ROUTES[actualCollection]);
+        return false;
+      }
+
+      state.actualCollection = actualCollection;
+      state.activeFilter = ensureAvailableFilter(state.activeFilter, state.manifest.photos || []);
+
+      applyCollectionCopy(actualCollection, state.manifest, state);
+      renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+      renderGalleryState(content, status, state);
       if (content) {
-        content.className = "empty-state";
-        content.textContent = error.message || "Please return to the home page and try signing in again.";
+        enableViewer(content);
       }
-      return;
+      updateRefreshButton(refreshButton, false);
+      return true;
     }
 
-    const actualCollection = normalizeCollection(manifest.collection);
-    const requestedCollection = getRequestedCollection();
+    filterContainer?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-gallery-filter]");
 
-    if (requestedCollection !== actualCollection) {
-      window.location.replace(ROUTES[actualCollection]);
-      return;
-    }
+      if (!button || !state.manifest) {
+        return;
+      }
 
-    applyCollectionCopy(actualCollection, manifest);
+      state.activeFilter = ensureAvailableFilter(
+        normalizeFilterKind(button.dataset.galleryFilter),
+        state.manifest.photos || []
+      );
 
-    if (!manifest.photos?.length) {
+      applyCollectionCopy(state.actualCollection, state.manifest, state);
+      renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+      renderGalleryState(content, status, state);
+    });
+
+    refreshButton?.addEventListener("click", async () => {
+      state.refreshToken = createRefreshToken();
+      writeRefreshToken(state.actualCollection, state.refreshToken);
+
       if (status) {
-        status.textContent = `No images were found under ${manifest.prefix}/`;
+        status.textContent = "Manually refreshing the gallery cache and fetching fresh CloudFront URLs.";
       }
-      if (content) {
-        content.className = "empty-state";
-        content.textContent =
-          actualCollection === "test"
-            ? "Upload JPG files under test/ and refresh to see the randomized collage."
-            : "Upload JPG files under months/ using your flat numbering like 0.jpg, 1.jpg, 11.jpg, and refresh the page.";
-      }
-      return;
-    }
 
-    if (status) {
-      status.textContent = `Loaded ${manifest.photos.length} signed CloudFront image${manifest.photos.length === 1 ? "" : "s"} from ${manifest.prefix}/.`;
-    }
+      await loadManifest({ manualRefresh: true });
+    });
 
-    if (actualCollection === "test") {
-      renderTestGallery(content, manifest);
-    } else {
-      renderMonthsGallery(content, manifest);
-    }
-
-    enableViewer(content);
+    await loadManifest();
   }
 
   document.addEventListener("DOMContentLoaded", () => {

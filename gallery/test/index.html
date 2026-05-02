@@ -36,12 +36,16 @@
             <div class="meta">
                 <span class="meta-pill" id="gallery-user">Signed in securely</span>
                 <span class="meta-pill" id="gallery-prefix">Collection prefix: test/</span>
-                <span class="meta-pill" id="gallery-cache">CloudFront cached delivery</span>
+                <span class="meta-pill" id="gallery-cache">Immutable cache with manual refresh</span>
             </div>
         </section>
 
         <section class="gallery-card">
             <p id="gallery-status" class="gallery-status">Checking your secure session and preparing the randomized collage.</p>
+            <div class="gallery-toolbar">
+                <div id="gallery-media-filters" class="filter-strip" role="toolbar" aria-label="Filter gallery by media type"></div>
+                <button id="gallery-refresh" class="btn btn-secondary" type="button">Manual refresh</button>
+            </div>
             <div id="gallery-content" class="loading-state">Loading your private test collection from the backend manifest.</div>
         </section>
     </div>

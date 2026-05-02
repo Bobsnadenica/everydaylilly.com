@@ -23,6 +23,11 @@ output "gallery_manifest_api_direct_url" {
   value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${local.gallery_manifest_path}"
 }
 
+output "gallery_cache_version" {
+  description = "Stable gallery cache version string used in signed CloudFront media URLs."
+  value       = var.gallery_cache_version
+}
+
 output "gallery_month_prefix" {
   description = "Prefix to use for the monthly gallery images."
   value       = var.gallery_month_prefix
