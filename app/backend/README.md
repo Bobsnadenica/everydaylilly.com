@@ -18,7 +18,7 @@ This backend stack now owns the secure gallery access path:
 - private gallery bucket
 - CloudFront distribution in front of the gallery bucket
 - JWT-protected gallery manifest API
-- short-lived CloudFront signed URLs minted on demand
+- CloudFront signed URLs minted on demand in stable cache windows
 
 ## Folder Layout
 
@@ -93,7 +93,7 @@ For example:
 - `2.jpg` can be the first picture in the second month
 - `11.jpg` can be another picture for the first month
 
-Because this is a custom convention, the future gallery page should treat these keys with your own grouping rules instead of assuming calendar month filenames.
+Because this is a custom convention, the gallery now treats these keys with your grouping rules instead of assuming calendar month filenames.
 
 ## Apply Flow
 
@@ -145,7 +145,7 @@ Current environment values and reference keys:
 - Cognito app client id: `680v9kq2oue5323c6r63egrltg`
 - Cognito hosted UI base URL: `https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com`
 - Cognito hosted UI login URL:
-  `https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com/login?client_id=680v9kq2oue5323c6r63egrltg&response_type=code&scope=openid+email+profile&redirect_uri=https%3A%2F%2Fwww.everydaylilly.com%2Fauth%2Fcallback.html`
+  `https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com/login?client_id=680v9kq2oue5323c6r63egrltg&response_type=code&scope=openid+email+profile+aws.cognito.signin.user.admin&redirect_uri=https%3A%2F%2Fwww.everydaylilly.com%2Fauth%2Fcallback.html`
 
 Suggested GitHub variable set for later frontend/app wiring:
 
@@ -186,9 +186,9 @@ Until that is built end to end, the best-practice website behavior is:
 
 The backend gallery routing rules are:
 
-- standard accounts receive signed URLs for `months/`
-- accounts in the Cognito group `test` receive signed URLs for `test/`
-- accounts with a tag-like claim of `test` also receive signed URLs for `test/`
+- standard accounts receive the `months/` collection
+- accounts in the Cognito group `test` receive the `test/` collection
+- accounts with a tag-like claim of `test` also receive the `test/` collection
   Supported claim keys are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`
 
 The enforcement model is:
@@ -197,8 +197,22 @@ The enforcement model is:
 2. the gallery page calls `GET /api/gallery/manifest` through CloudFront with a Cognito ID token
 3. API Gateway validates the JWT
 4. the Lambda manifest function decides the allowed prefix and lists the matching objects
-5. the Lambda uses AWS KMS plus a trusted CloudFront key group to mint short-lived signed URLs
+5. the Lambda uses AWS KMS plus a trusted CloudFront key group to mint signed URLs inside a stable cache window
 6. CloudFront serves photo objects only when the URL signature is valid
+
+The current website routing model is:
+
+- after Cognito login, browser-side claims send likely test accounts to `/gallery/test/` and everyone else to `/gallery/months/`
+- the backend manifest remains authoritative and the frontend corrects the route if someone opens the wrong page manually
+- `months/` is rendered as a month-by-month ordered gallery
+- `test/` is rendered as a randomized collage on each page load
+
+The current caching model is:
+
+- CloudFront remains the image delivery layer
+- signed URLs are generated in stable time buckets instead of changing on every manifest request
+- the default TTL now targets a 7-day cache window for better browser reuse
+- if you replace an image under the same key and need it to show immediately, use a CloudFront invalidation or temporarily clear browser cache
 
 For the managed login website flow, keep the app client aligned with the browser code:
 

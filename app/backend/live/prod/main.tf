@@ -157,6 +157,19 @@ resource "aws_cloudfront_origin_access_control" "gallery" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_response_headers_policy" "gallery_images" {
+  name    = "${local.prefix}-gallery-images"
+  comment = "Long-lived browser caching headers for signed gallery images."
+
+  custom_headers_config {
+    items {
+      header   = "Cache-Control"
+      override = true
+      value    = "public, max-age=${max(var.gallery_signed_url_ttl_seconds, 604800)}, stale-while-revalidate=86400"
+    }
+  }
+}
+
 resource "aws_cloudfront_distribution" "gallery" {
   enabled             = true
   is_ipv6_enabled     = true
@@ -187,13 +200,14 @@ resource "aws_cloudfront_distribution" "gallery" {
   }
 
   default_cache_behavior {
-    target_origin_id       = local.gallery_origin_id
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    cache_policy_id        = data.aws_cloudfront_cache_policy.caching_optimized.id
-    trusted_key_groups     = [aws_cloudfront_key_group.gallery.id]
+    target_origin_id           = local.gallery_origin_id
+    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.gallery_images.id
+    trusted_key_groups         = [aws_cloudfront_key_group.gallery.id]
   }
 
   ordered_cache_behavior {

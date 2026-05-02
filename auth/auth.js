@@ -188,8 +188,8 @@
   }
 
   function getGalleryDestination(input) {
-    void input;
-    return "/gallery/index.html";
+    const collection = getGalleryCollection(input);
+    return collection === "test" ? "/gallery/test/" : "/gallery/months/";
   }
 
   async function startLogin(options = {}) {

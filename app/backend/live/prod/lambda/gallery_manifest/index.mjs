@@ -10,7 +10,11 @@ const testPrefix = normalizePrefix(process.env.GALLERY_TEST_PREFIX || "test");
 const publicBaseUrl = (process.env.GALLERY_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
 const signerKeyPairId = process.env.GALLERY_SIGNER_KEY_PAIR_ID || "";
 const signerKmsKeyId = process.env.GALLERY_SIGNER_KMS_KEY_ID || "";
-const signedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED_URL_TTL || "900", 10);
+const minimumSignedUrlTtlSeconds = 7 * 24 * 60 * 60;
+const configuredSignedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED_URL_TTL || "604800", 10);
+const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
+  ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
+  : minimumSignedUrlTtlSeconds;
 const imageExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
 
 function normalizePrefix(prefix) {
@@ -182,6 +186,11 @@ async function buildSignedPhoto(key, expiresAtEpochSeconds) {
   };
 }
 
+function getStableExpiryEpochSeconds() {
+  const now = Math.floor(Date.now() / 1000);
+  return Math.ceil(now / signedUrlTtlSeconds) * signedUrlTtlSeconds;
+}
+
 export const handler = async (event) => {
   try {
     if (!bucketName || !publicBaseUrl || !signerKeyPairId || !signerKmsKeyId) {
@@ -201,8 +210,7 @@ export const handler = async (event) => {
     const isTest = isTestAccount(claims);
     const prefix = isTest ? testPrefix : defaultPrefix;
     const keys = await listGalleryKeys(prefix);
-    const expiresAtEpochSeconds =
-      Math.floor(Date.now() / 1000) + Math.max(signedUrlTtlSeconds, 60);
+    const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
     const photos = [];
 
     for (const key of keys) {
@@ -210,9 +218,10 @@ export const handler = async (event) => {
     }
 
     return json(200, {
-      collection: isTest ? "test" : "default",
+      collection: isTest ? "test" : "months",
       prefix,
       expiresAt: expiresAtEpochSeconds,
+      cacheTtlSeconds: signedUrlTtlSeconds,
       user: {
         email: claims.email || null,
       },

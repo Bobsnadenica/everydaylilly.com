@@ -55,9 +55,9 @@ variable "gallery_public_base_url" {
 }
 
 variable "gallery_signed_url_ttl_seconds" {
-  description = "Lifetime in seconds for the signed gallery image URLs returned by the backend."
+  description = "Lifetime in seconds for the signed gallery image URLs returned by the backend. Defaults to 7 days for better browser caching."
   type        = number
-  default     = 300
+  default     = 604800
 }
 
 variable "gallery_api_allowed_origins" {

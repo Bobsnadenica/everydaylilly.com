@@ -55,5 +55,5 @@ output "cognito_hosted_ui_base_url" {
 
 output "cognito_hosted_ui_login_url" {
   description = "Direct login URL for the hosted UI."
-  value       = "https://${aws_cognito_user_pool_domain.gallery.domain}.auth.${var.aws_region}.amazoncognito.com/login?client_id=${aws_cognito_user_pool_client.gallery.id}&response_type=code&scope=openid+email+profile&redirect_uri=${urlencode(var.auth_callback_urls[0])}"
+  value       = "https://${aws_cognito_user_pool_domain.gallery.domain}.auth.${var.aws_region}.amazoncognito.com/login?client_id=${aws_cognito_user_pool_client.gallery.id}&response_type=code&scope=openid+email+profile+aws.cognito.signin.user.admin&redirect_uri=${urlencode(var.auth_callback_urls[0])}"
 }
