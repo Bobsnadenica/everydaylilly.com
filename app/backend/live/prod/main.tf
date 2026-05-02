@@ -309,11 +309,21 @@ resource "aws_cognito_user_pool_client" "gallery" {
   prevent_user_existence_errors        = "ENABLED"
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
-  allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  callback_urls                        = var.auth_callback_urls
-  logout_urls                          = var.auth_logout_urls
-  supported_identity_providers         = ["COGNITO"]
-  explicit_auth_flows                  = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_SRP_AUTH"]
+  allowed_oauth_scopes = [
+    "aws.cognito.signin.user.admin",
+    "email",
+    "openid",
+    "profile"
+  ]
+  callback_urls                = var.auth_callback_urls
+  logout_urls                  = var.auth_logout_urls
+  supported_identity_providers = ["COGNITO"]
+  explicit_auth_flows = [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_AUTH",
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
 
   token_validity_units {
     access_token  = "minutes"

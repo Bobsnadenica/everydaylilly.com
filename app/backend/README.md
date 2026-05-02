@@ -199,3 +199,10 @@ The enforcement model is:
 4. the Lambda manifest function decides the allowed prefix and lists the matching objects
 5. the Lambda uses AWS KMS plus a trusted CloudFront key group to mint short-lived signed URLs
 6. CloudFront serves photo objects only when the URL signature is valid
+
+For the managed login website flow, keep the app client aligned with the browser code:
+
+- include the reserved OAuth scope `aws.cognito.signin.user.admin`
+- allow password-oriented app client flows that managed login can use, including `ALLOW_USER_AUTH`, `ALLOW_USER_PASSWORD_AUTH`, and `ALLOW_USER_SRP_AUTH`
+
+If the website callback page shows `invalid_scope`, the frontend has started requesting a scope that the deployed Cognito app client has not been updated to allow yet. Re-run `terraform apply` for `live/prod` so the app client settings in AWS match the website code.

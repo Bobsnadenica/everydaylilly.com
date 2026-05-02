@@ -32,7 +32,10 @@
         overrides.logoutUri ||
         data.authLogoutUri ||
         `${appBaseUrl}/`,
-      scope: overrides.scope || data.authScope || "openid email profile",
+      scope:
+        overrides.scope ||
+        data.authScope ||
+        "openid email profile aws.cognito.signin.user.admin",
     };
   }
 

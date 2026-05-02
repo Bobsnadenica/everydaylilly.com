@@ -27,6 +27,7 @@ Important:
 - The landing page now hands real sign-in over to Cognito Hosted UI and returns through `auth/callback.html`.
 - After login, users now land in the private gallery shell.
 - The backend, not the browser, decides whether that account can see the standard `months/` collection or the `test/` collection.
+- If the callback page shows `invalid_scope`, the deployed Cognito app client needs a fresh Terraform apply so its allowed scopes match the website code.
 
 ## Flutter App
 
