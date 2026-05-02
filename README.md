@@ -17,7 +17,7 @@ The public site is still a static multi-page site intended for GitHub Pages styl
 - `index.html` and `index-bg.html` are the main landing pages.
 - `script.js` powers shared interactions such as the screenshot lightbox, carousel behavior, language switching, and the Cognito-backed login modal flow.
 - `auth/` contains the browser-side Cognito helper and callback page.
-- `gallery/` contains the signed-in photo gallery that routes accounts to either the default `months/` collection or the `test/` collection.
+- `gallery/` contains the signed-in photo gallery shell. It now requests a backend manifest and renders only backend-signed image URLs.
 - `style.css` contains the shared visual layer for the main site.
 - `everyday_dandelion/`, `everyday_storage/`, and `everyday_stuff/` contain companion microsites and project pages.
 
@@ -25,7 +25,8 @@ Important:
 
 - The root landing page now includes a login/profile modal UI.
 - The landing page now hands real sign-in over to Cognito Hosted UI and returns through `auth/callback.html`.
-- After login, users now land in the private gallery, with test accounts routed to the `test/` collection.
+- After login, users now land in the private gallery shell.
+- The backend, not the browser, decides whether that account can see the standard `months/` collection or the `test/` collection.
 
 ## Flutter App
 
@@ -46,7 +47,7 @@ That backend is currently designed around two storage paths:
 - `archive` storage for the full long-term photo collection.
 - `gallery` storage for a smaller monthly selection that can sit behind CloudFront.
 
-Auth is planned around Amazon Cognito so the current login mockup can become real later.
+Auth now runs through Amazon Cognito Hosted UI, and the backend stack is responsible for enforcing who can actually read gallery photos.
 
 See `app/backend/README.md` for the backend-specific runbook.
 

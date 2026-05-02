@@ -261,7 +261,7 @@
 
         <section class="gallery-card">
             <p class="gallery-status" id="gallery-status">Checking your secure session and loading photos.</p>
-            <div id="gallery-content" class="loading-state">Scanning the selected collection for available images.</div>
+            <div id="gallery-content" class="loading-state">Requesting a backend-signed photo manifest for your account.</div>
         </section>
     </div>
 
@@ -278,11 +278,8 @@
             const userPill = document.getElementById("gallery-user");
             const prefixPill = document.getElementById("gallery-prefix");
 
-            const params = new URLSearchParams(window.location.search);
-            const requestedCollection = params.get("collection");
             const baseDomain = document.body.dataset.galleryDomain || "";
-            const maxIndex = 120;
-            const maxConsecutiveMisses = 30;
+            const manifestUrl = `${baseDomain.replace(/\/+$/, "")}/api/gallery/manifest`;
 
             if (!auth) {
                 status.textContent = "The secure gallery helper could not load.";
@@ -298,87 +295,66 @@
                 return;
             }
 
-            const testAccount = auth.isTestAccount(session);
-            const collection = requestedCollection === "test" && testAccount
-                ? "test"
-                : auth.getGalleryCollection(session);
-            const prefix = collection === "test" ? "test/" : "months/";
+            userPill.textContent = `Signed in as ${session.claims?.email || "your account"}`;
+            status.textContent = "Requesting a backend-approved private gallery manifest.";
 
-            const labels = collection === "test"
+            signoutButton.addEventListener("click", () => auth.signOut({ logoutUri: `${window.location.origin}/` }));
+
+            let manifest;
+
+            try {
+                const response = await fetch(manifestUrl, {
+                    headers: {
+                        Authorization: `Bearer ${session.tokens?.id_token || ""}`,
+                    },
+                    cache: "no-store",
+                });
+
+                manifest = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error(manifest?.error || "The gallery backend rejected this session.");
+                }
+            } catch (error) {
+                console.error(error);
+                status.textContent = "The private gallery backend could not load your photos.";
+                content.className = "empty-state";
+                content.textContent = error.message || "Please return to the home page and try signing in again.";
+                return;
+            }
+
+            const labels = manifest.collection === "test"
                 ? {
                     eyebrow: "Test collection",
                     title: "Test gallery",
-                    copy: "This view is reserved for accounts in the test group or with a test tag.",
+                    copy: "This view is granted by the backend only for test accounts and test-tagged logins.",
                   }
                 : {
                     eyebrow: "Private gallery",
                     title: "Monthly family gallery",
-                    copy: "A secure look back at selected moments, loaded from your fast CloudFront collection.",
+                    copy: "A secure look back at selected moments, unlocked by the backend with short-lived signed URLs.",
                   };
 
             eyebrow.textContent = labels.eyebrow;
             title.textContent = labels.title;
             copy.textContent = labels.copy;
-            userPill.textContent = `Signed in as ${session.claims?.email || "your account"}`;
-            prefixPill.textContent = `Collection prefix: ${prefix}`;
-            status.textContent = `Loading images from ${prefix}`;
+            prefixPill.textContent = `Collection prefix: ${manifest.prefix}/`;
 
-            signoutButton.addEventListener("click", () => auth.signOut({ logoutUri: `${window.location.origin}/` }));
-
-            function probeImage(url) {
-                return new Promise((resolve) => {
-                    const image = new Image();
-                    image.onload = () => resolve(true);
-                    image.onerror = () => resolve(false);
-                    image.src = `${url}?cacheBust=${Date.now()}`;
-                });
-            }
-
-            async function loadAvailableImages() {
-                const hits = [];
-                let consecutiveMisses = 0;
-
-                for (let index = 0; index <= maxIndex; index += 1) {
-                    const objectKey = `${prefix}${index}.jpg`;
-                    const imageUrl = `${baseDomain}/${objectKey}`;
-                    const exists = await probeImage(imageUrl);
-
-                    if (exists) {
-                        hits.push({
-                            index,
-                            objectKey,
-                            imageUrl,
-                        });
-                        consecutiveMisses = 0;
-                    } else if (hits.length > 0) {
-                        consecutiveMisses += 1;
-
-                        if (consecutiveMisses >= maxConsecutiveMisses) {
-                            break;
-                        }
-                    }
-                }
-
-                return hits;
-            }
-
-            const images = await loadAvailableImages();
-
-            if (!images.length) {
-                status.textContent = `No images were found under ${prefix}`;
+            if (!manifest.photos?.length) {
+                status.textContent = `No images were found under ${manifest.prefix}/`;
                 content.className = "empty-state";
-                content.textContent = "Upload a few JPG files to this collection and refresh the page. The gallery looks for files like 0.jpg, 1.jpg, 2.jpg, 11.jpg, and so on.";
+                content.textContent = "Upload a few JPG files to this collection and refresh the page. The backend expects files like 0.jpg, 1.jpg, 2.jpg, 11.jpg, and so on.";
                 return;
             }
 
-            status.textContent = `Loaded ${images.length} image${images.length === 1 ? "" : "s"} from ${prefix}`;
+            status.textContent = `Loaded ${manifest.photos.length} image${manifest.photos.length === 1 ? "" : "s"} from ${manifest.prefix}/`;
             content.className = "gallery-grid";
-            content.innerHTML = images.map((image) => `
+            content.innerHTML = manifest.photos.map((image) => `
                 <article class="photo-card">
-                    <img src="${image.imageUrl}" alt="Gallery image ${image.index}">
+                    <img src="${image.url}" alt="Gallery image ${image.label}">
                     <div class="photo-meta">
-                        <p class="photo-label">Photo ${image.index}</p>
-                        <p class="photo-path">${image.objectKey}</p>
+                        <p class="photo-label">Photo ${image.label}</p>
+                        <p class="photo-path">${image.key}</p>
                     </div>
                 </article>
             `).join("");

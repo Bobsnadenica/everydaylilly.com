@@ -185,10 +185,8 @@
   }
 
   function getGalleryDestination(input) {
-    const collection = getGalleryCollection(input);
-    return collection === "test"
-      ? "/gallery/index.html?collection=test"
-      : "/gallery/index.html";
+    void input;
+    return "/gallery/index.html";
   }
 
   async function startLogin(options = {}) {

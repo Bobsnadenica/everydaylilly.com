@@ -5,6 +5,10 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
   name = "Managed-CachingOptimized"
 }
 
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
 resource "random_string" "bucket_suffix" {
   length  = 8
   special = false
@@ -170,6 +174,18 @@ resource "aws_cloudfront_distribution" "gallery" {
     }
   }
 
+  origin {
+    domain_name = trimprefix(aws_apigatewayv2_api.gallery.api_endpoint, "https://")
+    origin_id   = local.gallery_api_origin_id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
   default_cache_behavior {
     target_origin_id       = local.gallery_origin_id
     viewer_protocol_policy = "redirect-to-https"
@@ -177,6 +193,18 @@ resource "aws_cloudfront_distribution" "gallery" {
     cached_methods         = ["GET", "HEAD"]
     compress               = true
     cache_policy_id        = data.aws_cloudfront_cache_policy.caching_optimized.id
+    trusted_key_groups     = [aws_cloudfront_key_group.gallery.id]
+  }
+
+  ordered_cache_behavior {
+    path_pattern             = "/api/*"
+    target_origin_id         = local.gallery_api_origin_id
+    viewer_protocol_policy   = "redirect-to-https"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    cached_methods           = ["GET", "HEAD"]
+    compress                 = true
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.gallery_api.id
   }
 
   restrictions {

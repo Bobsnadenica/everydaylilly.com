@@ -15,6 +15,9 @@ auth_logout_urls = [
 
 archive_transition_days = 7
 gallery_month_prefix    = "months"
+gallery_test_prefix     = "test"
+gallery_public_base_url = "https://d111111abcdef8.cloudfront.net"
+gallery_signed_url_ttl_seconds = 300
 price_class             = "PriceClass_100"
 
 tags = {

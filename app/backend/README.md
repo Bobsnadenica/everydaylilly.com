@@ -11,12 +11,14 @@ The backend is split into two storage lanes:
 - `gallery` storage for a much smaller set of monthly images.
   This stays in a normal S3 bucket behind CloudFront so the website/app can load selected photos quickly after login.
 
-The root website currently has a login modal UI, but it is still a mockup.
-This backend scaffolding prepares the real pieces for turning that into a real sign-in flow:
+The root website now has a real Cognito-backed sign-in flow.
+This backend stack now owns the secure gallery access path:
 
 - Amazon Cognito user pool for authentication
 - private gallery bucket
 - CloudFront distribution in front of the gallery bucket
+- JWT-protected gallery manifest API
+- short-lived CloudFront signed URLs minted on demand
 
 ## Folder Layout
 
@@ -25,6 +27,10 @@ app/backend/
 ├── README.md
 └── live/
     └── prod/
+        ├── gallery_api.tf
+        ├── lambda/
+        │   └── gallery_manifest/
+        │       └── index.mjs
         ├── locals.tf
         ├── main.tf
         ├── outputs.tf
@@ -98,6 +104,11 @@ terraform init
 terraform apply
 ```
 
+Important for this stack:
+
+- set `gallery_public_base_url` in `terraform.tfvars` to the viewer-facing CloudFront base URL for the gallery, for example `https://d1fxhro74spn7q.cloudfront.net`
+- keep `gallery_month_prefix = "months"` and `gallery_test_prefix = "test"` aligned with your upload layout
+
 If this folder was previously initialized against the old S3 backend, do a one-time reinitialization before the next apply:
 
 - use `terraform init -migrate-state` if you want Terraform to pull the existing backend state down into local state
@@ -126,6 +137,7 @@ Current environment values and reference keys:
 - archive bucket: `everyday-lilly-vault-prod-archive-rnk3lm46`
 - gallery bucket: `everyday-lilly-vault-prod-gallery-rnk3lm46`
 - CloudFront domain: `d1fxhro74spn7q.cloudfront.net`
+- gallery manifest URL: `https://d1fxhro74spn7q.cloudfront.net/api/gallery/manifest`
 - gallery month prefix: `months`
 - example gallery object key: `months/0.jpg`
 - example same-series gallery object key: `months/11.jpg`
@@ -142,12 +154,13 @@ Suggested GitHub variable set for later frontend/app wiring:
 - `COGNITO_APP_CLIENT_ID=680v9kq2oue5323c6r63egrltg`
 - `COGNITO_HOSTED_UI_BASE_URL=https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com`
 - `GALLERY_CLOUDFRONT_DOMAIN=d1fxhro74spn7q.cloudfront.net`
+- `GALLERY_MANIFEST_URL=https://d1fxhro74spn7q.cloudfront.net/api/gallery/manifest`
 - `GALLERY_MONTH_PREFIX=months`
 
 ## Current Scope
 
-This first Terraform cut provisions the durable storage and auth foundation.
-The landing page is now wired into Cognito Hosted UI with a browser callback flow, and signed-in users are routed into the browser gallery. The gallery still does not mint signed image URLs/cookies.
+This stack is now intended to enforce gallery access through the backend.
+The browser gallery should no longer decide which collection is visible, and viewers should no longer load raw CloudFront object URLs directly.
 
 For the real website login, the safest first implementation is to use Cognito hosted UI rather than handling password challenges entirely inside the current custom modal. Hosted UI already handles flows like:
 
@@ -171,15 +184,18 @@ Until that is built end to end, the best-practice website behavior is:
 - send real sign-in, first-login password change, and forgot-password actions to Cognito hosted UI
 - return to your site only after Cognito finishes those flows
 
-The current gallery routing rules are:
+The backend gallery routing rules are:
 
-- standard accounts load images from `months/`
-- accounts in the Cognito group `test` load images from `test/`
-- accounts with a tag-like claim of `test` also load images from `test/`
-  Supported claim keys in the browser flow are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`
+- standard accounts receive signed URLs for `months/`
+- accounts in the Cognito group `test` receive signed URLs for `test/`
+- accounts with a tag-like claim of `test` also receive signed URLs for `test/`
+  Supported claim keys are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`
 
-That next step should likely be:
+The enforcement model is:
 
-1. decide whether the gallery will read from signed CloudFront cookies, signed URLs, or an app-backed proxy
-2. replace browser-side image probing with a small manifest or API response
-3. keep the `months/` and `test/` collections aligned with your upload conventions
+1. the browser signs in with Cognito Hosted UI
+2. the gallery page calls `GET /api/gallery/manifest` through CloudFront with a Cognito ID token
+3. API Gateway validates the JWT
+4. the Lambda manifest function decides the allowed prefix and lists the matching objects
+5. the Lambda uses AWS KMS plus a trusted CloudFront key group to mint short-lived signed URLs
+6. CloudFront serves photo objects only when the URL signature is valid

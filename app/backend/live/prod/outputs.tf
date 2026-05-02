@@ -13,6 +13,16 @@ output "gallery_cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.gallery.domain_name
 }
 
+output "gallery_manifest_url" {
+  description = "JWT-protected gallery manifest endpoint exposed through CloudFront."
+  value       = "${var.gallery_public_base_url}${local.gallery_manifest_path}"
+}
+
+output "gallery_manifest_api_direct_url" {
+  description = "Direct API Gateway URL for the gallery manifest endpoint."
+  value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${local.gallery_manifest_path}"
+}
+
 output "gallery_month_prefix" {
   description = "Prefix to use for the monthly gallery images."
   value       = var.gallery_month_prefix

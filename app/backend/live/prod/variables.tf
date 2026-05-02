@@ -43,6 +43,32 @@ variable "gallery_month_prefix" {
   default     = "months"
 }
 
+variable "gallery_test_prefix" {
+  description = "Prefix inside the gallery bucket for the test-only gallery files."
+  type        = string
+  default     = "test"
+}
+
+variable "gallery_public_base_url" {
+  description = "Public base URL that viewers use for the CloudFront gallery distribution."
+  type        = string
+}
+
+variable "gallery_signed_url_ttl_seconds" {
+  description = "Lifetime in seconds for the signed gallery image URLs returned by the backend."
+  type        = number
+  default     = 300
+}
+
+variable "gallery_api_allowed_origins" {
+  description = "Browser origins allowed to call the private gallery manifest API through CloudFront."
+  type        = list(string)
+  default = [
+    "https://www.everydaylilly.com",
+    "http://localhost:8000"
+  ]
+}
+
 variable "price_class" {
   description = "CloudFront price class."
   type        = string
