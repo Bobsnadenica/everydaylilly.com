@@ -19,6 +19,7 @@ The public site is still a static multi-page site intended for GitHub Pages styl
 - `auth/` contains the browser-side Cognito helper and callback page.
 - `gallery/` contains the signed-in photo gallery routes. It now includes an auto-router plus separate `months/` and `test/` experiences backed by the same manifest API.
 - `style.css` contains the shared visual layer for the main site.
+- `cleanup.sh` tears down the backend stack and removes local Terraform artifacts when you want to reset the environment.
 - `everyday_dandelion/`, `everyday_storage/`, and `everyday_stuff/` contain companion microsites and project pages.
 
 Important:
@@ -28,6 +29,7 @@ Important:
 - After login, users now land in the private gallery route that matches their Cognito-backed account type.
 - The backend, not the browser, decides whether that account can see the standard `months/` collection or the `test/` collection, and the frontend corrects the route if someone opens the wrong page directly.
 - Gallery images are still served from CloudFront, but the signed URLs are now bucketed for longer-lived browser caching instead of changing on every single manifest refresh.
+- Login abuse protection now lives mostly at the Cognito edge: username existence suppression stays enabled, Cognito keeps its built-in failed-password lockout, and AWS WAF quietly adds CAPTCHA plus temporary blocking for suspicious login bursts.
 - If the callback page shows `invalid_scope`, the deployed Cognito app client needs a fresh Terraform apply so its allowed scopes match the website code.
 
 ## Flutter App
@@ -52,6 +54,14 @@ That backend is currently designed around two storage paths:
 Auth now runs through Amazon Cognito Hosted UI, and the backend stack is responsible for enforcing who can actually read gallery photos.
 
 See `app/backend/README.md` for the backend-specific runbook.
+
+To tear the backend down from the repo root:
+
+```bash
+./cleanup.sh
+```
+
+Use `./cleanup.sh --yes` for a non-interactive destroy-and-clean run.
 
 ## Repository Structure
 

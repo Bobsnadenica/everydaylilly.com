@@ -19,6 +19,7 @@ This backend stack now owns the secure gallery access path:
 - CloudFront distribution in front of the gallery bucket
 - JWT-protected gallery manifest API
 - CloudFront signed URLs minted on demand in stable cache windows
+- AWS WAF on the Cognito user pool for quiet login abuse protection
 
 ## Folder Layout
 
@@ -108,6 +109,7 @@ Important for this stack:
 
 - set `gallery_public_base_url` in `terraform.tfvars` to the viewer-facing CloudFront base URL for the gallery, for example `https://d1fxhro74spn7q.cloudfront.net`
 - keep `gallery_month_prefix = "months"` and `gallery_test_prefix = "test"` aligned with your upload layout
+- tune the Cognito WAF thresholds only if you have real traffic data, because AWS WAF rate rules are burst protection rather than exact per-attempt counters
 
 If this folder was previously initialized against the old S3 backend, do a one-time reinitialization before the next apply:
 
@@ -162,6 +164,15 @@ Suggested GitHub variable set for later frontend/app wiring:
 This stack is now intended to enforce gallery access through the backend.
 The browser gallery should no longer decide which collection is visible, and viewers should no longer load raw CloudFront object URLs directly.
 
+For spam and brute-force protection, the stack now layers three controls:
+
+- `prevent_user_existence_errors = "ENABLED"` on the app client, so login responses do not reveal whether a user exists
+- Cognito's built-in password lockout behavior, which begins exponential lockouts after repeated failed password attempts
+- a regional AWS WAF web ACL attached directly to the Cognito user pool, with hidden CAPTCHA on suspicious login bursts and a stricter temporary block for heavier abuse
+
+Because Cognito managed login keeps password entry on the Cognito domain, AWS WAF is the right place to add a quiet CAPTCHA without advertising it in your own website UI.
+AWS WAF can't inspect usernames or passwords in Cognito requests, so its rules work on request patterns and rate rather than an exact "failed twice" counter.
+
 For the real website login, the safest first implementation is to use Cognito hosted UI rather than handling password challenges entirely inside the current custom modal. Hosted UI already handles flows like:
 
 - temporary-password first login
@@ -213,6 +224,21 @@ The current caching model is:
 - signed URLs are generated in stable time buckets instead of changing on every manifest request
 - the default TTL now targets a 7-day cache window for better browser reuse
 - if you replace an image under the same key and need it to show immediately, use a CloudFront invalidation or temporarily clear browser cache
+
+## Cleanup Script
+
+From the repo root, you can tear the backend down with:
+
+```bash
+./cleanup.sh
+```
+
+That script:
+
+- runs `terraform destroy` in `app/backend/live/prod`
+- removes local Terraform state files, plans, and the `.terraform/` working directory afterward
+
+Use `./cleanup.sh --yes` to skip the confirmation prompt.
 
 For the managed login website flow, keep the app client aligned with the browser code:
 

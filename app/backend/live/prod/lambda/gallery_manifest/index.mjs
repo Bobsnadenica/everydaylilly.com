@@ -42,9 +42,23 @@ function normalizeClaimValues(value) {
   }
 
   if (typeof value === "string") {
+    const trimmed = value.trim();
+
+    if (
+      (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
+      (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+      (trimmed.startsWith("\"") && trimmed.endsWith("\""))
+    ) {
+      try {
+        return normalizeClaimValues(JSON.parse(trimmed));
+      } catch (error) {
+        console.warn("Unable to parse structured claim string.", error);
+      }
+    }
+
     return value
       .split(/[\s,;|]+/)
-      .map((entry) => entry.trim().toLowerCase())
+      .map((entry) => entry.trim().toLowerCase().replace(/^[\[\]"']+|[\[\]"']+$/g, ""))
       .filter(Boolean);
   }
 
