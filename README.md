@@ -15,15 +15,16 @@ This repo now has three main concerns:
 The public site is still a static multi-page site intended for GitHub Pages style hosting.
 
 - `index.html` and `index-bg.html` are the main landing pages.
-- `script.js` powers shared interactions such as the screenshot lightbox, carousel behavior, language switching, and the current login modal UI.
+- `script.js` powers shared interactions such as the screenshot lightbox, carousel behavior, language switching, and the Cognito-backed login modal flow.
+- `auth/` contains the browser-side Cognito helper and callback page.
 - `style.css` contains the shared visual layer for the main site.
 - `everyday_dandelion/`, `everyday_storage/`, and `everyday_stuff/` contain companion microsites and project pages.
 
 Important:
 
 - The root landing page now includes a login/profile modal UI.
-- That UI is still a frontend mockup today.
-- Real authentication is intended to come from the backend stack in `app/backend/`.
+- The landing page now hands real sign-in over to Cognito Hosted UI and returns through `auth/callback.html`.
+- The private gallery experience is still the next step on top of that auth foundation.
 
 ## Flutter App
 
@@ -84,12 +85,13 @@ Notes:
 
 ### Backend workflow
 
-The Terraform flow is intentionally split:
+The Terraform stack now lives directly in:
 
-1. `app/backend/bootstrap/` creates the remote S3 state bucket.
-2. `app/backend/live/prod/` provisions the photo backend using that remote state bucket.
+- `app/backend/live/prod/`
 
+This repo does not rely on a Terraform-managed remote state bucket anymore.
 Do not commit `.tfstate` files to Git.
+If you previously created the old `everydaylilly` bootstrap bucket, it is no longer part of the repo workflow and can be deleted manually after you verify nothing still uses it.
 
 ## Content and Maintenance Notes
 

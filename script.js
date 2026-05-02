@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // === Utility Functions ===
     const query = selector => document.querySelector(selector);
     const queryAll = selector => document.querySelectorAll(selector);
@@ -256,24 +256,32 @@ document.addEventListener('keydown', e => {
 });
 
 // === Profile / Login Modal ===
+const auth = window.EverydayLillyAuth;
 const profileBtn = document.getElementById('profile-btn');
+const profileBtnText = document.getElementById('profile-btn-text');
 const loginModal = document.getElementById('login-modal');
 const modalClose = document.getElementById('modal-close');
 const modalBackdrop = document.getElementById('modal-backdrop');
 const loginForm = document.getElementById('login-form');
+const loginPanel = document.getElementById('login-panel');
+const accountPanel = document.getElementById('account-panel');
+const accountEmail = document.getElementById('account-email');
+const accountClose = document.getElementById('account-close');
+const accountSignout = document.getElementById('account-signout');
+const rememberMe = document.getElementById('remember-me');
+const forgotPasswordButton = document.querySelector('[data-login-placeholder="forgot-password"]');
 const loginSubmit = document.getElementById('login-submit');
-const togglePassword = document.getElementById('toggle-password');
-const loginPasswordInput = document.getElementById('login-password');
 const loginEmailInput = document.getElementById('login-email');
 const loginSubmitIdleLabel =
   loginSubmit?.dataset.idleText || loginSubmit?.textContent?.trim() || 'Sign In';
 const loginSubmitLoadingLabel =
-  loginSubmit?.dataset.loadingText || 'Signing in…';
-const showPasswordLabel =
-  togglePassword?.dataset.showLabel || 'Show password';
-const hidePasswordLabel =
-  togglePassword?.dataset.hideLabel || 'Hide password';
+  loginSubmit?.dataset.loadingText || 'Redirecting…';
+const signedOutProfileLabel =
+  profileBtn?.dataset.signedOutText || profileBtnText?.textContent?.trim() || 'Sign In';
+const signedInProfileLabel =
+  profileBtn?.dataset.signedInText || 'Vault';
 let lastFocusedElement = null;
+let currentAuthSession = null;
 
 function getLoginModalFocusableElements() {
     if (!loginModal) return [];
@@ -281,27 +289,50 @@ function getLoginModalFocusableElements() {
         .filter(element => element.offsetParent !== null);
 }
 
-function setPasswordToggleState(isPasswordVisible) {
-    if (!togglePassword) return;
+function setLoginMode(mode) {
+    if (loginPanel) {
+        loginPanel.style.display = mode === 'login' ? 'block' : 'none';
+    }
 
-    togglePassword.setAttribute(
-        'aria-label',
-        isPasswordVisible ? hidePasswordLabel : showPasswordLabel
-    );
+    if (accountPanel) {
+        accountPanel.style.display = mode === 'account' ? 'block' : 'none';
+    }
+}
 
-    const eyeIcon = document.getElementById('eye-icon');
-    if (eyeIcon) {
-        eyeIcon.innerHTML = isPasswordVisible
-            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+function updateProfileButton(session) {
+    if (!profileBtn || !profileBtnText) return;
+
+    if (session) {
+        profileBtnText.textContent = signedInProfileLabel;
+        profileBtn.setAttribute('aria-label', signedInProfileLabel);
+        return;
+    }
+
+    profileBtnText.textContent = signedOutProfileLabel;
+    profileBtn.setAttribute('aria-label', signedOutProfileLabel);
+}
+
+function renderAuthSession(session) {
+    currentAuthSession = session || null;
+    updateProfileButton(currentAuthSession);
+
+    if (accountEmail) {
+        accountEmail.textContent = currentAuthSession?.claims?.email || '';
     }
 }
 
 function openLoginModal() {
     lastFocusedElement = document.activeElement;
+    setLoginMode(currentAuthSession ? 'account' : 'login');
     loginModal.style.display = 'flex';
     loginModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+
+    if (currentAuthSession) {
+        accountClose?.focus();
+        return;
+    }
+
     loginEmailInput?.focus();
 }
 
@@ -309,38 +340,58 @@ function closeLoginModal() {
     loginModal.style.display = 'none';
     loginModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    if (loginPasswordInput) {
-        loginPasswordInput.type = 'password';
-        setPasswordToggleState(false);
-    }
+
+    setLoginMode('login');
+
     if (loginSubmit) {
         loginSubmit.textContent = loginSubmitIdleLabel;
         loginSubmit.style.background = '#10b981';
         loginSubmit.disabled = false;
     }
+
     lastFocusedElement?.focus?.();
+}
+
+async function beginHostedLogin() {
+    if (!auth || !loginSubmit) return;
+
+    loginSubmit.textContent = loginSubmitLoadingLabel;
+    loginSubmit.style.background = '#059669';
+    loginSubmit.disabled = true;
+
+    try {
+        await auth.startLogin({
+            loginHint: loginEmailInput?.value?.trim() || '',
+            remember: rememberMe?.checked,
+            returnTo: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        });
+    } catch (error) {
+        console.error(error);
+        loginSubmit.textContent = loginSubmitIdleLabel;
+        loginSubmit.style.background = '#10b981';
+        loginSubmit.disabled = false;
+    }
 }
 
 profileBtn?.addEventListener('click', openLoginModal);
 modalClose?.addEventListener('click', closeLoginModal);
 modalBackdrop?.addEventListener('click', closeLoginModal);
+accountClose?.addEventListener('click', closeLoginModal);
 
-togglePassword?.addEventListener('click', () => {
-    const isPassword = loginPasswordInput.type === 'password';
-    loginPasswordInput.type = isPassword ? 'text' : 'password';
-    setPasswordToggleState(isPassword);
+accountSignout?.addEventListener('click', () => {
+    if (!auth) return;
+
+    accountSignout.disabled = true;
+    auth.signOut();
 });
 
-loginForm?.addEventListener('submit', e => {
+loginForm?.addEventListener('submit', async e => {
     e.preventDefault();
-    if (!loginSubmit) return;
-    loginSubmit.textContent = loginSubmitLoadingLabel;
-    loginSubmit.style.background = '#059669';
-    loginSubmit.disabled = true;
-    setTimeout(() => {
-        loginSubmit.disabled = false;
-        closeLoginModal();
-    }, 1800);
+    await beginHostedLogin();
+});
+
+forgotPasswordButton?.addEventListener('click', async () => {
+    await beginHostedLogin();
 });
 
 document.addEventListener('keydown', e => {
@@ -371,6 +422,6 @@ document.addEventListener('keydown', e => {
     }
 });
 
-setPasswordToggleState(false);
+renderAuthSession(auth ? await auth.getSession() : null);
 updateCarousel();
 });

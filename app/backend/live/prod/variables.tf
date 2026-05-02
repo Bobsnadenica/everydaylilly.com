@@ -16,11 +16,6 @@ variable "environment" {
   default     = "prod"
 }
 
-variable "site_base_url" {
-  description = "Main public website URL."
-  type        = string
-}
-
 variable "auth_callback_urls" {
   description = "Allowed Cognito callback URLs."
   type        = list(string)
@@ -39,11 +34,11 @@ variable "cognito_domain_prefix" {
 variable "archive_transition_days" {
   description = "Days before archive uploads transition to DEEP_ARCHIVE."
   type        = number
-  default     = 1
+  default     = 7
 }
 
 variable "gallery_month_prefix" {
-  description = "Prefix inside the gallery bucket for the selected monthly photos."
+  description = "Prefix inside the gallery bucket for the flat numeric gallery files."
   type        = string
   default     = "months"
 }

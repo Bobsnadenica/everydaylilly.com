@@ -19,8 +19,13 @@ output "gallery_month_prefix" {
 }
 
 output "gallery_month_example_object_key" {
-  description = "Example gallery object key."
-  value       = "${var.gallery_month_prefix}/01.jpg"
+  description = "Example gallery object key under the flat numeric naming convention."
+  value       = "${var.gallery_month_prefix}/0.jpg"
+}
+
+output "gallery_month_extra_example_object_key" {
+  description = "Example extra gallery object key for the same custom month grouping."
+  value       = "${var.gallery_month_prefix}/11.jpg"
 }
 
 output "cognito_user_pool_id" {

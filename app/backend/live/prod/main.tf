@@ -246,19 +246,29 @@ resource "aws_s3_bucket_policy" "gallery" {
 resource "aws_cognito_user_pool" "gallery" {
   name                = "${local.prefix}-users"
   username_attributes = ["email"]
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 
   auto_verified_attributes = ["email"]
+
+  username_configuration {
+    case_sensitive = false
+  }
 
   admin_create_user_config {
     allow_admin_create_user_only = true
   }
 
   password_policy {
-    minimum_length                   = 14
+    minimum_length                   = 8
     require_lowercase                = true
     require_numbers                  = true
-    require_symbols                  = true
-    require_uppercase                = true
+    require_symbols                  = false
+    require_uppercase                = false
     temporary_password_validity_days = 7
   }
 }

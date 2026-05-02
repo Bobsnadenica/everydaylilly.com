@@ -37,18 +37,20 @@
         }
     </style>
 </head>
-<body class="text-gray-800 font-sans">
+<body class="text-gray-800 font-sans"
+      data-auth-base-url="https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com"
+      data-auth-client-id="680v9kq2oue5323c6r63egrltg">
 
     <nav class="sticky-nav transition duration-300 hidden md:block" role="navigation" aria-label="Основна навигация">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="font-display text-2xl font-bold text-gray-900">Всеки ден Лили</a>
             <div class="flex items-center space-x-6 text-sm font-medium">
-                <button id="profile-btn" type="button" aria-label="Влизане" style="display:flex; align-items:center; gap:0.375rem; background:#10b981; color:white; border:none; cursor:pointer; border-radius:9999px; padding:0.375rem 1rem; font-size:0.875rem; font-weight:600; font-family:inherit; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                <button id="profile-btn" type="button" aria-label="Влизане" data-signed-out-text="Влез" data-signed-in-text="Vault" style="display:flex; align-items:center; gap:0.375rem; background:#10b981; color:white; border:none; cursor:pointer; border-radius:9999px; padding:0.375rem 1rem; font-size:0.875rem; font-weight:600; font-family:inherit; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
-                    Влез
+                    <span id="profile-btn-text">Влез</span>
                 </button>
                 <a href="#features" class="text-gray-600 hover:text-emerald-600 transition">Функции</a>
                 <a href="#how-it-works" class="text-gray-600 hover:text-emerald-600 transition">Как работи</a>
@@ -376,83 +378,58 @@
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
                 </div>
-                <h2 id="login-modal-title" style="font-size:1.5rem; font-weight:700; color:white; margin:0 0 0.25rem; font-family:'Playfair Display',serif; letter-spacing:-0.01em;">Добре дошли</h2>
-                <p style="font-size:0.8125rem; color:rgba(255,255,255,0.82); margin:0;">Влезте в Lilly's Vault</p>
+                <h2 id="login-modal-title" style="font-size:1.5rem; font-weight:700; color:white; margin:0 0 0.25rem; font-family:'Playfair Display',serif; letter-spacing:-0.01em;">Lilly's Vault</h2>
+                <p style="font-size:0.8125rem; color:rgba(255,255,255,0.82); margin:0;">Продължете към защитения ни вход през Cognito</p>
             </div>
 
             <div style="padding:1.75rem 2rem 2rem;">
-                <form id="login-form" style="display:flex; flex-direction:column; gap:1rem;">
-                    <div>
-                        <label for="login-email" style="display:block; font-size:0.8125rem; font-weight:600; color:#374151; margin-bottom:0.375rem;">Имейл адрес</label>
-                        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"
-                               style="width:100%; padding:0.75rem 1rem; border:1.5px solid #e5e7eb; border-radius:0.625rem; font-size:0.875rem; outline:none; transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box; font-family:inherit; color:#111827; background:#f9fafb;"
-                               onfocus="this.style.borderColor='#10b981'; this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.12)'; this.style.background='white';"
-                               onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'; this.style.background='#f9fafb';">
-                    </div>
-                    <div>
-                        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.375rem;">
-                            <label for="login-password" style="font-size:0.8125rem; font-weight:600; color:#374151;">Парола</label>
-                            <button type="button" data-login-placeholder="forgot-password" style="font-size:0.75rem; color:#10b981; text-decoration:none; font-weight:500; background:none; border:none; cursor:pointer; padding:0;" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#10b981'">Забравена парола?</button>
-                        </div>
-                        <div style="position:relative;">
-                            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"
-                                   style="width:100%; padding:0.75rem 3rem 0.75rem 1rem; border:1.5px solid #e5e7eb; border-radius:0.625rem; font-size:0.875rem; outline:none; transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box; font-family:inherit; color:#111827; background:#f9fafb;"
+                <div id="login-panel">
+                    <form id="login-form" style="display:flex; flex-direction:column; gap:1rem;">
+                        <div>
+                            <label for="login-email" style="display:block; font-size:0.8125rem; font-weight:600; color:#374151; margin-bottom:0.375rem;">Имейл адрес</label>
+                            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"
+                                   style="width:100%; padding:0.75rem 1rem; border:1.5px solid #e5e7eb; border-radius:0.625rem; font-size:0.875rem; outline:none; transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box; font-family:inherit; color:#111827; background:#f9fafb;"
                                    onfocus="this.style.borderColor='#10b981'; this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.12)'; this.style.background='white';"
                                    onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'; this.style.background='#f9fafb';">
-                            <button type="button" id="toggle-password" aria-label="Покажи паролата" data-show-label="Покажи паролата" data-hide-label="Скрий паролата"
-                                    style="position:absolute; right:0.875rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#9ca3af; padding:0; display:flex; align-items:center; line-height:0;"
-                                    onmouseover="this.style.color='#6b7280'" onmouseout="this.style.color='#9ca3af'">
-                                <svg id="eye-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
+                            <p style="font-size:0.75rem; line-height:1.5; color:#6b7280; margin:0.5rem 0 0;">Използваме имейла само като подсказка, а стъпката с паролата минава през Cognito Hosted UI.</p>
                         </div>
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; user-select:none; margin-top:-0.125rem;">
+                            <input type="checkbox" id="remember-me" style="width:1rem; height:1rem; accent-color:#10b981; cursor:pointer; flex-shrink:0;">
+                            <span style="font-size:0.8125rem; color:#6b7280;">Запомни ме на това устройство</span>
+                        </label>
+                        <button id="login-submit" type="submit" data-idle-text="Продължи сигурно" data-loading-text="Пренасочване…"
+                                style="width:100%; background:#10b981; color:white; font-weight:600; padding:0.8125rem; border:none; border-radius:0.625rem; cursor:pointer; font-size:0.9375rem; transition:background-color 0.2s, transform 0.1s; font-family:inherit; letter-spacing:0.01em; margin-top:0.125rem;"
+                                onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'"
+                                onmousedown="this.style.transform='scale(0.985)'" onmouseup="this.style.transform='scale(1)'">
+                            Продължи сигурно
+                        </button>
+                    </form>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap; margin:1rem 0 0;">
+                        <button type="button" data-login-placeholder="forgot-password" style="font-size:0.75rem; color:#10b981; text-decoration:none; font-weight:500; background:none; border:none; cursor:pointer; padding:0;" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#10b981'">Забравена парола?</button>
+                        <span style="font-size:0.75rem; color:#6b7280;">Първоначалната смяна на парола продължава на защитената страница.</span>
                     </div>
-                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; user-select:none; margin-top:-0.125rem;">
-                        <input type="checkbox" id="remember-me" style="width:1rem; height:1rem; accent-color:#10b981; cursor:pointer; flex-shrink:0;">
-                        <span style="font-size:0.8125rem; color:#6b7280;">Запомни ме за 30 дни</span>
-                    </label>
-                    <button id="login-submit" type="submit" data-idle-text="Влез" data-loading-text="Влизане…"
-                            style="width:100%; background:#10b981; color:white; font-weight:600; padding:0.8125rem; border:none; border-radius:0.625rem; cursor:pointer; font-size:0.9375rem; transition:background-color 0.2s, transform 0.1s; font-family:inherit; letter-spacing:0.01em; margin-top:0.125rem;"
-                            onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'"
-                            onmousedown="this.style.transform='scale(0.985)'" onmouseup="this.style.transform='scale(1)'">
-                        Влез
-                    </button>
-                </form>
 
-                <div style="display:flex; align-items:center; margin:1.25rem 0; gap:0.75rem;">
-                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
-                    <span style="font-size:0.75rem; color:#9ca3af; font-weight:500; white-space:nowrap;">или продължи с</span>
-                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                    <p style="font-size:0.8125rem; color:#6b7280; margin:1.1rem 0 0;">
+                        Достъпът до Vault засега е само с покана.
+                        <a href="mailto:contactus@everydaylilly.com?subject=Lilly%27s%20Vault%20access" style="color:#10b981; font-weight:600; text-decoration:none;" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#10b981'">Заяви достъп</a>
+                    </p>
                 </div>
 
-                <div style="display:flex; gap:0.75rem;">
-                    <button type="button" style="flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.6875rem 0.75rem; border:1.5px solid #e5e7eb; border-radius:0.625rem; background:white; cursor:pointer; font-size:0.8125rem; font-weight:500; color:#374151; font-family:inherit; transition:border-color 0.2s, background 0.2s;" onmouseover="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
-                        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Google
-                    </button>
-                    <button type="button" style="flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.6875rem 0.75rem; border:1.5px solid #e5e7eb; border-radius:0.625rem; background:white; cursor:pointer; font-size:0.8125rem; font-weight:500; color:#374151; font-family:inherit; transition:border-color 0.2s, background 0.2s;" onmouseover="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white'">
-                        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
-                            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.54 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
-                        </svg>
-                        Apple
-                    </button>
+                <div id="account-panel" style="display:none;">
+                    <p style="font-size:1rem; font-weight:700; color:#111827; margin:0;">Влезли сте успешно</p>
+                    <p style="font-size:0.8125rem; line-height:1.6; color:#6b7280; margin:0.625rem 0 0;">Защитената ви сесия за Lilly's Vault е активна. Следващата стъпка е да свържем частната месечна галерия върху този вход.</p>
+                    <p style="font-size:0.8125rem; color:#374151; margin:1rem 0 0;">Влезли сте като <strong id="account-email"></strong></p>
+                    <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
+                        <button id="account-close" type="button" style="flex:1; padding:0.75rem 0.9rem; border:1.5px solid #d1d5db; border-radius:0.625rem; background:white; color:#374151; font-weight:600; cursor:pointer; font-size:0.875rem; font-family:inherit;">Затвори</button>
+                        <button id="account-signout" type="button" style="flex:1; padding:0.75rem 0.9rem; border:none; border-radius:0.625rem; background:#111827; color:white; font-weight:600; cursor:pointer; font-size:0.875rem; font-family:inherit;">Изход</button>
+                    </div>
                 </div>
-
-                <p style="text-align:center; font-size:0.8125rem; color:#6b7280; margin:1.25rem 0 0;">
-                    Нямате акаунт?
-                    <button type="button" data-login-placeholder="sign-up" style="color:#10b981; font-weight:600; text-decoration:none; background:none; border:none; cursor:pointer; padding:0;" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#10b981'">Регистрирайте се</button>
-                </p>
             </div>
         </div>
     </div>
 
+    <script src="auth/auth.js" defer></script>
     <script src="script.js" defer></script>
 </body>
 </html>
