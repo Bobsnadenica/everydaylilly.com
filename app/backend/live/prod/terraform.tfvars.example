@@ -1,0 +1,23 @@
+aws_region            = "eu-central-1"
+project_slug          = "everyday-lilly-vault"
+environment           = "prod"
+site_base_url         = "https://www.everydaylilly.com"
+cognito_domain_prefix = "everyday-lilly-vault-prod-example"
+
+auth_callback_urls = [
+  "https://www.everydaylilly.com/auth/callback.html",
+  "http://localhost:8000/auth/callback.html"
+]
+
+auth_logout_urls = [
+  "https://www.everydaylilly.com/",
+  "http://localhost:8000/"
+]
+
+archive_transition_days = 1
+gallery_month_prefix    = "months"
+price_class             = "PriceClass_100"
+
+tags = {
+  Owner = "your-name"
+}

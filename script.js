@@ -264,19 +264,61 @@ const loginForm = document.getElementById('login-form');
 const loginSubmit = document.getElementById('login-submit');
 const togglePassword = document.getElementById('toggle-password');
 const loginPasswordInput = document.getElementById('login-password');
+const loginEmailInput = document.getElementById('login-email');
+const loginSubmitIdleLabel =
+  loginSubmit?.dataset.idleText || loginSubmit?.textContent?.trim() || 'Sign In';
+const loginSubmitLoadingLabel =
+  loginSubmit?.dataset.loadingText || 'Signing in…';
+const showPasswordLabel =
+  togglePassword?.dataset.showLabel || 'Show password';
+const hidePasswordLabel =
+  togglePassword?.dataset.hideLabel || 'Hide password';
+let lastFocusedElement = null;
+
+function getLoginModalFocusableElements() {
+    if (!loginModal) return [];
+    return [...loginModal.querySelectorAll('button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')]
+        .filter(element => element.offsetParent !== null);
+}
+
+function setPasswordToggleState(isPasswordVisible) {
+    if (!togglePassword) return;
+
+    togglePassword.setAttribute(
+        'aria-label',
+        isPasswordVisible ? hidePasswordLabel : showPasswordLabel
+    );
+
+    const eyeIcon = document.getElementById('eye-icon');
+    if (eyeIcon) {
+        eyeIcon.innerHTML = isPasswordVisible
+            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+}
 
 function openLoginModal() {
+    lastFocusedElement = document.activeElement;
     loginModal.style.display = 'flex';
-    document.getElementById('login-email')?.focus();
+    loginModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    loginEmailInput?.focus();
 }
 
 function closeLoginModal() {
     loginModal.style.display = 'none';
+    loginModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (loginPasswordInput) {
+        loginPasswordInput.type = 'password';
+        setPasswordToggleState(false);
+    }
     if (loginSubmit) {
-        loginSubmit.textContent = 'Sign In';
+        loginSubmit.textContent = loginSubmitIdleLabel;
         loginSubmit.style.background = '#10b981';
         loginSubmit.disabled = false;
     }
+    lastFocusedElement?.focus?.();
 }
 
 profileBtn?.addEventListener('click', openLoginModal);
@@ -286,18 +328,13 @@ modalBackdrop?.addEventListener('click', closeLoginModal);
 togglePassword?.addEventListener('click', () => {
     const isPassword = loginPasswordInput.type === 'password';
     loginPasswordInput.type = isPassword ? 'text' : 'password';
-    const eyeIcon = document.getElementById('eye-icon');
-    if (eyeIcon) {
-        eyeIcon.innerHTML = isPassword
-            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    }
+    setPasswordToggleState(isPassword);
 });
 
 loginForm?.addEventListener('submit', e => {
     e.preventDefault();
     if (!loginSubmit) return;
-    loginSubmit.textContent = 'Signing in…';
+    loginSubmit.textContent = loginSubmitLoadingLabel;
     loginSubmit.style.background = '#059669';
     loginSubmit.disabled = true;
     setTimeout(() => {
@@ -307,8 +344,33 @@ loginForm?.addEventListener('submit', e => {
 });
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && loginModal?.style.display === 'flex') closeLoginModal();
+    if (loginModal?.style.display !== 'flex') return;
+
+    if (e.key === 'Escape') {
+        closeLoginModal();
+        return;
+    }
+
+    if (e.key !== 'Tab') return;
+
+    const focusable = getLoginModalFocusableElements();
+    if (!focusable.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+        return;
+    }
+
+    if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+    }
 });
 
+setPasswordToggleState(false);
 updateCarousel();
 });

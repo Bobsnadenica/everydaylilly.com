@@ -1,0 +1,6 @@
+aws_region                  = "eu-central-1"
+terraform_state_bucket_name = "everyday-lilly-terraform-state-example"
+
+tags = {
+  Owner = "your-name"
+}

@@ -1,0 +1,12 @@
+.DS_Store
+**/.DS_Store
+
+app/backend/**/.terraform/
+app/backend/**/.terraform.lock.hcl
+app/backend/**/*.tfstate
+app/backend/**/*.tfstate.*
+app/backend/**/crash.log
+app/backend/**/terraform.tfvars
+app/backend/**/terraform.tfvars.json
+app/backend/**/*.tfplan
+app/backend/**/plan.out

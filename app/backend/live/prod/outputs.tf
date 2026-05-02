@@ -1,0 +1,44 @@
+output "archive_bucket_name" {
+  description = "Bucket for the full long-term photo library."
+  value       = aws_s3_bucket.archive.bucket
+}
+
+output "gallery_bucket_name" {
+  description = "Private bucket that holds the selected monthly gallery photos."
+  value       = aws_s3_bucket.gallery.bucket
+}
+
+output "gallery_cloudfront_domain_name" {
+  description = "CloudFront domain for the fast-access gallery."
+  value       = aws_cloudfront_distribution.gallery.domain_name
+}
+
+output "gallery_month_prefix" {
+  description = "Prefix to use for the monthly gallery images."
+  value       = var.gallery_month_prefix
+}
+
+output "gallery_month_example_object_key" {
+  description = "Example gallery object key."
+  value       = "${var.gallery_month_prefix}/01.jpg"
+}
+
+output "cognito_user_pool_id" {
+  description = "Cognito user pool id."
+  value       = aws_cognito_user_pool.gallery.id
+}
+
+output "cognito_app_client_id" {
+  description = "Cognito web app client id."
+  value       = aws_cognito_user_pool_client.gallery.id
+}
+
+output "cognito_hosted_ui_base_url" {
+  description = "Base URL for Cognito hosted UI."
+  value       = "https://${aws_cognito_user_pool_domain.gallery.domain}.auth.${var.aws_region}.amazoncognito.com"
+}
+
+output "cognito_hosted_ui_login_url" {
+  description = "Direct login URL for the hosted UI."
+  value       = "https://${aws_cognito_user_pool_domain.gallery.domain}.auth.${var.aws_region}.amazoncognito.com/login?client_id=${aws_cognito_user_pool_client.gallery.id}&response_type=code&scope=openid+email+profile&redirect_uri=${urlencode(var.auth_callback_urls[0])}"
+}
