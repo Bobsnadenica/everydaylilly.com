@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         galleryTitle: query('section:nth-of-type(2) h2'),
         galleryText: query('section:nth-of-type(2) p'),
         langSwitcher: query('#language-switcher'),
-        btnEn: query('#lang-en'),
-        btnBg: query('#lang-bg'),
+        btnEn: queryAll('#lang-en, #lang-en-mobile'),
+        btnBg: queryAll('#lang-bg, #lang-bg-mobile'),
         galleryItems: queryAll('.gallery-item'),
         galleryContainer: query('.gallery-container'),
         dotsContainer: query('.gallery-dots'),
@@ -43,12 +43,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     } else {
-        if (elements.btnEn) {
-            elements.btnEn.addEventListener('click', () => window.location.href = 'index.html');
-        }
-        if (elements.btnBg) {
-            elements.btnBg.addEventListener('click', () => window.location.href = 'index-bg.html');
-        }
+        elements.btnEn.forEach(button => {
+            button.addEventListener('click', () => window.location.href = 'index.html');
+        });
+        elements.btnBg.forEach(button => {
+            button.addEventListener('click', () => window.location.href = 'index-bg.html');
+        });
     }
 
     // === Lightbox Setup ===
@@ -257,8 +257,8 @@ document.addEventListener('keydown', e => {
 
 // === Profile / Login Modal ===
 const auth = window.EverydayLillyAuth;
-const profileBtn = document.getElementById('profile-btn');
-const profileBtnText = document.getElementById('profile-btn-text');
+const profileButtons = [...document.querySelectorAll('[data-profile-trigger]')];
+const profileLabels = [...document.querySelectorAll('[data-profile-label]')];
 const loginModal = document.getElementById('login-modal');
 const modalClose = document.getElementById('modal-close');
 const modalBackdrop = document.getElementById('modal-backdrop');
@@ -277,9 +277,9 @@ const loginSubmitIdleLabel =
 const loginSubmitLoadingLabel =
   loginSubmit?.dataset.loadingText || 'Redirecting…';
 const signedOutProfileLabel =
-  profileBtn?.dataset.signedOutText || profileBtnText?.textContent?.trim() || 'Sign In';
+  profileButtons[0]?.dataset.signedOutText || profileLabels[0]?.textContent?.trim() || 'Sign In';
 const signedInProfileLabel =
-  profileBtn?.dataset.signedInText || 'Vault';
+  profileButtons[0]?.dataset.signedInText || 'Vault';
 let lastFocusedElement = null;
 let currentAuthSession = null;
 
@@ -300,16 +300,24 @@ function setLoginMode(mode) {
 }
 
 function updateProfileButton(session) {
-    if (!profileBtn || !profileBtnText) return;
+    if (!profileButtons.length || !profileLabels.length) return;
 
     if (session) {
-        profileBtnText.textContent = signedInProfileLabel;
-        profileBtn.setAttribute('aria-label', signedInProfileLabel);
+        profileLabels.forEach(label => {
+            label.textContent = signedInProfileLabel;
+        });
+        profileButtons.forEach(button => {
+            button.setAttribute('aria-label', signedInProfileLabel);
+        });
         return;
     }
 
-    profileBtnText.textContent = signedOutProfileLabel;
-    profileBtn.setAttribute('aria-label', signedOutProfileLabel);
+    profileLabels.forEach(label => {
+        label.textContent = signedOutProfileLabel;
+    });
+    profileButtons.forEach(button => {
+        button.setAttribute('aria-label', signedOutProfileLabel);
+    });
 }
 
 function renderAuthSession(session) {
@@ -378,7 +386,9 @@ async function beginHostedLogin() {
     }
 }
 
-profileBtn?.addEventListener('click', openLoginModal);
+profileButtons.forEach(button => {
+    button.addEventListener('click', openLoginModal);
+});
 modalClose?.addEventListener('click', closeLoginModal);
 modalBackdrop?.addEventListener('click', closeLoginModal);
 accountClose?.addEventListener('click', closeLoginModal);

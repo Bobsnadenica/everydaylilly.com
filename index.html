@@ -45,12 +45,12 @@
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="font-display text-2xl font-bold text-gray-900">Everyday Lilly</a>
             <div class="flex items-center space-x-6 text-sm font-medium">
-                <button id="profile-btn" type="button" aria-label="Sign in" data-signed-out-text="Sign In" data-signed-in-text="Vault" style="display:flex; align-items:center; gap:0.375rem; background:#10b981; color:white; border:none; cursor:pointer; border-radius:9999px; padding:0.375rem 1rem; font-size:0.875rem; font-weight:600; font-family:inherit; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                <button data-profile-trigger type="button" aria-label="Sign in" data-signed-out-text="Sign In" data-signed-in-text="Vault" style="display:flex; align-items:center; gap:0.375rem; background:#10b981; color:white; border:none; cursor:pointer; border-radius:9999px; padding:0.375rem 1rem; font-size:0.875rem; font-weight:600; font-family:inherit; transition:background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
-                    <span id="profile-btn-text">Sign In</span>
+                    <span data-profile-label>Sign In</span>
                 </button>
                 <a href="#features" class="text-gray-600 hover:text-emerald-600 transition">Features</a>
                 <a href="#how-it-works" class="text-gray-600 hover:text-emerald-600 transition">How it Works</a>
@@ -89,6 +89,47 @@
             </div>
         </div>
     </nav>
+
+    <div class="sticky-nav md:hidden" role="navigation" aria-label="Mobile navigation">
+        <div class="px-4 py-3 flex items-center justify-between gap-3">
+            <a href="#" class="font-display text-xl font-bold text-gray-900">Everyday Lilly</a>
+            <div class="flex items-center gap-2">
+                <button data-profile-trigger type="button" aria-label="Sign in" data-signed-out-text="Sign In" data-signed-in-text="Vault" style="display:flex; align-items:center; gap:0.35rem; background:#10b981; color:white; border:none; cursor:pointer; border-radius:9999px; padding:0.45rem 0.9rem; font-size:0.8125rem; font-weight:600; font-family:inherit;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span data-profile-label>Sign In</span>
+                </button>
+                <button id="lang-en-mobile" aria-label="Switch to English language" class="w-8 h-8 rounded overflow-hidden border-2 border-gray-200 hover:border-emerald-400 transition">
+                    <svg viewBox="0 0 60 30" width="30" height="30" role="img" aria-labelledby="flag-en-title-mobile">
+                        <title id="flag-en-title-mobile">United States Flag</title>
+                        <rect width="60" height="30" fill="#b22234"/>
+                        <g fill="#fff">
+                            <rect y="3" width="60" height="3"/>
+                            <rect y="9" width="60" height="3"/>
+                            <rect y="15" width="60" height="3"/>
+                            <rect y="21" width="60" height="3"/>
+                            <rect y="27" width="60" height="3"/>
+                        </g>
+                        <rect width="24" height="14" fill="#3c3b6e"/>
+                        <g fill="#fff">
+                            <circle cx="2" cy="2" r="1"/><circle cx="6" cy="2" r="1"/><circle cx="10" cy="2" r="1"/><circle cx="14" cy="2" r="1"/><circle cx="18" cy="2" r="1"/><circle cx="22" cy="2" r="1"/>
+                            <circle cx="4" cy="4" r="1"/><circle cx="8" cy="4" r="1"/><circle cx="12" cy="4" r="1"/><circle cx="16" cy="4" r="1"/><circle cx="20" cy="4" r="1"/>
+                        </g>
+                    </svg>
+                </button>
+                <button id="lang-bg-mobile" aria-label="Switch to Bulgarian language" class="w-8 h-8 rounded overflow-hidden border-2 border-gray-200 hover:border-emerald-400 transition">
+                    <svg viewBox="0 0 3 2" width="30" height="30" role="img" aria-labelledby="flag-bg-title-mobile">
+                        <title id="flag-bg-title-mobile">Bulgarian Flag</title>
+                        <rect width="3" height="2" fill="#fff"/>
+                        <rect y="0.666" width="3" height="0.666" fill="#00966e"/>
+                        <rect y="1.333" width="3" height="0.667" fill="#d62612"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <header role="banner" class="hero-section relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" style="background-image: url('images/hero.jpg');">
         <div class="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
