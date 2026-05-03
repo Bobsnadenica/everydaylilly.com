@@ -743,7 +743,7 @@
     }
 
     button.disabled = isRefreshing;
-    button.textContent = isRefreshing ? "Refreshing gallery..." : "Manual refresh";
+    button.textContent = isRefreshing ? "Опресняване..." : "Ръчно опресняване";
   }
 
   function applyCollectionCopy(collection, manifest, state) {
@@ -947,7 +947,7 @@
       writeRefreshToken(state.actualCollection, state.refreshToken);
 
       if (status) {
-        status.textContent = "Manually refreshing the gallery cache and fetching fresh CloudFront URLs.";
+        status.textContent = "Ръчно опресняване на кеша и извличане на пресни CloudFront връзки.";
       }
 
       await loadManifest({ manualRefresh: true });
