@@ -7,13 +7,21 @@ data "archive_file" "gallery_manifest_lambda" {
 resource "aws_cloudfront_public_key" "local_signer" {
   comment     = "Public key for ${local.prefix} gallery signed URLs."
   encoded_key = file("${path.module}/lambda/gallery_manifest/gallery_public_key.pem")
-  name        = "${local.prefix}-gallery-v4-signer"
+  name        = "${local.prefix}-gallery-v5-signer"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_cloudfront_key_group" "local_signer" {
   comment = "Trusted key group for ${local.prefix} gallery signed URLs."
   items   = [aws_cloudfront_public_key.local_signer.id]
-  name    = "${local.prefix}-gallery-v4-key-group"
+  name    = "${local.prefix}-gallery-v5-key-group"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_cloudfront_origin_request_policy" "gallery_api" {

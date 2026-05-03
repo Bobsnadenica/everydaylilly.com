@@ -10,3 +10,6 @@ app/backend/**/terraform.tfvars
 app/backend/**/terraform.tfvars.json
 app/backend/**/*.tfplan
 app/backend/**/plan.out
+
+# Security: Never commit private keys or certificates
+*.pem
