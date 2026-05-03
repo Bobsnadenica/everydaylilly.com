@@ -92,14 +92,15 @@
   function buildMonthGroups(photos) {
     const groups = new Map();
 
+    for (let i = 0; i < 12; i++) {
+      groups.set(i, []);
+    }
+
     [...photos].sort(compareMonthsPhotos).forEach((photo) => {
       const bucket = getMonthBucket(photo);
-
-      if (!groups.has(bucket)) {
-        groups.set(bucket, []);
+      if (bucket >= 0 && bucket < 12) {
+        groups.get(bucket).push(photo);
       }
-
-      groups.get(bucket).push(photo);
     });
 
     return [...groups.entries()].map(([month, items]) => ({ month, items }));
@@ -279,68 +280,63 @@
     `;
   }
 
-  function renderMonthsGallery(content, manifest, visiblePhotos) {
-    const groups = buildMonthGroups(visiblePhotos);
-    const heroPhotos = manifest.heroPhotos || [];
-    const currentMonth = new Date().getMonth();
+  function renderMonthOverview(content, state) {
+    const photos = state.manifest.photos || [];
+    const groups = buildMonthGroups(photos);
 
-    const heroPhoto = heroPhotos.find((photo) => {
-      const stem = getPhotoStem(photo);
-      return Number.parseInt(stem, 10) === currentMonth;
-    });
-
-    const heroMarkup = heroPhoto
-      ? `
-        <div class="gallery-hero-lane">
-          <div class="gallery-hero-frame">
-            <img src="${escapeHtml(heroPhoto.url)}" alt="Month Hero" class="gallery-hero-img">
-            <div class="gallery-hero-content">
-              <span class="gallery-hero-kicker">Current Month Highlight</span>
-              <h2 class="gallery-hero-title">Month ${currentMonth}</h2>
-            </div>
-          </div>
-        </div>
-      `
-      : "";
-
-    content.className = "months-stack";
-    const groupsMarkup = groups
-      .map(({ month, items }, groupIndex) => {
-        const cards = items
-          .map((photo, photoIndex) =>
-            buildPhotoCardMarkup(photo, {
-              title: `Month ${month} · ${getPhotoStem(photo)}`,
-              caption: photo.key,
-              priority: groupIndex === 0 && photoIndex === 0,
-            })
-          )
-          .join("");
-
-        const plural = items.length === 1 ? "memory" : "memories";
+    content.className = "calendar-grid";
+    content.innerHTML = groups
+      .map(({ month, items }) => {
+        const hero = items.find(p => getPhotoStem(p) === String(month)) || items[0];
+        const count = items.length;
+        const hasPhotos = count > 0;
 
         return `
-          <section class="month-panel">
-            <div class="month-header">
-              <div>
-                <span class="month-kicker">Calendar lane</span>
-                <h2 class="month-title">Month ${escapeHtml(month)}</h2>
-                <p class="month-note">Numeric names stay in your custom order, so 0 comes first, then 1, 11, and the rest of that month lane.</p>
-              </div>
-              <p class="month-count">${items.length} ${plural}</p>
+          <div class="calendar-card ${hasPhotos ? "is-clickable" : "is-empty"}" 
+               ${hasPhotos ? `data-month-trigger="${month}"` : ""}
+               role="button" 
+               aria-label="Month ${month}, ${count} memories">
+            <div class="calendar-card-media">
+              ${hero ? buildMediaMarkup(hero, `Month ${month}`, false) : '<div class="calendar-card-placeholder"><span>No photos</span></div>'}
             </div>
-            <div class="month-grid">${cards}</div>
-          </section>
+            <div class="calendar-card-info">
+              <span class="calendar-card-number">${month}</span>
+              <span class="calendar-card-count">${count} items</span>
+            </div>
+          </div>
         `;
       })
       .join("");
+  }
 
-    const footerMarkup = `
-      <div class="gallery-dissolve-lane">
-        <p class="gallery-dissolve-text">and live goes on...</p>
+  function renderMonthDetail(content, state) {
+    const month = state.selectedMonth;
+    const photos = (state.manifest.photos || []).filter(p => getMonthBucket(p) === month);
+
+    content.className = "month-detail";
+    const cards = photos
+      .map((photo, index) =>
+        buildPhotoCardMarkup(photo, {
+          title: `Month ${month} · ${getPhotoStem(photo)}`,
+          caption: photo.key,
+          priority: index === 0,
+        })
+      )
+      .join("");
+
+    content.innerHTML = `
+      <div class="detail-header">
+        <button class="btn btn-secondary" id="detail-back">← Back to Months</button>
+        <h2 class="detail-title">Month ${month}</h2>
+        <span class="detail-count">${photos.length} memories</span>
       </div>
+      <div class="month-grid">${cards}</div>
     `;
 
-    content.innerHTML = heroMarkup + groupsMarkup + footerMarkup;
+    document.getElementById("detail-back")?.addEventListener("click", () => {
+      state.selectedMonth = null;
+      renderGalleryState(content, null, state);
+    });
   }
 
   function renderTestGallery(content, manifest, visiblePhotos) {
@@ -748,36 +744,24 @@
   function renderGalleryState(content, status, state) {
     dismissViewer();
 
-    const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
-    const filterLabel = MEDIA_LABELS[state.activeFilter] || MEDIA_LABELS.all;
-    const visibleSummary = state.activeFilter === "all"
-      ? "everything in this view"
-      : `${visiblePhotos.length} ${filterLabel}`;
-
-    if (!visiblePhotos.length) {
-      if (status) {
-        status.textContent = `No ${filterLabel} were found under ${state.manifest.prefix}/ right now.`;
-      }
-
-      if (content) {
-        content.className = "empty-state";
-        content.textContent =
-          state.actualCollection === "test"
-            ? `Upload pictures, GIFs, or movies under ${state.manifest.prefix}/ and use manual refresh when you want the collage to pick them up.`
-            : `Upload pictures, GIFs, or movies under ${state.manifest.prefix}/ using your flat numbering like 0.jpg, 1.jpg, or 11.mp4, then use manual refresh when you want the month view to update.`;
-      }
-
-      return;
-    }
-
-    if (status) {
-      status.textContent = `Loaded ${state.manifest.photos.length} signed CloudFront items from ${state.manifest.prefix}/. Showing ${visibleSummary}.`;
-    }
-
     if (state.actualCollection === "test") {
+      const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
       renderTestGallery(content, state.manifest, visiblePhotos);
+      if (status) {
+        status.textContent = `Showing ${visiblePhotos.length} test items.`;
+      }
     } else {
-      renderMonthsGallery(content, state.manifest, visiblePhotos);
+      if (state.selectedMonth !== null) {
+        renderMonthDetail(content, state);
+        if (status) {
+          status.textContent = `Viewing Month ${state.selectedMonth}.`;
+        }
+      } else {
+        renderMonthOverview(content, state);
+        if (status) {
+          status.textContent = `Showing calendar overview with 12 months.`;
+        }
+      }
     }
   }
 
@@ -796,6 +780,7 @@
       activeFilter: "all",
       refreshToken: readRefreshToken(requestedCollection),
       manifest: null,
+      selectedMonth: null,
     };
 
     if (!auth) {
@@ -866,7 +851,13 @@
       state.activeFilter = ensureAvailableFilter(state.activeFilter, state.manifest.photos || []);
 
       applyCollectionCopy(actualCollection, state.manifest, state);
-      renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+      
+      if (state.actualCollection === "months") {
+        if (filterContainer) filterContainer.style.display = "none";
+      } else {
+        renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+      }
+      
       renderGalleryState(content, status, state);
       if (content) {
         enableViewer(content);
@@ -874,6 +865,14 @@
       updateRefreshButton(refreshButton, false);
       return true;
     }
+
+    content?.addEventListener("click", (event) => {
+      const trigger = event.target.closest("[data-month-trigger]");
+      if (trigger) {
+        state.selectedMonth = Number.parseInt(trigger.dataset.monthTrigger, 10);
+        renderGalleryState(content, status, state);
+      }
+    });
 
     filterContainer?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-gallery-filter]");
