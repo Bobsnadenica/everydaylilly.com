@@ -209,7 +209,7 @@ resource "aws_cloudfront_distribution" "gallery" {
   }
 
   origin {
-    domain_name = trimprefix(aws_apigatewayv2_api.gallery.api_endpoint, "https://")
+    domain_name = "${aws_apigatewayv2_api.gallery.id}.execute-api.${var.aws_region}.amazonaws.com"
     origin_id   = local.gallery_api_origin_id
 
     custom_origin_config {
@@ -373,5 +373,8 @@ resource "aws_cognito_user_pool_client" "gallery" {
 
 resource "aws_cognito_user_pool_domain" "gallery" {
   domain       = var.cognito_domain_prefix
+  user_pool_id = aws_cognito_user_pool.gallery.id
+}
+to_domain_prefix
   user_pool_id = aws_cognito_user_pool.gallery.id
 }
