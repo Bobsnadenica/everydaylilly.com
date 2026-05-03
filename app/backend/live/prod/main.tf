@@ -263,7 +263,9 @@ resource "aws_cloudfront_distribution" "gallery" {
   lifecycle {
     ignore_changes = [
       viewer_certificate,
-      tags
+      tags,
+      origin,
+      custom_error_response
     ]
   }
 }
