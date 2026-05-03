@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lilly's Vault Calendar Gallery</title>
+    <title>Хрониката на Лили</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap">
@@ -19,31 +19,24 @@
     data-auth-client-id="680v9kq2oue5323c6r63egrltg"
     data-auth-scope="openid email profile aws.cognito.signin.user.admin"
     data-gallery-domain="https://d1fxhro74spn7q.cloudfront.net"
-<title>Хрониката на Лили | Календарна галерия</title>
-...
-    <header class="topbar">
-        <a class="brand" href="/">Хрониката на Лили</a>
-        <div class="top-actions">
-            <a class="btn btn-secondary" href="/">Обратно към сайта</a>
-            <button id="gallery-signout" class="btn btn-primary" type="button">Изход</button>
-        </div>
-    </header>
+>
+    <div class="shell">
+        <header class="topbar">
+            <a class="brand" href="/">Хрониката на Лили</a>
+            <div class="top-actions">
+                <a class="btn btn-secondary" href="/">Обратно</a>
+                <button id="gallery-signout" class="btn btn-primary" type="button">Изход</button>
+            </div>
+        </header>
 
-    <section class="hero">
-        <div class="eyebrow" id="gallery-eyebrow">Частен архив</div>
-        <h1 id="gallery-title">Спомени по месеци</h1>
-        <p id="gallery-copy">Минималистичен поглед назад към твоето приключение, месец по месец.</p>
-    </section>
+        <p id="gallery-status" class="gallery-status">Зареждаме вашите спомени...</p>
 
-    <section class="gallery-card">
-        <p id="gallery-status" class="gallery-status">Проверяваме вашата сесия и подготвяме календарната галерия.</p>
-        <div class="gallery-toolbar">
-            <div id="gallery-media-filters" class="filter-strip" role="toolbar" aria-label="Филтрирай галерията по тип медия"></div>
-            <button id="gallery-refresh" class="btn btn-secondary" type="button">Ръчно опресняване</button>
-        </div>
-        <div id="gallery-content" class="loading-state">Зареждаме вашата частна колекция от архива.</div>
-    </section>
-
+        <section class="gallery-card">
+            <div id="gallery-content" class="loading-state">Моля, изчакайте...</div>
+        </section>
+        
+        <div id="gallery-media-filters" style="display: none;"></div>
+        <button id="gallery-refresh" style="display: none;"></button>
     </div>
 
     <script src="/auth/auth.js" defer></script>

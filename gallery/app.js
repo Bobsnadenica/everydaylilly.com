@@ -747,48 +747,14 @@
   }
 
   function applyCollectionCopy(collection, manifest, state) {
-    const eyebrow = document.getElementById("gallery-eyebrow");
-    const title = document.getElementById("gallery-title");
-    const copy = document.getElementById("gallery-copy");
-    const prefixPill = document.getElementById("gallery-prefix");
-    const cachePill = document.getElementById("gallery-cache");
+    const status = document.getElementById("gallery-status");
 
     if (collection === "test") {
-      if (eyebrow) {
-        eyebrow.textContent = "Творческа тестова колекция";
-      }
-
-      if (title) {
-        title.textContent = "Изненадващ колаж";
-      }
-
-      if (copy) {
-        copy.textContent =
-          "Този маршрут остава закачлив с разбъркано оформление, докато бекендът решава точно кой може да го види.";
-      }
+      if (status) status.textContent = "Творческа тестова колекция";
     } else {
-      if (eyebrow) {
-        eyebrow.textContent = "Частен архив";
+      if (status && state.selectedMonth === null) {
+        status.textContent = "Вашите спомени, подредени по месеци.";
       }
-
-      if (title) {
-        title.textContent = "Спомени по месеци";
-      }
-
-      if (copy) {
-        copy.textContent =
-          "Минималистичен поглед назад към твоето приключение, месец по месец.";
-      }
-    }
-
-    if (prefixPill) {
-      prefixPill.textContent = `Колекция: ${manifest.prefix}/`;
-    }
-
-    if (cachePill) {
-      cachePill.textContent = state.refreshToken
-        ? "Ръчното опресняване е активно"
-        : "Кеширано локално";
     }
   }
 
@@ -799,7 +765,7 @@
       const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
       renderTestGallery(content, state.manifest, visiblePhotos);
       if (status) {
-        status.textContent = `Показване на ${visiblePhotos.length} тестови елемента.`;
+        status.textContent = `Показване на ${visiblePhotos.length} снимки.`;
       }
     } else {
       if (state.selectedMonth !== null) {
@@ -810,7 +776,7 @@
       } else {
         renderMonthOverview(content, state);
         if (status) {
-          status.textContent = `Календарен преглед на 12-те месеца.`;
+          status.textContent = `Всички месеци от годината.`;
         }
       }
     }
