@@ -13,10 +13,6 @@ resource "random_string" "bucket_suffix" {
 
 resource "aws_s3_bucket" "archive" {
   bucket = "${local.prefix}-archive-${random_string.bucket_suffix.result}"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_s3_bucket_versioning" "archive" {
