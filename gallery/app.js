@@ -18,7 +18,36 @@
     movie: "movies",
   };
 
-  const REFRESH_STORAGE_PREFIX = "everyday-lilly.gallery-refresh.";
+  const STORAGE_KEYS = {
+    refresh: "everyday-lilly.gallery-refresh.",
+    manifest: "everyday-lilly.gallery-manifest.",
+  };
+
+  function getStorageKey(type, collection) {
+    return `${STORAGE_KEYS[type]}${collection}`;
+  }
+
+  function readCachedManifest(collection) {
+    try {
+      const data = localStorage.getItem(getStorageKey("manifest", collection));
+      if (!data) return null;
+      const parsed = JSON.parse(data);
+      // Cache for 1 hour
+      if (Date.now() - parsed.timestamp > 3600000) return null;
+      return parsed.manifest;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeCachedManifest(collection, manifest) {
+    try {
+      localStorage.setItem(getStorageKey("manifest", collection), JSON.stringify({
+        timestamp: Date.now(),
+        manifest
+      }));
+    } catch (e) {}
+  }
 
   function normalizeCollection(value) {
     return value === "test" ? "test" : "months";
@@ -155,9 +184,6 @@
     return isKnownMediaKind(explicit) ? explicit : inferMediaKindFromKey(photo?.key || "");
   }
 
-  function getRefreshStorageKey(collection) {
-    return `${REFRESH_STORAGE_PREFIX}${collection}`;
-  }
 
   function sanitizeRefreshToken(value) {
     return String(value || "")
@@ -168,7 +194,7 @@
 
   function readRefreshToken(collection) {
     try {
-      return sanitizeRefreshToken(localStorage.getItem(getRefreshStorageKey(collection)));
+      return sanitizeRefreshToken(localStorage.getItem(getStorageKey("refresh", collection)));
     } catch (error) {
       console.warn("Unable to read gallery refresh token from localStorage.", error);
       return "";
@@ -179,10 +205,11 @@
     const nextValue = sanitizeRefreshToken(value);
 
     try {
+      const key = getStorageKey("refresh", collection);
       if (nextValue) {
-        localStorage.setItem(getRefreshStorageKey(collection), nextValue);
+        localStorage.setItem(key, nextValue);
       } else {
-        localStorage.removeItem(getRefreshStorageKey(collection));
+        localStorage.removeItem(key);
       }
     } catch (error) {
       console.warn("Unable to write gallery refresh token to localStorage.", error);
@@ -641,6 +668,13 @@
   }
 
   async function fetchManifest(session, options = {}) {
+    const collection = getRequestedCollection();
+    
+    if (!options.refreshToken) {
+      const cached = readCachedManifest(collection);
+      if (cached) return cached;
+    }
+
     const requestUrl = new URL(getManifestUrl());
 
     if (options.refreshToken) {
@@ -658,6 +692,10 @@
 
     if (!response.ok) {
       throw new Error(manifest?.error || "The gallery backend rejected this session.");
+    }
+
+    if (manifest) {
+      writeCachedManifest(collection, manifest);
     }
 
     return manifest;
