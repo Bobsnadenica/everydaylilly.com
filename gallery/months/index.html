@@ -19,30 +19,31 @@
     data-auth-client-id="680v9kq2oue5323c6r63egrltg"
     data-auth-scope="openid email profile aws.cognito.signin.user.admin"
     data-gallery-domain="https://d1fxhro74spn7q.cloudfront.net"
->
-    <div class="shell">
-        <header class="topbar">
-            <a class="brand" href="/">Lilly's Vault</a>
-            <div class="top-actions">
-                <a class="btn btn-secondary" href="/">Back to site</a>
-                <button id="gallery-signout" class="btn btn-primary" type="button">Sign Out</button>
-            </div>
-        </header>
+<title>Хрониката на Лили | Календарна галерия</title>
+...
+    <header class="topbar">
+        <a class="brand" href="/">Хрониката на Лили</a>
+        <div class="top-actions">
+            <a class="btn btn-secondary" href="/">Обратно към сайта</a>
+            <button id="gallery-signout" class="btn btn-primary" type="button">Изход</button>
+        </div>
+    </header>
 
-        <section class="hero">
-            <div class="eyebrow" id="gallery-eyebrow">Private Vault</div>
-            <h1 id="gallery-title">Calendar Memories</h1>
-            <p id="gallery-copy">A minimalist look back at your journey, month by month.</p>
-        </section>
+    <section class="hero">
+        <div class="eyebrow" id="gallery-eyebrow">Частен архив</div>
+        <h1 id="gallery-title">Спомени по месеци</h1>
+        <p id="gallery-copy">Минималистичен поглед назад към твоето приключение, месец по месец.</p>
+    </section>
 
-        <section class="gallery-card">
-            <p id="gallery-status" class="gallery-status">Checking your secure session and preparing the calendar gallery.</p>
-            <div class="gallery-toolbar">
-                <div id="gallery-media-filters" class="filter-strip" role="toolbar" aria-label="Filter gallery by media type"></div>
-                <button id="gallery-refresh" class="btn btn-secondary" type="button">Manual refresh</button>
-            </div>
-            <div id="gallery-content" class="loading-state">Loading your private month-by-month collection from the backend manifest.</div>
-        </section>
+    <section class="gallery-card">
+        <p id="gallery-status" class="gallery-status">Проверяваме вашата сесия и подготвяме календарната галерия.</p>
+        <div class="gallery-toolbar">
+            <div id="gallery-media-filters" class="filter-strip" role="toolbar" aria-label="Филтрирай галерията по тип медия"></div>
+            <button id="gallery-refresh" class="btn btn-secondary" type="button">Ръчно опресняване</button>
+        </div>
+        <div id="gallery-content" class="loading-state">Зареждаме вашата частна колекция от архива.</div>
+    </section>
+
     </div>
 
     <script src="/auth/auth.js" defer></script>

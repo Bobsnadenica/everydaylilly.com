@@ -308,6 +308,11 @@
     `;
   }
 
+  const MONTH_NAMES = [
+    "Месец 0", "Месец 1", "Месец 2", "Месец 3", "Месец 4", "Месец 5",
+    "Месец 6", "Месец 7", "Месец 8", "Месец 9", "Месец 10", "Месец 11"
+  ];
+
   function renderMonthOverview(content, state) {
     const heroPhotos = state.manifest.heroPhotos || [];
     const allPhotos = state.manifest.photos || [];
@@ -322,19 +327,20 @@
 
         const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
         const hasPhotos = count > 0;
+        const monthLabel = MONTH_NAMES[month];
 
         return `
           <div class="calendar-card ${hasPhotos ? "is-clickable" : "is-empty"}" 
                ${hasPhotos ? `data-month-trigger="${month}"` : ""}
                style="--idx: ${month}"
                role="button" 
-               aria-label="Month ${month}, ${count} memories">
+               aria-label="${monthLabel}, ${count} спомена">
             <div class="calendar-card-media">
-              ${hero ? buildMediaMarkup(hero, `Month ${month}`, false) : '<div class="calendar-card-placeholder"><span>No photos</span></div>'}
+              ${hero ? buildMediaMarkup(hero, monthLabel, false) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
             </div>
             <div class="calendar-card-info">
               <span class="calendar-card-number">${month}</span>
-              <span class="calendar-card-count">${count} memories</span>
+              <span class="calendar-card-count">${count} спомена</span>
             </div>
           </div>
         `;
@@ -345,12 +351,13 @@
   function renderMonthDetail(content, state) {
     const month = state.selectedMonth;
     const photos = (state.manifest.photos || []).filter(p => getMonthBucket(p) === month);
+    const monthLabel = MONTH_NAMES[month];
 
     content.className = "month-detail";
     const cards = photos
       .map((photo, index) =>
         buildPhotoCardMarkup(photo, {
-          title: `Month ${month} · ${getPhotoStem(photo)}`,
+          title: `${monthLabel} · ${getPhotoStem(photo)}`,
           caption: photo.key,
           priority: index === 0,
         })
@@ -359,9 +366,9 @@
 
     content.innerHTML = `
       <div class="detail-header">
-        <button class="btn btn-secondary" id="detail-back">← Back to Months</button>
-        <h2 class="detail-title">Month ${month}</h2>
-        <span class="detail-count">${photos.length} memories</span>
+        <button class="btn btn-secondary" id="detail-back">← Обратно</button>
+        <h2 class="detail-title">${monthLabel}</h2>
+        <span class="detail-count">${photos.length} спомена</span>
       </div>
       <div class="month-grid">${cards}</div>
     `;
@@ -748,40 +755,40 @@
 
     if (collection === "test") {
       if (eyebrow) {
-        eyebrow.textContent = "Creative test collection";
+        eyebrow.textContent = "Творческа тестова колекция";
       }
 
       if (title) {
-        title.textContent = "Surprise collage vault";
+        title.textContent = "Изненадващ колаж";
       }
 
       if (copy) {
         copy.textContent =
-          "This signed-in route stays playful with a reshuffled layout while the backend still decides exactly who can see it.";
+          "Този маршрут остава закачлив с разбъркано оформление, докато бекендът решава точно кой може да го види.";
       }
     } else {
       if (eyebrow) {
-        eyebrow.textContent = "Month-by-month vault";
+        eyebrow.textContent = "Частен архив";
       }
 
       if (title) {
-        title.textContent = "Calendar memory gallery";
+        title.textContent = "Спомени по месеци";
       }
 
       if (copy) {
         copy.textContent =
-          "This route follows your custom month naming convention and keeps the selected memories grouped in calendar order.";
+          "Минималистичен поглед назад към твоето приключение, месец по месец.";
       }
     }
 
     if (prefixPill) {
-      prefixPill.textContent = `Collection prefix: ${manifest.prefix}/`;
+      prefixPill.textContent = `Колекция: ${manifest.prefix}/`;
     }
 
     if (cachePill) {
       cachePill.textContent = state.refreshToken
-        ? "Manual refresh active on this device"
-        : "Immutable cache with manual refresh";
+        ? "Ръчното опресняване е активно"
+        : "Кеширано локално";
     }
   }
 
@@ -792,18 +799,18 @@
       const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
       renderTestGallery(content, state.manifest, visiblePhotos);
       if (status) {
-        status.textContent = `Showing ${visiblePhotos.length} test items.`;
+        status.textContent = `Показване на ${visiblePhotos.length} тестови елемента.`;
       }
     } else {
       if (state.selectedMonth !== null) {
         renderMonthDetail(content, state);
         if (status) {
-          status.textContent = `Viewing Month ${state.selectedMonth}.`;
+          status.textContent = `Преглед на ${MONTH_NAMES[state.selectedMonth]}.`;
         }
       } else {
         renderMonthOverview(content, state);
         if (status) {
-          status.textContent = `Showing calendar overview with 12 months.`;
+          status.textContent = `Календарен преглед на 12-те месеца.`;
         }
       }
     }
@@ -858,7 +865,7 @@
     }
 
     if (status) {
-      status.textContent = "Checking your private manifest and preparing CloudFront media delivery.";
+      status.textContent = "Проверяваме вашия частен манифест и подготвяме CloudFront за доставка на медия.";
     }
 
     async function loadManifest(options = {}) {
@@ -872,12 +879,12 @@
         console.error(error);
 
         if (status) {
-          status.textContent = "The private gallery backend could not load your media.";
+          status.textContent = "Частният бекенд на галерията не успя да зареди вашите снимки.";
         }
 
         if (content) {
           content.className = "empty-state";
-          content.textContent = error.message || "Please return to the home page and try signing in again.";
+          content.textContent = error.message || "Моля, върнете се на началната страница и опитайте да влезете отново.";
         }
 
         updateRefreshButton(refreshButton, false);
