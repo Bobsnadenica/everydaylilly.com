@@ -408,24 +408,14 @@
     viewer.innerHTML = `
       <div class="viewer-backdrop" data-viewer-close></div>
       <div class="viewer-card">
-        <button class="viewer-close" type="button" aria-label="Close media viewer" data-viewer-close>&times;</button>
-        <button class="viewer-nav viewer-nav-prev" type="button" aria-label="Previous item" data-viewer-nav="-1">&#10094;</button>
-        <button class="viewer-nav viewer-nav-next" type="button" aria-label="Next item" data-viewer-nav="1">&#10095;</button>
+        <button class="viewer-close" type="button" aria-label="Close" data-viewer-close>&times;</button>
+        <button class="viewer-nav viewer-nav-prev" type="button" aria-label="Previous" data-viewer-nav="-1">&#10094;</button>
+        <button class="viewer-nav viewer-nav-next" type="button" aria-label="Next" data-viewer-nav="1">&#10095;</button>
         <div class="viewer-frame">
           <div class="viewer-stage" id="viewer-stage">
             <div class="viewer-media">
               <img id="viewer-image" alt="" hidden>
               <video id="viewer-video" playsinline controls preload="metadata" hidden></video>
-            </div>
-          </div>
-          <div class="viewer-meta">
-            <div>
-              <p id="viewer-title" class="viewer-title"></p>
-              <p id="viewer-key" class="viewer-key"></p>
-            </div>
-            <div class="viewer-actions">
-              <a id="viewer-open-link" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Original</a>
-              <button class="btn btn-secondary" type="button" data-viewer-close>Close</button>
             </div>
           </div>
         </div>

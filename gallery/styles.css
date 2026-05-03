@@ -204,47 +204,11 @@ body {
 
 .viewer-frame {
     flex: 1;
-    height: 0;
+    height: 100%;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
-}
-
-.viewer-media {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.viewer-media img,
-.viewer-media video {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain !important;
-    border-radius: 4px;
-}
-
-.viewer-meta {
-    padding: 1rem 1.5rem;
-    background: #080808;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-top: 1px solid #1a1a1a;
-}
-
-.viewer-title {
-    color: white;
-    font-family: "Baloo 2", cursive;
-    font-size: 1.2rem;
-    margin: 0;
-    text-align: center;
 }
 
 .viewer-close {
