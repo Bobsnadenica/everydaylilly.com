@@ -20,7 +20,7 @@ output "gallery_manifest_url" {
 
 output "gallery_manifest_api_direct_url" {
   description = "Direct API Gateway URL for the gallery manifest endpoint."
-  value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${local.gallery_manifest_path}"
+  value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${trimprefix(local.gallery_manifest_path, "/")}"
 }
 
 output "gallery_cache_version" {

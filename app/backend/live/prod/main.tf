@@ -197,26 +197,33 @@ resource "aws_cloudfront_distribution" "gallery" {
   comment             = "Private gallery distribution for ${local.prefix}"
   price_class         = var.price_class
   wait_for_deployment = true
+  tags                = {}
 
   origin {
-    domain_name              = aws_s3_bucket.gallery.bucket_regional_domain_name
+    connection_attempts = 3
+    connection_timeout  = 10
+    domain_name         = "${aws_apigatewayv2_api.gallery.id}.execute-api.${var.aws_region}.amazonaws.com"
+    origin_id           = local.gallery_api_origin_id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_keepalive_timeout = 5
+      origin_protocol_policy   = "https-only"
+      origin_read_timeout      = 30
+      origin_ssl_protocols     = ["TLSv1.2"]
+    }
+  }
+
+  origin {
+    connection_attempts      = 3
+    connection_timeout       = 10
+    domain_name              = "${aws_s3_bucket.gallery.id}.s3.${var.aws_region}.amazonaws.com"
     origin_id                = local.gallery_origin_id
     origin_access_control_id = aws_cloudfront_origin_access_control.gallery.id
 
     s3_origin_config {
       origin_access_identity = ""
-    }
-  }
-
-  origin {
-    domain_name = "${aws_apigatewayv2_api.gallery.id}.execute-api.${var.aws_region}.amazonaws.com"
-    origin_id   = local.gallery_api_origin_id
-
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -251,6 +258,13 @@ resource "aws_cloudfront_distribution" "gallery" {
   viewer_certificate {
     cloudfront_default_certificate = true
     minimum_protocol_version       = "TLSv1"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      viewer_certificate,
+      tags
+    ]
   }
 }
 

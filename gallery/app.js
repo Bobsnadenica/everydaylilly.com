@@ -536,11 +536,6 @@
         viewerKey.textContent = key;
       }
 
-      if (viewerOpenLink) {
-        viewerOpenLink.href = src;
-        viewerOpenLink.textContent = kind === "movie" ? "Open movie" : "Open original";
-      }
-
       if (kind === "movie") {
         if (viewerImage) {
           viewerImage.hidden = true;
