@@ -314,12 +314,11 @@
 
     content.className = "calendar-grid";
     content.innerHTML = Array.from({ length: 12 }, (_, month) => {
-        // 1. Try to find an explicit hero from the heroPhotos lane
-        // 2. Fallback to finding a photo named exactly like the month (e.g. "0.jpg")
-        // 3. Fallback to the first photo in that month bucket
-        const hero = heroPhotos.find(p => getPhotoStem(p) === String(month)) || 
-                     allPhotos.find(p => getPhotoStem(p) === String(month) && getMonthBucket(p) === month) ||
-                     allPhotos.find(p => getMonthBucket(p) === month);
+        // Find the hero image that is strictly in the /hero/ folder and named after the month index
+        const hero = heroPhotos.find(p => {
+          const stem = getPhotoStem(p);
+          return stem === String(month) || stem === `0${month}`.slice(-2);
+        }) || allPhotos.find(p => getMonthBucket(p) === month);
 
         const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
         const hasPhotos = count > 0;
