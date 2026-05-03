@@ -60,7 +60,7 @@
 
   function getMonthBucket(photo) {
     const stem = getPhotoStem(photo);
-    const match = stem.match(/\d/);
+    const match = stem.match(/\d+/);
     return match ? Number.parseInt(match[0], 10) : 0;
   }
 
