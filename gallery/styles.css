@@ -247,7 +247,69 @@ h1 {
 
 .months-stack {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
+}
+
+.gallery-hero-lane {
+    margin-bottom: 1rem;
+}
+
+.gallery-hero-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.8rem;
+    aspect-ratio: 16 / 7;
+    background: #020617;
+    box-shadow: 0 32px 64px -32px rgba(15, 23, 42, 0.45);
+}
+
+.gallery-hero-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+}
+
+.gallery-hero-content {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(2, 6, 23, 0.8) 100%);
+    color: white;
+}
+
+.gallery-hero-kicker {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--hero-end);
+    margin-bottom: 0.5rem;
+}
+
+.gallery-hero-title {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+}
+
+.gallery-dissolve-lane {
+    padding: 6rem 1rem;
+    text-align: center;
+}
+
+.gallery-dissolve-text {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    font-style: italic;
+    color: var(--muted);
+    opacity: 0.4;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
 }
 
 .month-panel {

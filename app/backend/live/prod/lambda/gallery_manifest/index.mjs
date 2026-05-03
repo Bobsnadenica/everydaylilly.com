@@ -263,12 +263,19 @@ export const handler = async (event) => {
 
     const isTest = isTestAccount(claims);
     const prefix = isTest ? testPrefix : defaultPrefix;
+    const heroPrefix = `${prefix}/hero`;
     const keys = await listGalleryKeys(prefix);
     const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
     const photos = [];
+    const heroPhotos = [];
 
     for (const key of keys) {
-      photos.push(await buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion));
+      const signedMedia = await buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion);
+      if (key.startsWith(heroPrefix)) {
+        heroPhotos.push(signedMedia);
+      } else {
+        photos.push(signedMedia);
+      }
     }
 
     return json(200, {
@@ -281,6 +288,7 @@ export const handler = async (event) => {
         email: claims.email || null,
       },
       photos,
+      heroPhotos,
     });
   } catch (error) {
     console.error("Unable to build gallery manifest.", error);

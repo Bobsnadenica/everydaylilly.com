@@ -281,9 +281,30 @@
 
   function renderMonthsGallery(content, manifest, visiblePhotos) {
     const groups = buildMonthGroups(visiblePhotos);
+    const heroPhotos = manifest.heroPhotos || [];
+    const currentMonth = new Date().getMonth();
+
+    const heroPhoto = heroPhotos.find((photo) => {
+      const stem = getPhotoStem(photo);
+      return Number.parseInt(stem, 10) === currentMonth;
+    });
+
+    const heroMarkup = heroPhoto
+      ? `
+        <div class="gallery-hero-lane">
+          <div class="gallery-hero-frame">
+            <img src="${escapeHtml(heroPhoto.url)}" alt="Month Hero" class="gallery-hero-img">
+            <div class="gallery-hero-content">
+              <span class="gallery-hero-kicker">Current Month Highlight</span>
+              <h2 class="gallery-hero-title">Month ${currentMonth}</h2>
+            </div>
+          </div>
+        </div>
+      `
+      : "";
 
     content.className = "months-stack";
-    content.innerHTML = groups
+    const groupsMarkup = groups
       .map(({ month, items }, groupIndex) => {
         const cards = items
           .map((photo, photoIndex) =>
@@ -312,6 +333,14 @@
         `;
       })
       .join("");
+
+    const footerMarkup = `
+      <div class="gallery-dissolve-lane">
+        <p class="gallery-dissolve-text">and live goes on...</p>
+      </div>
+    `;
+
+    content.innerHTML = heroMarkup + groupsMarkup + footerMarkup;
   }
 
   function renderTestGallery(content, manifest, visiblePhotos) {
