@@ -375,6 +375,3 @@ resource "aws_cognito_user_pool_domain" "gallery" {
   domain       = var.cognito_domain_prefix
   user_pool_id = aws_cognito_user_pool.gallery.id
 }
-to_domain_prefix
-  user_pool_id = aws_cognito_user_pool.gallery.id
-}
