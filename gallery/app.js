@@ -328,27 +328,22 @@
 
     content.className = "calendar-flip-container";
     content.innerHTML = `
-      <div class="calendar-flip-stage">
-        <button class="flip-nav-btn" data-flip="-1" aria-label="Предишен месец" ${month === 0 ? "disabled" : ""}>←</button>
-        
-        <div class="calendar-card-focused" 
-             data-month-trigger="${month}"
-             role="button" 
-             aria-label="${monthLabel}, ${count} спомена">
-          <div class="calendar-card-media">
-            ${hero ? buildMediaMarkup(hero, monthLabel, true) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
-          </div>
-          <div class="calendar-card-info">
-            <span class="calendar-card-number">${month}</span>
-            <span class="calendar-card-count">${count} спомена</span>
-          </div>
+      <div class="calendar-card-focused" 
+           data-month-trigger="${month}"
+           role="button" 
+           aria-label="${monthLabel}, ${count} спомена">
+        <div class="calendar-card-media">
+          ${hero ? buildMediaMarkup(hero, monthLabel, true) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
         </div>
-
-        <button class="flip-nav-btn" data-flip="1" aria-label="Следващ месец" ${month === 11 ? "disabled" : ""}>→</button>
+        <div class="calendar-card-info">
+          <span class="calendar-card-number">${month}</span>
+          <span class="calendar-card-count">${count} спомена</span>
+        </div>
       </div>
-      <div class="top-actions">
-        <button class="btn btn-secondary" data-flip="-1" ${month === 0 ? "disabled" : ""}>Предишен</button>
-        <button class="btn btn-secondary" data-flip="1" ${month === 11 ? "disabled" : ""}>Следващ</button>
+
+      <div class="flip-controls">
+        <button class="btn btn-secondary" data-flip="-1" ${month === 0 ? "disabled" : ""}>← Предишен</button>
+        <button class="btn btn-secondary" data-flip="1" ${month === 11 ? "disabled" : ""}>Следващ →</button>
       </div>
     `;
   }
@@ -764,6 +759,7 @@
   }
 
   function renderGalleryState(content, status, state) {
+    if (!content || !state.manifest) return;
     dismissViewer();
 
     if (state.actualCollection === "test") {
@@ -781,7 +777,7 @@
       } else {
         renderMonthOverview(content, state);
         if (status) {
-          status.textContent = `Всички месеци от годината.`;
+          status.textContent = `Вашите спомени, подредени по месеци.`;
         }
       }
     }
@@ -807,20 +803,15 @@
     };
 
     if (!auth) {
-      if (status) {
-        status.textContent = "The secure gallery helper could not load.";
-      }
-
+      if (status) status.textContent = "Системна грешка: помощникът за вход не зареди.";
       if (content) {
-        content.className = "empty-state";
-        content.textContent = "Please return to the home page and try again.";
+        content.className = "loading-state";
+        content.textContent = "Моля, опитайте отново по-късно.";
       }
-
       return;
     }
 
     const session = await auth.getSession();
-
     if (!session) {
       window.location.replace("/");
       return;
@@ -832,16 +823,8 @@
       });
     }
 
-    if (userPill) {
-      userPill.textContent = `Signed in as ${session.claims?.email || "your account"}`;
-    }
-
-    if (status) {
-      status.textContent = "Проверяваме вашия частен манифест и подготвяме CloudFront за доставка на медия.";
-    }
-
     async function loadManifest(options = {}) {
-      updateRefreshButton(refreshButton, true);
+      if (refreshButton) updateRefreshButton(refreshButton, true);
 
       try {
         state.manifest = await fetchManifest(session, {
@@ -849,43 +832,28 @@
         });
       } catch (error) {
         console.error(error);
-
-        if (status) {
-          status.textContent = "Частният бекенд на галерията не успя да зареди вашите снимки.";
-        }
-
+        if (status) status.textContent = "Грешка при зареждане на архива.";
         if (content) {
-          content.className = "empty-state";
-          content.textContent = error.message || "Моля, върнете се на началната страница и опитайте да влезете отново.";
+          content.className = "loading-state";
+          content.textContent = error.message || "Възникна проблем. Моля, влезте отново.";
         }
-
-        updateRefreshButton(refreshButton, false);
+        if (refreshButton) updateRefreshButton(refreshButton, false);
         return false;
       }
 
       const actualCollection = normalizeCollection(state.manifest.collection);
-
       if (state.requestedCollection !== actualCollection) {
         window.location.replace(ROUTES[actualCollection]);
         return false;
       }
 
       state.actualCollection = actualCollection;
-      state.activeFilter = ensureAvailableFilter(state.activeFilter, state.manifest.photos || []);
-
-      applyCollectionCopy(actualCollection, state.manifest, state);
-      
-      if (state.actualCollection === "months") {
-        if (filterContainer) filterContainer.style.display = "none";
-      } else {
-        renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
-      }
       
       renderGalleryState(content, status, state);
       if (content) {
         enableViewer(content);
       }
-      updateRefreshButton(refreshButton, false);
+      if (refreshButton) updateRefreshButton(refreshButton, false);
       return true;
     }
 
@@ -905,31 +873,10 @@
       }
     });
 
-    filterContainer?.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-gallery-filter]");
-
-      if (!button || !state.manifest) {
-        return;
-      }
-
-      state.activeFilter = ensureAvailableFilter(
-        normalizeFilterKind(button.dataset.galleryFilter),
-        state.manifest.photos || []
-      );
-
-      applyCollectionCopy(state.actualCollection, state.manifest, state);
-      renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
-      renderGalleryState(content, status, state);
-    });
-
     refreshButton?.addEventListener("click", async () => {
       state.refreshToken = createRefreshToken();
       writeRefreshToken(state.actualCollection, state.refreshToken);
-
-      if (status) {
-        status.textContent = "Ръчно опресняване на кеша и извличане на пресни CloudFront връзки.";
-      }
-
+      if (status) status.textContent = "Опресняване...";
       await loadManifest({ manualRefresh: true });
     });
 

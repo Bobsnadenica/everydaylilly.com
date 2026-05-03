@@ -250,7 +250,6 @@ resource "aws_cloudfront_distribution" "gallery" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
 
@@ -296,7 +295,7 @@ data "aws_iam_policy_document" "gallery_bucket" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.gallery.arn]
+      values   = ["arn:aws:cloudfront::010419877195:distribution/E1CGP9WRXR343M"]
     }
   }
 }
