@@ -267,11 +267,12 @@
       `;
     }
 
-    const fetchPriority = priority ? ' fetchpriority="high"' : "";
+    const fetchPriority = priority ? ' fetchpriority="high"' : ' fetchpriority="low"';
+    const loading = priority ? ' loading="eager"' : ' loading="lazy"';
 
     return `
       <div class="media-shell">
-        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async"${fetchPriority}>
+        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(title)}"${loading} decoding="async"${fetchPriority}>
       </div>
     `;
   }
@@ -308,14 +309,19 @@
   }
 
   function renderMonthOverview(content, state) {
-    const photos = state.manifest.photos || [];
-    const groups = buildMonthGroups(photos);
+    const heroPhotos = state.manifest.heroPhotos || [];
+    const allPhotos = state.manifest.photos || [];
 
     content.className = "calendar-grid";
-    content.innerHTML = groups
-      .map(({ month, items }) => {
-        const hero = items.find(p => getPhotoStem(p) === String(month)) || items[0];
-        const count = items.length;
+    content.innerHTML = Array.from({ length: 12 }, (_, month) => {
+        // 1. Try to find an explicit hero from the heroPhotos lane
+        // 2. Fallback to finding a photo named exactly like the month (e.g. "0.jpg")
+        // 3. Fallback to the first photo in that month bucket
+        const hero = heroPhotos.find(p => getPhotoStem(p) === String(month)) || 
+                     allPhotos.find(p => getPhotoStem(p) === String(month) && getMonthBucket(p) === month) ||
+                     allPhotos.find(p => getMonthBucket(p) === month);
+
+        const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
         const hasPhotos = count > 0;
 
         return `
@@ -328,7 +334,7 @@
             </div>
             <div class="calendar-card-info">
               <span class="calendar-card-number">${month}</span>
-              <span class="calendar-card-count">${count} items</span>
+              <span class="calendar-card-count">${count} memories</span>
             </div>
           </div>
         `;
@@ -418,8 +424,8 @@
               <p id="viewer-key" class="viewer-key"></p>
             </div>
             <div class="viewer-actions">
-              <a id="viewer-open-link" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Open original</a>
-              <button class="btn btn-primary" type="button" data-viewer-close>Back to gallery</button>
+              <a id="viewer-open-link" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Original</a>
+              <button class="btn btn-secondary" type="button" data-viewer-close>Close</button>
             </div>
           </div>
         </div>
