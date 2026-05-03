@@ -71,142 +71,99 @@ body {
     font-weight: 600;
 }
 
-/* --- Focused Flip View --- */
-.calendar-flip-container {
+/* --- Vertical Hero Stack --- */
+.calendar-stack {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
-    padding: 1rem 0 3rem;
-}
-
-.calendar-flip-stage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 1.5rem;
-    width: 100%;
+    padding: 1rem 0 4rem;
 }
 
-.calendar-card-focused {
-    width: min(90vw, 480px);
+.calendar-stack-card {
+    width: min(100%, 500px);
     aspect-ratio: 1 / 1;
-    border-radius: 40px;
-    background: white;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.3);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: none;
-    position: relative;
-    animation: popIn 0.4s ease-out;
+    border-radius: 0; /* Borderless means sharp or very subtle? Let's go completely borderless as requested */
+    background: #f1f5f9;
+    transition: opacity 0.2s ease;
+    animation: fadeInUp 0.6s ease-out backwards;
 }
 
-.calendar-card-focused:hover {
-    transform: scale(1.02) translateY(-10px);
+.calendar-stack-card:hover {
+    opacity: 0.9;
 }
 
-.calendar-card-focused .media-shell,
-.calendar-card-focused img,
-.calendar-card-focused video {
-    width: 100% !important;
-    height: 100% !important;
-    display: block !important;
-    object-fit: cover !important; /* Strict fill */
+.calendar-stack-card img,
+.calendar-stack-card video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
 }
 
-.calendar-card-focused .calendar-card-info {
+/* Label overlay - minimalist */
+.calendar-stack-label {
     position: absolute;
-    inset: auto 0 0;
-    padding: 2.5rem 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    top: 1.5rem;
+    left: 1.5rem;
     color: white;
+    font-family: "Baloo 2", cursive;
+    font-size: 2rem;
+    font-weight: 800;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
     pointer-events: none;
 }
 
-.calendar-card-focused .calendar-card-number {
-    font-size: 3rem;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.flip-nav-btn {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 50%;
-    background: white;
-    border: 2px solid #f1f5f9;
-    color: var(--text);
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
-}
-
-.flip-nav-btn:hover:not(:disabled) {
-    background: #ffd447;
-    border-color: #ffd447;
-    transform: scale(1.1);
-}
-
-.flip-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: default;
-}
-
 .month-detail {
-    animation: popIn 0.3s ease-out;
+    animation: fadeInUp 0.4s ease-out;
 }
 
 .detail-header {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid #f1f5f9;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #edf2f7;
 }
 
 .detail-title {
     margin: 0;
     font-family: "Baloo 2", cursive;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
-}
-
-.detail-count {
-    margin-left: auto;
-    color: var(--muted);
-    font-weight: 700;
 }
 
 .month-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem; /* Tight, professional grid */
+}
+
+@media (max-width: 480px) {
+    .month-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+    }
+    .photo-card { border-radius: 0; }
 }
 
 .photo-card {
     aspect-ratio: 1 / 1;
-    border-radius: 20px;
     overflow: hidden;
+    border: none;
     background: #f1f5f9;
-    transition: transform 0.2s ease;
-    cursor: pointer;
 }
 
-.photo-card:hover {
-    transform: scale(1.02) translateY(-4px);
-}
-
-.photo-card .media-shell,
 .photo-card img,
 .photo-card video {
-    width: 100% !important;
-    height: 100% !important;
-    display: block !important;
-    object-fit: cover !important; /* Strict uniform squares in details too */
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
 }
 
 .viewer[hidden] {

@@ -316,36 +316,28 @@
   function renderMonthOverview(content, state) {
     const heroPhotos = state.manifest.heroPhotos || [];
     const allPhotos = state.manifest.photos || [];
-    const month = state.overviewMonthIndex;
 
-    const hero = heroPhotos.find(p => {
-      const stem = getPhotoStem(p);
-      return stem === String(month) || stem === `0${month}`.slice(-2);
-    }) || allPhotos.find(p => getMonthBucket(p) === month);
+    content.className = "calendar-stack";
+    content.innerHTML = Array.from({ length: 12 }, (_, month) => {
+        const hero = heroPhotos.find(p => {
+          const stem = getPhotoStem(p);
+          return stem === String(month) || stem === `0${month}`.slice(-2);
+        }) || allPhotos.find(p => getMonthBucket(p) === month);
 
-    const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
-    const monthLabel = MONTH_NAMES[month];
+        const hasPhotos = allPhotos.some(p => getMonthBucket(p) === month);
 
-    content.className = "calendar-flip-container";
-    content.innerHTML = `
-      <div class="calendar-card-focused" 
-           data-month-trigger="${month}"
-           role="button" 
-           aria-label="${monthLabel}, ${count} спомена">
-        <div class="calendar-card-media">
-          ${hero ? buildMediaMarkup(hero, monthLabel, true) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
-        </div>
-        <div class="calendar-card-info">
-          <span class="calendar-card-number">${month}</span>
-          <span class="calendar-card-count">${count} спомена</span>
-        </div>
-      </div>
-
-      <div class="flip-controls">
-        <button class="btn btn-secondary" data-flip="-1" ${month === 0 ? "disabled" : ""}>← Предишен</button>
-        <button class="btn btn-secondary" data-flip="1" ${month === 11 ? "disabled" : ""}>Следващ →</button>
-      </div>
-    `;
+        return `
+          <div class="calendar-stack-card" 
+               ${hasPhotos ? `data-month-trigger="${month}"` : ""}
+               style="--idx: ${month}"
+               role="button" 
+               aria-label="Месец ${month}">
+            ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
+            <span class="calendar-stack-label">${month}</span>
+          </div>
+        `;
+      })
+      .join("");
   }
 
   function renderMonthDetail(content, state) {
@@ -360,15 +352,15 @@
           title: `${monthLabel} · ${getPhotoStem(photo)}`,
           caption: photo.key,
           priority: index === 0,
+          showMeta: false
         })
       )
       .join("");
 
     content.innerHTML = `
       <div class="detail-header">
-        <button class="btn btn-secondary" id="detail-back">← Обратно</button>
+        <button class="btn btn-secondary" id="detail-back">← Назад</button>
         <h2 class="detail-title">${monthLabel}</h2>
-        <span class="detail-count">${photos.length} спомена</span>
       </div>
       <div class="month-grid">${cards}</div>
     `;
@@ -376,6 +368,7 @@
     document.getElementById("detail-back")?.addEventListener("click", () => {
       state.selectedMonth = null;
       renderGalleryState(content, null, state);
+      window.scrollTo(0, 0);
     });
   }
 
