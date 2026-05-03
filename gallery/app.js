@@ -316,36 +316,41 @@
   function renderMonthOverview(content, state) {
     const heroPhotos = state.manifest.heroPhotos || [];
     const allPhotos = state.manifest.photos || [];
+    const month = state.overviewMonthIndex;
 
-    content.className = "calendar-grid";
-    content.innerHTML = Array.from({ length: 12 }, (_, month) => {
-        // Find the hero image that is strictly in the /hero/ folder and named after the month index
-        const hero = heroPhotos.find(p => {
-          const stem = getPhotoStem(p);
-          return stem === String(month) || stem === `0${month}`.slice(-2);
-        }) || allPhotos.find(p => getMonthBucket(p) === month);
+    const hero = heroPhotos.find(p => {
+      const stem = getPhotoStem(p);
+      return stem === String(month) || stem === `0${month}`.slice(-2);
+    }) || allPhotos.find(p => getMonthBucket(p) === month);
 
-        const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
-        const hasPhotos = count > 0;
-        const monthLabel = MONTH_NAMES[month];
+    const count = allPhotos.filter(p => getMonthBucket(p) === month).length;
+    const monthLabel = MONTH_NAMES[month];
 
-        return `
-          <div class="calendar-card ${hasPhotos ? "is-clickable" : "is-empty"}" 
-               ${hasPhotos ? `data-month-trigger="${month}"` : ""}
-               style="--idx: ${month}"
-               role="button" 
-               aria-label="${monthLabel}, ${count} спомена">
-            <div class="calendar-card-media">
-              ${hero ? buildMediaMarkup(hero, monthLabel, false) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
-            </div>
-            <div class="calendar-card-info">
-              <span class="calendar-card-number">${month}</span>
-              <span class="calendar-card-count">${count} спомена</span>
-            </div>
+    content.className = "calendar-flip-container";
+    content.innerHTML = `
+      <div class="calendar-flip-stage">
+        <button class="flip-nav-btn" data-flip="-1" aria-label="Предишен месец" ${month === 0 ? "disabled" : ""}>←</button>
+        
+        <div class="calendar-card-focused" 
+             data-month-trigger="${month}"
+             role="button" 
+             aria-label="${monthLabel}, ${count} спомена">
+          <div class="calendar-card-media">
+            ${hero ? buildMediaMarkup(hero, monthLabel, true) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
           </div>
-        `;
-      })
-      .join("");
+          <div class="calendar-card-info">
+            <span class="calendar-card-number">${month}</span>
+            <span class="calendar-card-count">${count} спомена</span>
+          </div>
+        </div>
+
+        <button class="flip-nav-btn" data-flip="1" aria-label="Следващ месец" ${month === 11 ? "disabled" : ""}>→</button>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-secondary" data-flip="-1" ${month === 0 ? "disabled" : ""}>Предишен</button>
+        <button class="btn btn-secondary" data-flip="1" ${month === 11 ? "disabled" : ""}>Следващ</button>
+      </div>
+    `;
   }
 
   function renderMonthDetail(content, state) {
@@ -798,6 +803,7 @@
       refreshToken: readRefreshToken(requestedCollection),
       manifest: null,
       selectedMonth: null,
+      overviewMonthIndex: new Date().getMonth(),
     };
 
     if (!auth) {
@@ -884,6 +890,14 @@
     }
 
     content?.addEventListener("click", (event) => {
+      const flipBtn = event.target.closest("[data-flip]");
+      if (flipBtn) {
+        const delta = Number.parseInt(flipBtn.dataset.flip, 10);
+        state.overviewMonthIndex = Math.max(0, Math.min(11, state.overviewMonthIndex + delta));
+        renderGalleryState(content, status, state);
+        return;
+      }
+
       const trigger = event.target.closest("[data-month-trigger]");
       if (trigger) {
         state.selectedMonth = Number.parseInt(trigger.dataset.monthTrigger, 10);
