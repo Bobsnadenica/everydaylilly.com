@@ -326,6 +326,7 @@
         return `
           <div class="calendar-card ${hasPhotos ? "is-clickable" : "is-empty"}" 
                ${hasPhotos ? `data-month-trigger="${month}"` : ""}
+               style="--idx: ${month}"
                role="button" 
                aria-label="Month ${month}, ${count} memories">
             <div class="calendar-card-media">
