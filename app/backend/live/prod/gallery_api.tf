@@ -4,32 +4,16 @@ data "archive_file" "gallery_manifest_lambda" {
   output_path = "${path.module}/.terraform/gallery_manifest_lambda.zip"
 }
 
-resource "aws_kms_key" "gallery_signer" {
-  description              = "KMS signing key for CloudFront gallery signed URLs."
-  deletion_window_in_days  = 30
-  customer_master_key_spec = "RSA_2048"
-  key_usage                = "SIGN_VERIFY"
-}
-
-resource "aws_kms_alias" "gallery_signer" {
-  name          = "alias/${local.prefix}-gallery-signer"
-  target_key_id = aws_kms_key.gallery_signer.key_id
-}
-
-data "aws_kms_public_key" "gallery_signer" {
-  key_id = aws_kms_key.gallery_signer.key_id
-}
-
-resource "aws_cloudfront_public_key" "gallery" {
+resource "aws_cloudfront_public_key" "local_signer" {
   comment     = "Public key for ${local.prefix} gallery signed URLs."
-  encoded_key = data.aws_kms_public_key.gallery_signer.public_key_pem
-  name        = "${local.prefix}-gallery-signer"
+  encoded_key = file("${path.module}/lambda/gallery_manifest/gallery_public_key.pem")
+  name        = "${local.prefix}-gallery-v4-signer"
 }
 
-resource "aws_cloudfront_key_group" "gallery" {
+resource "aws_cloudfront_key_group" "local_signer" {
   comment = "Trusted key group for ${local.prefix} gallery signed URLs."
-  items   = [aws_cloudfront_public_key.gallery.id]
-  name    = "${local.prefix}-gallery-key-group"
+  items   = [aws_cloudfront_public_key.local_signer.id]
+  name    = "${local.prefix}-gallery-v4-key-group"
 }
 
 resource "aws_cloudfront_origin_request_policy" "gallery_api" {
@@ -97,13 +81,6 @@ resource "aws_iam_role_policy" "gallery_manifest_lambda" {
         ]
         Effect   = "Allow"
         Resource = aws_s3_bucket.gallery.arn
-      },
-      {
-        Action = [
-          "kms:Sign"
-        ]
-        Effect   = "Allow"
-        Resource = aws_kms_key.gallery_signer.arn
       }
     ]
   })
@@ -127,8 +104,7 @@ resource "aws_lambda_function" "gallery_manifest" {
       GALLERY_PUBLIC_BASE_URL    = trimsuffix(var.gallery_public_base_url, "/")
       GALLERY_CACHE_VERSION      = var.gallery_cache_version
       GALLERY_SIGNED_URL_TTL     = tostring(var.gallery_signed_url_ttl_seconds)
-      GALLERY_SIGNER_KEY_PAIR_ID = aws_cloudfront_public_key.gallery.id
-      GALLERY_SIGNER_KMS_KEY_ID  = aws_kms_key.gallery_signer.key_id
+      GALLERY_SIGNER_KEY_PAIR_ID = aws_cloudfront_public_key.local_signer.id
     }
   }
 

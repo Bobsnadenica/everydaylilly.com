@@ -1,7 +1,10 @@
-import { KMSClient, SignCommand } from "@aws-sdk/client-kms";
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const kms = new KMSClient({});
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const s3 = new S3Client({});
 
 const bucketName = process.env.GALLERY_BUCKET;
@@ -9,7 +12,6 @@ const defaultPrefix = normalizePrefix(process.env.GALLERY_DEFAULT_PREFIX || "mon
 const testPrefix = normalizePrefix(process.env.GALLERY_TEST_PREFIX || "test");
 const publicBaseUrl = (process.env.GALLERY_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
 const signerKeyPairId = process.env.GALLERY_SIGNER_KEY_PAIR_ID || "";
-const signerKmsKeyId = process.env.GALLERY_SIGNER_KMS_KEY_ID || "";
 const defaultCacheVersion = normalizeCacheVersion(process.env.GALLERY_CACHE_VERSION || "v1");
 const minimumSignedUrlTtlSeconds = 365 * 24 * 60 * 60;
 const configuredSignedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED_URL_TTL || "31536000", 10);
@@ -17,6 +19,21 @@ const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
   ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
   : minimumSignedUrlTtlSeconds;
 const mediaExtensionPattern = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
+
+let cachedPrivateKey = null;
+
+function getPrivateKey() {
+  if (cachedPrivateKey) {
+    return cachedPrivateKey;
+  }
+  try {
+    cachedPrivateKey = fs.readFileSync(path.join(__dirname, "gallery_private_key.pem"), "utf8");
+    return cachedPrivateKey;
+  } catch (error) {
+    console.error("Unable to read local private key.", error);
+    throw new Error("Gallery manifest signing key is missing.");
+  }
+}
 
 function normalizePrefix(prefix) {
   return String(prefix || "")
@@ -121,14 +138,6 @@ function isTestAccount(claims) {
   });
 }
 
-function toCloudFrontSafeBase64(buffer) {
-  return Buffer.from(buffer)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/=/g, "_")
-    .replace(/\//g, "~");
-}
-
 function encodePathSegments(path) {
   return path
     .split("/")
@@ -151,21 +160,11 @@ function buildCannedPolicy(resourceUrl, expiresAtEpochSeconds) {
   });
 }
 
-async function signPolicy(policy) {
-  const response = await kms.send(
-    new SignCommand({
-      KeyId: signerKmsKeyId,
-      Message: Buffer.from(policy, "utf8"),
-      MessageType: "RAW",
-      SigningAlgorithm: "RSASSA_PKCS1_V1_5_SHA_256",
-    })
-  );
-
-  if (!response.Signature) {
-    throw new Error("KMS did not return a CloudFront signature.");
-  }
-
-  return toCloudFrontSafeBase64(response.Signature);
+function signPolicy(policy) {
+  const signer = crypto.createSign("RSA-SHA256");
+  signer.update(policy);
+  const signature = signer.sign(getPrivateKey(), "base64");
+  return signature.replace(/\+/g, "-").replace(/\//g, "~").replace(/=/g, "_");
 }
 
 async function listGalleryKeys(prefix) {
@@ -221,7 +220,7 @@ async function buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion) {
   }
 
   const policy = buildCannedPolicy(signedUrl.toString(), expiresAtEpochSeconds);
-  const signature = await signPolicy(policy);
+  const signature = signPolicy(policy);
 
   signedUrl.searchParams.set("Expires", String(expiresAtEpochSeconds));
   signedUrl.searchParams.set("Signature", signature);
@@ -243,7 +242,7 @@ function getStableExpiryEpochSeconds() {
 
 export const handler = async (event) => {
   try {
-    if (!bucketName || !publicBaseUrl || !signerKeyPairId || !signerKmsKeyId) {
+    if (!bucketName || !publicBaseUrl || !signerKeyPairId) {
       return json(500, {
         error: "Gallery manifest backend is missing required configuration.",
       });
