@@ -4,28 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Everyday Dandelion | Mindful 5-Second Daily Video Journaling App</title>
-  <link rel="icon" type="image/png" href="/images/icons/everyday_lilly.png">
+  
+  <!-- SEO & Social Media -->
   <meta name="description" content="Capture your life 5 seconds at a time with Everyday Dandelion. A simple, mindful video journaling app for preserving daily highlights and creating beautiful timelapses.">
   <meta name="keywords" content="5 second daily moments, video journaling, mindfulness app, daily highlights, everyday dandelion, video diary, timelapse app, mindful living">
+  <meta property="og:title" content="Everyday Dandelion | Mindful Daily Video Journaling">
+  <meta property="og:description" content="Capture your life 5 seconds at a time. A simple, mindful video journaling app for preserving daily highlights and creating beautiful timelapses.">
+  <meta property="og:image" content="https://everydaylilly.com/images/icons/everyday_dandelion.png">
+  <meta property="og:url" content="https://everydaylilly.com/everyday_dandelion/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Everyday Dandelion | Mindful Daily Video Journaling">
+  <meta name="twitter:description" content="Capture your life 5 seconds at a time. A simple, mindful video journaling app.">
+  <meta name="twitter:image" content="https://everydaylilly.com/images/icons/everyday_dandelion.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/icons/everyday_lilly.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css" />
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Everyday Dandelion",
+    "operatingSystem": "iOS, Android",
+    "applicationCategory": "LifestyleApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Capture your life 5 seconds at a time. A simple, mindful video journaling app for preserving daily highlights and creating beautiful timelapses.",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "ratingCount": "10"
+    }
+  }
+  </script>
+
   <style>
     /* Base styles */
+    :root {
+      --primary-green: #3a6b35;
+      --accent-teal: #7ed8c6;
+      --bg-cream: #f9f6ea;
+      --bg-green-light: #e6f4d9;
+    }
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top left, #e6f4d9, #f9f6ea);
+      background: radial-gradient(circle at top left, var(--bg-green-light), var(--bg-cream));
       color: #2f4f2f;
       margin: 0;
       text-align: center;
       overflow-x: hidden;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       position: relative;
     }
     a {
-      color: #7ed8c6;
+      color: var(--accent-teal);
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
     }
     a:hover {
       color: #4db6a1;
@@ -34,140 +81,87 @@
     h1, h2, h3 {
       font-family: 'Playfair Display', serif;
       margin: 0 0 1rem 0;
-      color: #3a6b35;
+      color: var(--primary-green);
       line-height: 1.2;
     }
     p {
       font-size: 1.125rem;
       max-width: 600px;
       margin: 0 auto 1.5rem auto;
-      color: #3a6b35;
+      color: var(--primary-green);
     }
-    button {
+    .btn {
+      display: inline-block;
       cursor: pointer;
       border: none;
       border-radius: 0.75rem;
-      padding: 0.75rem 2rem;
+      padding: 0.85rem 2.25rem;
       font-weight: 600;
       font-size: 1rem;
-      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
-      color: #1b3a1b;
-      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
-      transition: background 0.4s ease, box-shadow 0.4s ease;
-    }
-    button:hover:not(:disabled) {
-      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
-      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-decoration: none;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
+      background: linear-gradient(135deg, #a7d8a7, var(--accent-teal));
       color: #1b3a1b;
-      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
+      box-shadow: 0 4px 15px rgba(126, 216, 198, 0.3);
     }
     .btn-primary:hover:not(:disabled) {
-      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
-      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(126, 216, 198, 0.5);
     }
     .btn-secondary {
       background-color: transparent;
-      color: #3a6b35;
+      color: var(--primary-green);
       border: 2px solid #a7d8a7;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
     .btn-secondary:hover:not(:disabled) {
-      background-color: #e6f4d9;
-      border-color: #7ed8c6;
+      background-color: var(--bg-green-light);
+      border-color: var(--accent-teal);
     }
 
     /* Animations */
     @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     @keyframes pulseGlow {
-      0%, 100% {
-        box-shadow: 0 0 8px 2px rgba(126, 216, 198, 0.3);
-      }
-      50% {
-        box-shadow: 0 0 14px 4px rgba(126, 216, 198, 0.5);
-      }
-    }
-    @keyframes floatSeed {
-      0% {
-        transform: translateY(0) translateX(0) rotate(0deg);
-        opacity: 0.2;
-      }
-      50% {
-        opacity: 0.4;
-      }
-      100% {
-        transform: translateY(-120px) translateX(30px) rotate(360deg);
-        opacity: 0;
-      }
+      0%, 100% { box-shadow: 0 0 10px rgba(126, 216, 198, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(126, 216, 198, 0.6); }
     }
 
     /* Header */
     header {
-      padding: 3rem 1rem 2rem;
+      padding: 4rem 1rem 2rem;
       position: relative;
       z-index: 10;
-      max-width: 700px;
+      max-width: 800px;
       margin: 0 auto;
     }
     .app-icon {
-      width: 72px;
-      height: 72px;
-      object-fit: contain;
-      border-radius: 20px;
-      margin-bottom: 1rem;
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      margin: 0 auto 1.5rem;
       animation: pulseGlow 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 6px rgba(126, 216, 198, 0.5));
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 100%;
+      filter: drop-shadow(0 4px 10px rgba(58, 107, 53, 0.2));
       display: block;
-      /* Fallback for visibility */
-      background-color: transparent;
     }
-    h1 {
-      font-size: 2.75rem;
-      margin-bottom: 0.5rem;
-    }
-    p.lead {
-      font-size: 1.25rem;
-      max-width: 600px;
-      margin: 0 auto 2rem;
-      color: #3a6b35;
-      font-weight: 500;
-    }
-    .btn-group {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
+    h1 { font-size: 3.25rem; letter-spacing: -0.02em; }
+    p.lead { font-size: 1.35rem; font-weight: 500; opacity: 0.9; }
 
-    /* Language toggle button */
     #lang-toggle {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
+      top: 1.5rem;
+      right: 1.5rem;
       font-size: 0.9rem;
-      color: #3a6b35;
-      background: transparent;
-      border: none;
-      text-decoration: underline;
+      font-weight: 600;
+      color: var(--primary-green);
+      background: rgba(255, 255, 255, 0.5);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(167, 216, 167, 0.3);
       cursor: pointer;
       z-index: 20;
     }
@@ -175,476 +169,250 @@
     /* Hero Section */
     .hero {
       position: relative;
-      padding: 6rem 1rem 5rem;
-      background: radial-gradient(circle at center, #d9f9d9 0%, #f9f9ea 80%);
-      color: #3a6b35;
-      overflow: hidden;
-      max-width: 720px;
-      margin: 0 auto 3rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 8px 24px rgba(58, 107, 53, 0.1);
-      animation: fadeInUp 1s ease forwards;
+      padding: 5rem 2rem;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      max-width: 800px;
+      margin: 0 auto 4rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 40px rgba(58, 107, 53, 0.05);
+      animation: fadeInUp 1s ease-out;
     }
-    .hero h2 {
-      font-size: 2.5rem;
-      max-width: 700px;
-      margin: 0 auto 1.25rem;
-      font-weight: 700;
-      text-shadow: none;
-    }
-    .hero p {
-      font-size: 1.25rem;
-      max-width: 600px;
-      margin: 0 auto 0;
-      font-weight: 500;
-    }
-
-    /* Floating dandelion seeds */
-    .seed {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, #fff8dc 60%, transparent 70%);
-      border-radius: 50%;
-      filter: drop-shadow(0 0 2px #f0e9c9);
-      opacity: 0.2;
-      animation-name: floatSeed;
-      animation-timing-function: ease-in-out;
-      animation-iteration-count: infinite;
-      animation-duration: 12s;
-      pointer-events: none;
-    }
-    .seed:nth-child(1) {
-      left: 15%;
-      bottom: 10%;
-      animation-delay: 0s;
-      width: 18px;
-      height: 18px;
-    }
-    .seed:nth-child(2) {
-      left: 40%;
-      bottom: 5%;
-      animation-delay: 4s;
-      width: 15px;
-      height: 15px;
-    }
-    .seed:nth-child(3) {
-      left: 70%;
-      bottom: 15%;
-      animation-delay: 2s;
-      width: 20px;
-      height: 20px;
-    }
-    .seed:nth-child(4) {
-      left: 85%;
-      bottom: 8%;
-      animation-delay: 6s;
-      width: 12px;
-      height: 12px;
-    }
-    .seed:nth-child(5) {
-      left: 30%;
-      bottom: 12%;
-      animation-delay: 8s;
-      width: 14px;
-      height: 14px;
-    }
+    .hero h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
 
     /* Features Section */
     .features {
-      padding: 4rem 1rem 3rem;
-      background: #f9f9ea;
-      display: flex;
-      justify-content: center;
+      padding: 2rem 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
-      flex-wrap: wrap;
-      max-width: 960px;
-      margin: 0 auto 3rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 6px 18px rgba(58, 107, 53, 0.05);
+      max-width: 1000px;
+      margin: 0 auto 4rem;
     }
     .feature-card {
       background: white;
-      border-radius: 1.25rem;
-      box-shadow: 0 6px 14px rgba(58, 107, 53, 0.1);
-      padding: 2.5rem 2rem;
-      max-width: 320px;
-      flex: 1 1 280px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      animation: fadeInUp 1s ease forwards;
+      border-radius: 1.5rem;
+      padding: 3rem 2rem;
+      box-shadow: 0 10px 30px rgba(58, 107, 53, 0.06);
+      transition: all 0.3s ease;
       opacity: 0;
-      animation-fill-mode: forwards;
-      animation-delay: 0.3s;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .feature-card:nth-child(2) {
-      animation-delay: 0.5s;
-    }
-    .feature-card:nth-child(3) {
-      animation-delay: 0.7s;
+      animation: fadeInUp 0.8s ease forwards;
     }
     .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 24px rgba(58, 107, 53, 0.15);
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(58, 107, 53, 0.1);
     }
-    .feature-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 1px 2px rgba(58, 107, 53, 0.1));
-    }
-    .feature-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 0.75rem;
-      color: #3a6b35;
-    }
-    .feature-card p {
-      font-size: 1rem;
-      color: #6b8e4a;
-      margin-bottom: 0;
-    }
+    .feature-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+    .feature-card h3 { font-size: 1.5rem; }
 
     /* About Section */
     .about {
-      background: #e6f4d9;
-      padding: 4rem 1rem 3rem;
-      color: #3a6b35;
-      max-width: 700px;
-      margin: 0 auto 3rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 6px 12px rgba(58, 107, 53, 0.05);
-      font-weight: 500;
-    }
-    .about h2 {
-      margin-bottom: 1rem;
-      font-size: 2rem;
-    }
-    .about p {
-      font-size: 1.125rem;
-      max-width: none;
-      margin-bottom: 0;
-      line-height: 1.6;
+      background: var(--bg-green-light);
+      padding: 4rem 2rem;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+      border-radius: 2rem;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
     }
 
     /* Download Section */
-    .download {
-      padding: 4rem 1rem 4rem;
-      max-width: 700px;
-      margin: 0 auto 4rem;
-    }
-    .download h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: #3a6b35;
-      font-weight: 700;
-    }
-    .download .btn-group {
+    .download { padding: 4rem 1rem; }
+    .btn-group {
+      display: flex;
       justify-content: center;
       gap: 1.5rem;
-    }
-    .download a.btn-primary {
-      display: inline-block;
-      min-width: 180px;
-      text-align: center;
-      text-decoration: none;
-      color: #1b3a1b;
-      background: linear-gradient(135deg, #a7d8a7, #7ed8c6);
-      border-radius: 0.75rem;
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(126, 216, 198, 0.4);
-      transition: background 0.4s ease, box-shadow 0.4s ease;
-    }
-    .download a.btn-primary:hover {
-      background: linear-gradient(135deg, #7ed8c6, #a7d8a7);
-      box-shadow: 0 6px 14px rgba(126, 216, 198, 0.6);
+      flex-wrap: wrap;
     }
 
     /* Footer */
     footer {
-      margin-top: 4rem;
-      padding: 2rem 1rem;
-      background: #2f4f2f;
+      padding: 4rem 2rem;
+      background: #1b3a1b;
       color: #d9f9d9;
-      font-size: 0.9rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 1rem;
-      box-shadow: 0 6px 12px rgba(58, 107, 53, 0.2);
+      border-radius: 2rem 2rem 0 0;
+      max-width: 1000px;
+      margin: 4rem auto 0;
     }
-    footer .footer-links {
+    .footer-links {
       display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
+      gap: 2rem;
       justify-content: center;
+      margin-bottom: 2rem;
     }
-    footer .footer-links a {
-      color: #a7d8a7;
-      font-weight: 600;
-      transition: color 0.3s ease;
-    }
-    footer .footer-links a:hover {
-      color: #7ed8c6;
-      text-decoration: underline;
-    }
+    .footer-links a { color: #a7d8a7; font-weight: 500; }
 
     /* Bilingual text styles */
-    .bg-text {
-      display: none;
-    }
-    .bg .en-text {
-      display: none;
-    }
-    .bg .bg-text {
-      display: inline;
-    }
+    .bg-text { display: none; }
+    .bg .en-text { display: none; }
+    .bg .bg-text { display: inline; }
   </style>
 </head>
 <body>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  for (let i = 0; i < 40; i++) {
-    const seed = document.createElement("div");
-    seed.className = "floating-seed";
-    seed.style.left = Math.random() * 100 + "vw";
-    seed.style.animationDuration = 8 + Math.random() * 6 + "s";
-    seed.style.animationDelay = Math.random() * 4 + "s";
-    seed.style.opacity = 0.55;
-    document.body.appendChild(seed);
-  }
-});
-<\/script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // 🔥 Add 150 extra seeds dynamically for a fuller dandelion
-  const head = document.querySelector(".dandelion-bg .head");
-  for (let i = 0; i < 150; i++) {
-    const wrap = document.createElement("div");
-    wrap.className = "seed-wrapper outter";
-
-    const inner = document.createElement("div");
-    inner.className = "inner";
-
-    const seedEl = document.createElement("div");
-    seedEl.className = "seed";
-
-    inner.appendChild(seedEl);
-    wrap.appendChild(inner);
-    head.appendChild(wrap);
-  }
-  const wrappers = document.querySelectorAll(".dandelion-bg .seed-wrapper.outter");
-
-  wrappers.forEach((w, i) => {
-    // Random horizontal drift (-40vw to +40vw)
-    const tx = (Math.random() * 80 - 40).toFixed(1) + "vw";
-
-    // Random upward / diagonal height (-80vh to -220vh)
-    const ty = (Math.random() * -140 - 80).toFixed(1) + "vh";
-
-    // Random delay (0–3s)
-    const delay = (Math.random() * 3).toFixed(2) + "s";
-
-    // Set CSS vars for animation
-    w.style.setProperty("--tx", tx);
-    w.style.setProperty("--ty", ty);
-
-    // Random curve points for flying
-    w.style.setProperty("--rx1", (Math.random() * 30 - 15).toFixed(1) + "vw");
-    w.style.setProperty("--ry1", (Math.random() * -40 - 10).toFixed(1));
-
-    w.style.setProperty("--rx2", (Math.random() * 40 - 20).toFixed(1) + "vw");
-    w.style.setProperty("--ry2", (Math.random() * -80 - 20).toFixed(1));
-
-    w.style.setProperty("--rx3", (Math.random() * 60 - 30).toFixed(1) + "vw");
-    w.style.setProperty("--ry3", (Math.random() * -150 - 50).toFixed(1));
-
-    // Randomize delays & durations slightly
-    w.style.animationDelay = delay;
-    w.style.animationDuration = (6 + Math.random() * 3).toFixed(2) + "s";
-
-    const inner = w.querySelector(".inner");
-    const seed = w.querySelector(".seed");
-
-    // Give each seed a fully random starting rotation (ignores CSS nth-child fixed rotation)
-    const randomRotation = (Math.random() * 360).toFixed(1) + "deg";
-    seed.style.transform = "rotate(" + randomRotation + ")";
-
-    inner.style.animationDelay = delay;
-    seed.style.animationDelay = delay;
-  });
-});
-</script>
   <div class="dandelion-bg">
     <div class="dandelion">
-      <div class="head">
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
-        <div class="seed-wrapper outter"><div class="inner"><div class="seed"></div></div></div>
+      <div class="head" id="dandelion-head">
+        <!-- Seeds will be generated by JS -->
       </div>
     </div>
   </div>
+
   <header>
     <button id="lang-toggle" aria-label="Toggle language">Български</button>
     <img src="../images/icons/everyday_dandelion.png" alt="Everyday Dandelion Icon" class="app-icon" />
-    <h1><span class="en-text">Everyday Dandelion</span><span class="bg-text">Всеки ден Глухарче</span></h1>
-    <p class="lead"><span class="en-text">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</span><span class="bg-text">Лека апликация за улавяне на 5-секундни ежедневни моменти — бързо, осъзнато и красиво.</span></p>
+    <h1>
+      <span class="en-text">Everyday Dandelion</span>
+      <span class="bg-text">Всеки ден Глухарче</span>
+    </h1>
+    <p class="lead">
+      <span class="en-text">A simple app for capturing 5-second daily moments — quick, mindful, and beautiful.</span>
+      <span class="bg-text">Лека апликация за улавяне на 5-секундни ежедневни моменти — бързо, осъзнато и красиво.</span>
+    </p>
   </header>
 
-  <section class="hero" aria-label="Hero section with tagline">
-    <h2><span class="en-text">Capture Your Life, One Moment at a Time</span><span class="bg-text">Улови живота си, един момент наведнъж</span></h2>
-    <p><span class="en-text">Mindful video journaling designed to help you remember the beauty in everyday moments.</span><span class="bg-text">Осъзнат видео дневник, създаден да ти помогне да помниш красотата в ежедневните моменти.</span></p>
-    <div class="seed"></div>
-    <div class="seed"></div>
-    <div class="seed"></div>
-    <div class="seed"></div>
-    <div class="seed"></div>
-  </section>
+  <main>
+    <section class="hero" aria-label="Introduction">
+      <h2>
+        <span class="en-text">Capture Your Life, One Moment at a Time</span>
+        <span class="bg-text">Улови живота си, един момент наведнъж</span>
+      </h2>
+      <p>
+        <span class="en-text">Mindful video journaling designed to help you remember the beauty in everyday moments.</span>
+        <span class="bg-text">Осъзнат видео дневник, създаден да ти помогне да помниш красотата в ежедневните моменти.</span>
+      </p>
+    </section>
 
-  <section class="features" aria-label="Features of Everyday Dandelion">
-    <article class="feature-card" tabindex="0" aria-labelledby="feature1-title" aria-describedby="feature1-desc" style="animation-delay: 0.3s;">
-      <div class="feature-icon" aria-hidden="true">📸</div>
-      <h3 id="feature1-title"><span class="en-text">Capture Moments</span><span class="bg-text">Улавяй моменти</span></h3>
-      <p id="feature1-desc"><span class="en-text">Quickly record 5-second videos to preserve your daily highlights effortlessly.</span><span class="bg-text">Бързо записвай 5-секундни видеа, за да запазиш важните моменти от деня.</span></p>
-    </article>
-    <article class="feature-card" tabindex="0" aria-labelledby="feature2-title" aria-describedby="feature2-desc" style="animation-delay: 0.5s;">
-      <div class="feature-icon" aria-hidden="true">⏱️</div>
-      <h3 id="feature2-title"><span class="en-text">Watch Timelapses</span><span class="bg-text">Гледай таймлапси</span></h3>
-      <p id="feature2-desc"><span class="en-text">Watch your days and weeks unfold with beautiful timelapse compilations.</span><span class="bg-text">Наслаждавай се на дни и седмици, събрани в красиви таймлапс видеа.</span></p>
-    </article>
-    <article class="feature-card" tabindex="0" aria-labelledby="feature3-title" aria-describedby="feature3-desc" style="animation-delay: 0.7s;">
-      <div class="feature-icon" aria-hidden="true">🌿</div>
-      <h3 id="feature3-title"><span class="en-text">Stay Mindful</span><span class="bg-text">Бъди осъзнат</span></h3>
-      <p id="feature3-desc"><span class="en-text">Encourage daily reflection and mindfulness through simple, creative journaling.</span><span class="bg-text">Насърчава ежедневна рефлексия и осъзнатост чрез прост и творчески дневник.</span></p>
-    </article>
-  </section>
+    <section class="features" aria-label="Features">
+      <article class="feature-card" style="animation-delay: 0.1s;">
+        <span class="feature-icon" aria-hidden="true">📸</span>
+        <h3>
+          <span class="en-text">Capture Moments</span>
+          <span class="bg-text">Улавяй моменти</span>
+        </h3>
+        <p>
+          <span class="en-text">Quickly record 5-second videos to preserve your daily highlights effortlessly.</span>
+          <span class="bg-text">Бързо записвай 5-секундни видеа, за да запазиш важните моменти от деня.</span>
+        </p>
+      </article>
+      <article class="feature-card" style="animation-delay: 0.3s;">
+        <span class="feature-icon" aria-hidden="true">⏱️</span>
+        <h3>
+          <span class="en-text">Watch Timelapses</span>
+          <span class="bg-text">Гледай таймлапси</span>
+        </h3>
+        <p>
+          <span class="en-text">Watch your days and weeks unfold with beautiful timelapse compilations.</span>
+          <span class="bg-text">Наслаждавай се на дни и седмици, събрани в красиви таймлапс видеа.</span>
+        </p>
+      </article>
+      <article class="feature-card" style="animation-delay: 0.5s;">
+        <span class="feature-icon" aria-hidden="true">🌿</span>
+        <h3>
+          <span class="en-text">Stay Mindful</span>
+          <span class="bg-text">Бъди осъзнат</span>
+        </h3>
+        <p>
+          <span class="en-text">Encourage daily reflection and mindfulness through simple, creative journaling.</span>
+          <span class="bg-text">Насърчава ежедневна рефлексия и осъзнатост чрез прост и творчески дневник.</span>
+        </p>
+      </article>
+    </section>
 
+    <section class="about" aria-label="About">
+      <h2>
+        <span class="en-text">The Everyday Series</span>
+        <span class="bg-text">Серията Everyday</span>
+      </h2>
+      <p>
+        <span class="en-text">Everyday Dandelion is part of the Everyday family, including Everyday Lilly and Filetrap. Our apps are designed to inspire creativity and simplicity in your daily digital life.</span>
+        <span class="bg-text">Everyday Dandelion е част от семейството Everyday, включително Everyday Lilly и Filetrap. Нашите приложения са създадени да вдъхновяват креативност и простота.</span>
+      </p>
+    </section>
 
-  <section class="about" aria-label="About the Everyday series">
-    <h2><span class="en-text">About the Everyday Series</span><span class="bg-text">За серията Everyday</span></h2>
-    <p><span class="en-text">Everyday Dandelion is part of the Everyday family of apps, including Everyday Lilly and Filetrap. Each app is designed to inspire creativity, mindfulness, and simplicity in your daily digital life. Capture, organize, and cherish your moments with ease and beauty.</span><span class="bg-text">Everyday Dandelion е част от семейството приложения Everyday, включително Everyday Lilly и Filetrap. Всяко приложение е създадено да вдъхновява креативност, осъзнатост и простота в ежедневния ти дигитален живот. Заснемай, организирай и съхранявай моментите си лесно и красиво.</span></p>
-  </section>
-
-  <section class="download" aria-label="Download Everyday Dandelion app">
-    <h2><span class="en-text">Get the App</span><span class="bg-text">Изтегли приложението</span></h2>
-    <div class="btn-group">
-      <a href="#" style="opacity: 0.6; pointer-events: none;" class="btn-primary" aria-label="Coming Soon on Google Play"><span class="en-text">Coming Soon on Google Play</span><span class="bg-text">Очаквайте скоро в Google Play</span></a>
-      <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn-primary" aria-label="Download from Apple App Store"><span class="en-text">Get it on the App Store</span><span class="bg-text">Изтегли от App Store</span></a>
-    </div>
-  </section>
+    <section class="download" aria-label="Download">
+      <h2>
+        <span class="en-text">Get Started</span>
+        <span class="bg-text">Започни сега</span>
+      </h2>
+      <div class="btn-group">
+        <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn btn-primary">
+          <span class="en-text">Download on App Store</span>
+          <span class="bg-text">Изтегли от App Store</span>
+        </a>
+        <a href="#" style="opacity: 0.6; cursor: not-allowed;" class="btn btn-secondary">
+          <span class="en-text">Coming Soon to Android</span>
+          <span class="bg-text">Очаквайте за Android</span>
+        </a>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <div class="footer-links" role="navigation" aria-label="Footer navigation">
-      <a href="https://www.everydaylilly.com/supportus.html" rel="noopener"><span class="en-text">Support Us</span><span class="bg-text">Подкрепи ни</span></a>
-      <a href="privacypolicy.html" rel="noopener"><span class="en-text">Privacy Policy</span><span class="bg-text">Политика за поверителност</span></a>
-      <a href="https://www.everydaylilly.com" target="_blank" rel="noopener"><span class="en-text">Everyday Lilly Website</span><span class="bg-text">Уебсайт на Everyday Lilly</span></a>
+    <div class="footer-links">
+      <a href="https://www.everydaylilly.com/supportus.html">Support Us</a>
+      <a href="privacypolicy.html">Privacy Policy</a>
+      <a href="https://www.everydaylilly.com">Main Website</a>
     </div>
-    <p>&copy; <span id="year"></span> <span class="en-text">Everyday Dandelion. All rights reserved.</span><span class="bg-text">Всеки ден Глухарче. Всички права запазени.</span></p>
+    <p>&copy; <span id="year"></span> Everyday Dandelion. <span class="en-text">All rights reserved.</span><span class="bg-text">Всички права запазени.</span></p>
   </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set year
+      document.getElementById('year').textContent = new Date().getFullYear();
 
-    const langToggle = document.getElementById('lang-toggle');
-    langToggle.addEventListener('click', () => {
-      document.body.classList.toggle('bg');
-      if(document.body.classList.contains('bg')){
-        langToggle.textContent = 'English';
-        langToggle.setAttribute('aria-label', 'Switch to English');
-      } else {
-        langToggle.textContent = 'Български';
-        langToggle.setAttribute('aria-label', 'Превключи на български');
+      // Dandelion Seed Generation
+      const head = document.getElementById("dandelion-head");
+      if (head) {
+        for (let i = 0; i < 80; i++) {
+          const wrap = document.createElement("div");
+          wrap.className = "seed-wrapper outter";
+          wrap.innerHTML = '<div class="inner"><div class="seed"></div></div>';
+          
+          const delay = (Math.random() * 5).toFixed(2) + "s";
+          const duration = (6 + Math.random() * 4).toFixed(2) + "s";
+          const tx = (Math.random() * 100 - 50).toFixed(1) + "vw";
+          const ty = (Math.random() * -150 - 50).toFixed(1) + "vh";
+          
+          wrap.style.setProperty("--tx", tx);
+          wrap.style.setProperty("--ty", ty);
+          wrap.style.setProperty("--rx1", (Math.random() * 40 - 20).toFixed(1) + "vw");
+          wrap.style.setProperty("--ry1", (Math.random() * -30 - 10).toFixed(1));
+          wrap.style.setProperty("--rx2", (Math.random() * 60 - 30).toFixed(1) + "vw");
+          wrap.style.setProperty("--ry2", (Math.random() * -70 - 20).toFixed(1));
+          wrap.style.setProperty("--rx3", (Math.random() * 80 - 40).toFixed(1) + "vw");
+          wrap.style.setProperty("--ry3", (Math.random() * -140 - 50).toFixed(1));
+          
+          wrap.style.animationDelay = delay;
+          wrap.style.animationDuration = duration;
+          
+          const seed = wrap.querySelector(".seed");
+          seed.style.transform = `rotate(${(Math.random() * 360).toFixed(1)}deg)`;
+          seed.style.animationDelay = delay;
+          
+          head.appendChild(wrap);
+        }
       }
+
+      // Background floating seeds
+      for (let i = 0; i < 30; i++) {
+        const seed = document.createElement("div");
+        seed.className = "floating-seed";
+        seed.style.left = Math.random() * 100 + "vw";
+        seed.style.animationDuration = (10 + Math.random() * 10) + "s";
+        seed.style.animationDelay = (Math.random() * 5) + "s";
+        seed.style.opacity = (0.2 + Math.random() * 0.3).toString();
+        document.body.appendChild(seed);
+      }
+
+      // Language Toggle
+      const langToggle = document.getElementById('lang-toggle');
+      langToggle.addEventListener('click', () => {
+        document.body.classList.toggle('bg');
+        const isBg = document.body.classList.contains('bg');
+        langToggle.textContent = isBg ? 'English' : 'Български';
+        langToggle.setAttribute('aria-label', isBg ? 'Switch to English' : 'Превключи на английски');
+      });
     });
   </script>
 </body>
