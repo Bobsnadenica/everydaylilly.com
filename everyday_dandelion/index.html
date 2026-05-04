@@ -60,15 +60,21 @@
     }
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top left, var(--bg-green-light), var(--bg-cream));
+      background: var(--bg-cream);
       color: #2f4f2f;
       margin: 0;
       text-align: center;
       overflow-x: hidden;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      position: relative;
     }
+    
+    /* Ensure content is above background */
+    header, main, footer {
+      position: relative;
+      z-index: 20;
+    }
+
     a {
       color: var(--accent-teal);
       text-decoration: none;
@@ -95,29 +101,32 @@
       cursor: pointer;
       border: none;
       border-radius: 0.75rem;
-      padding: 0.85rem 2.25rem;
-      font-weight: 600;
+      padding: 0.85rem 2rem;
+      font-weight: 700;
       font-size: 1rem;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       text-decoration: none;
+      min-width: 200px;
+      box-sizing: border-box;
     }
     .btn-primary {
       background: linear-gradient(135deg, #a7d8a7, var(--accent-teal));
-      color: #1b3a1b;
-      box-shadow: 0 4px 15px rgba(126, 216, 198, 0.3);
+      color: #1b3a1b !important;
+      box-shadow: 0 4px 15px rgba(58, 107, 53, 0.2);
     }
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(126, 216, 198, 0.5);
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(58, 107, 53, 0.3);
     }
     .btn-secondary {
-      background-color: transparent;
+      background-color: rgba(255, 255, 255, 0.6);
       color: var(--primary-green);
       border: 2px solid #a7d8a7;
+      backdrop-filter: blur(5px);
     }
-    .btn-secondary:hover:not(:disabled) {
+    .btn-secondary:hover {
       background-color: var(--bg-green-light);
-      border-color: var(--accent-teal);
+      transform: translateY(-3px);
     }
 
     /* Animations */
@@ -132,9 +141,7 @@
 
     /* Header */
     header {
-      padding: 4rem 1rem 2rem;
-      position: relative;
-      z-index: 10;
+      padding: 2rem 1rem 1rem;
       max-width: 800px;
       margin: 0 auto;
     }
@@ -147,8 +154,8 @@
       filter: drop-shadow(0 4px 10px rgba(58, 107, 53, 0.2));
       display: block;
     }
-    h1 { font-size: 3.25rem; letter-spacing: -0.02em; }
-    p.lead { font-size: 1.35rem; font-weight: 500; opacity: 0.9; }
+    h1 { font-size: 3rem; letter-spacing: -0.02em; }
+    p.lead { font-size: 1.25rem; font-weight: 500; opacity: 0.9; }
 
     #lang-toggle {
       position: absolute;
@@ -157,88 +164,87 @@
       font-size: 0.9rem;
       font-weight: 600;
       color: var(--primary-green);
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.7);
       padding: 0.5rem 1rem;
       border-radius: 2rem;
       backdrop-filter: blur(4px);
-      border: 1px solid rgba(167, 216, 167, 0.3);
+      border: 1px solid rgba(167, 216, 167, 0.4);
       cursor: pointer;
-      z-index: 20;
+      z-index: 30;
     }
 
     /* Hero Section */
     .hero {
-      position: relative;
-      padding: 5rem 2rem;
-      background: rgba(255, 255, 255, 0.4);
+      padding: 3rem 2rem;
+      background: rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(10px);
       max-width: 800px;
-      margin: 0 auto 4rem;
+      margin: 0 auto 2rem;
       border-radius: 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.4);
       box-shadow: 0 20px 40px rgba(58, 107, 53, 0.05);
       animation: fadeInUp 1s ease-out;
     }
-    .hero h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+    .hero h2 { font-size: 2.25rem; margin-bottom: 1.25rem; }
+    
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
 
     /* Features Section */
     .features {
-      padding: 2rem 1rem;
+      padding: 1rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
       max-width: 1000px;
-      margin: 0 auto 4rem;
+      margin: 0 auto 2rem;
     }
     .feature-card {
-      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
       border-radius: 1.5rem;
-      padding: 3rem 2rem;
+      padding: 2.5rem 1.5rem;
       box-shadow: 0 10px 30px rgba(58, 107, 53, 0.06);
       transition: all 0.3s ease;
       opacity: 0;
       animation: fadeInUp 0.8s ease forwards;
     }
     .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(58, 107, 53, 0.1);
+      transform: translateY(-5px);
+      background: white;
     }
-    .feature-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
-    .feature-card h3 { font-size: 1.5rem; }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+    .feature-card h3 { font-size: 1.35rem; }
 
     /* About Section */
     .about {
-      background: var(--bg-green-light);
-      padding: 4rem 2rem;
+      background: rgba(230, 244, 217, 0.7);
+      backdrop-filter: blur(5px);
+      padding: 3rem 2rem;
       max-width: 800px;
-      margin: 0 auto 4rem;
+      margin: 0 auto 2rem;
       border-radius: 2rem;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
-    }
-
-    /* Download Section */
-    .download { padding: 4rem 1rem; }
-    .btn-group {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
     }
 
     /* Footer */
     footer {
-      padding: 4rem 2rem;
+      padding: 3rem 2rem;
       background: #1b3a1b;
       color: #d9f9d9;
       border-radius: 2rem 2rem 0 0;
       max-width: 1000px;
-      margin: 4rem auto 0;
+      margin: 2rem auto 0;
     }
     .footer-links {
       display: flex;
       gap: 2rem;
       justify-content: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     .footer-links a { color: #a7d8a7; font-weight: 500; }
 
@@ -246,14 +252,19 @@
     .bg-text { display: none; }
     .bg .en-text { display: none; }
     .bg .bg-text { display: inline; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2.25rem; }
+      .hero h2 { font-size: 1.75rem; }
+      .btn { width: 100%; min-width: 0; }
+      header { padding-top: 4rem; }
+    }
   </style>
 </head>
 <body>
   <div class="dandelion-bg">
     <div class="dandelion">
-      <div class="head" id="dandelion-head">
-        <!-- Seeds will be generated by JS -->
-      </div>
+      <div class="head" id="dandelion-head"></div>
     </div>
   </div>
 
@@ -280,6 +291,18 @@
         <span class="en-text">Mindful video journaling designed to help you remember the beauty in everyday moments.</span>
         <span class="bg-text">Осъзнат видео дневник, създаден да ти помогне да помниш красотата в ежедневните моменти.</span>
       </p>
+      
+      <!-- Buttons moved to Hero for better visibility and access -->
+      <div class="btn-group">
+        <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn btn-primary">
+          <span class="en-text">Download on App Store</span>
+          <span class="bg-text">Изтегли от App Store</span>
+        </a>
+        <a href="#" style="opacity: 0.7; cursor: not-allowed;" class="btn btn-secondary">
+          <span class="en-text">Android Coming Soon</span>
+          <span class="bg-text">Очаквайте за Android</span>
+        </a>
+      </div>
     </section>
 
     <section class="features" aria-label="Features">
@@ -294,7 +317,7 @@
           <span class="bg-text">Бързо записвай 5-секундни видеа, за да запазиш важните моменти от деня.</span>
         </p>
       </article>
-      <article class="feature-card" style="animation-delay: 0.3s;">
+      <article class="feature-card" style="animation-delay: 0.2s;">
         <span class="feature-icon" aria-hidden="true">⏱️</span>
         <h3>
           <span class="en-text">Watch Timelapses</span>
@@ -305,7 +328,7 @@
           <span class="bg-text">Наслаждавай се на дни и седмици, събрани в красиви таймлапс видеа.</span>
         </p>
       </article>
-      <article class="feature-card" style="animation-delay: 0.5s;">
+      <article class="feature-card" style="animation-delay: 0.3s;">
         <span class="feature-icon" aria-hidden="true">🌿</span>
         <h3>
           <span class="en-text">Stay Mindful</span>
@@ -324,26 +347,9 @@
         <span class="bg-text">Серията Everyday</span>
       </h2>
       <p>
-        <span class="en-text">Everyday Dandelion is part of the Everyday family, including Everyday Lilly and Filetrap. Our apps are designed to inspire creativity and simplicity in your daily digital life.</span>
-        <span class="bg-text">Everyday Dandelion е част от семейството Everyday, включително Everyday Lilly и Filetrap. Нашите приложения са създадени да вдъхновяват креативност и простота.</span>
+        <span class="en-text">Everyday Dandelion is part of the Everyday family, including Everyday Lilly and Filetrap. Our apps are designed to inspire creativity and simplicity.</span>
+        <span class="bg-text">Everyday Dandelion е част от семейството Everyday, включително Everyday Lilly и Filetrap. Нашите приложения вдъхновяват креативност и простота.</span>
       </p>
-    </section>
-
-    <section class="download" aria-label="Download">
-      <h2>
-        <span class="en-text">Get Started</span>
-        <span class="bg-text">Започни сега</span>
-      </h2>
-      <div class="btn-group">
-        <a href="https://apps.apple.com/bg/app/everyday-dandelion/id6754181607" target="_blank" rel="noopener" class="btn btn-primary">
-          <span class="en-text">Download on App Store</span>
-          <span class="bg-text">Изтегли от App Store</span>
-        </a>
-        <a href="#" style="opacity: 0.6; cursor: not-allowed;" class="btn btn-secondary">
-          <span class="en-text">Coming Soon to Android</span>
-          <span class="bg-text">Очаквайте за Android</span>
-        </a>
-      </div>
     </section>
   </main>
 
@@ -364,12 +370,12 @@
       // Dandelion Seed Generation
       const head = document.getElementById("dandelion-head");
       if (head) {
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 60; i++) {
           const wrap = document.createElement("div");
           wrap.className = "seed-wrapper outter";
           wrap.innerHTML = '<div class="inner"><div class="seed"></div></div>';
           
-          const delay = (Math.random() * 5).toFixed(2) + "s";
+          const delay = (Math.random() * 4).toFixed(2) + "s";
           const duration = (6 + Math.random() * 4).toFixed(2) + "s";
           const tx = (Math.random() * 100 - 50).toFixed(1) + "vw";
           const ty = (Math.random() * -150 - 50).toFixed(1) + "vh";
@@ -395,11 +401,11 @@
       }
 
       // Background floating seeds
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 20; i++) {
         const seed = document.createElement("div");
         seed.className = "floating-seed";
         seed.style.left = Math.random() * 100 + "vw";
-        seed.style.animationDuration = (10 + Math.random() * 10) + "s";
+        seed.style.animationDuration = (12 + Math.random() * 10) + "s";
         seed.style.animationDelay = (Math.random() * 5) + "s";
         seed.style.opacity = (0.2 + Math.random() * 0.3).toString();
         document.body.appendChild(seed);
