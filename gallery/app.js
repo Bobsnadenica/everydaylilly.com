@@ -196,7 +196,6 @@
     try {
       return sanitizeRefreshToken(localStorage.getItem(getStorageKey("refresh", collection)));
     } catch (error) {
-      console.warn("Unable to read gallery refresh token from localStorage.", error);
       return "";
     }
   }
@@ -212,7 +211,6 @@
         localStorage.removeItem(key);
       }
     } catch (error) {
-      console.warn("Unable to write gallery refresh token to localStorage.", error);
     }
   }
 
@@ -809,7 +807,6 @@
           refreshToken: state.refreshToken,
         });
       } catch (error) {
-        console.error(error);
         if (status) status.textContent = "Грешка при зареждане на архива.";
         if (content) {
           content.className = "loading-state";

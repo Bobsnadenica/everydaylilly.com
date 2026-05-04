@@ -1,9 +1,7 @@
-/* --- Global & Typography --- */
 body {
     font-family: 'Inter', sans-serif;
-    /* Updated background to match the new Tailwind-based sections (e.g., bg-gray-50, bg-gray-100) */
-    background-color: #f7f7f7; /* Light gray base for better section separation */
-    color: #1f2937; /* text-gray-800 */
+    background-color: #f7f7f7;
+    color: #1f2937;
     margin: 0;
 }
 
@@ -21,9 +19,6 @@ body.loaded {
     font-family: 'Playfair Display', serif;
 }
 
-/* --- Navigation & Header --- */
-
-/* --- Hero Section Mobile Fix --- */
 .hero-section {
     padding-top: env(safe-area-inset-top, 2rem);
     padding-bottom: 2rem;
@@ -79,7 +74,6 @@ body.loaded {
   }
 }
 
-/* STICKY NAVIGATION */
 .sticky-nav {
     position: sticky;
     top: 0;
@@ -89,25 +83,22 @@ body.loaded {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Hero Section background (Keep this if you prefer it in CSS) */
 .hero-bg {
     background-image: url('images/hero.jpg');
     background-size: cover;
     background-position: center;
 }
 
-/* Hero Section text shadow for better contrast */
 .text-shadow-lg {
     text-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* --- Buttons --- */
 .btn-primary {
-    background-color: #059669; /* emerald-600 */
+    background-color: #059669;
     color: white;
     font-weight: bold;
     padding: 0.75rem 2rem;
-    border-radius: 9999px; /* full rounded-full */
+    border-radius: 9999px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     border: none;
@@ -124,12 +115,12 @@ body.loaded {
     inset: 0;
     border-radius: inherit;
     z-index: -1;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.18); /* Apple-style subtle shadow */
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-    background-color: #047857; /* emerald-700 */
+    background-color: #047857;
     outline: none;
     transform: translateY(-2px);
 }
@@ -139,31 +130,28 @@ body.loaded {
 }
 
 .btn-primary:focus-visible {
-    outline: 2px solid #34d399; /* emerald-400 */
+    outline: 2px solid #34d399;
     outline-offset: 3px;
 }
 
 .btn-primary:disabled,
 .btn-primary[disabled] {
-    background-color: #a7f3d0; /* emerald-200 */
+    background-color: #a7f3d0;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
 
-/* --- FIX: Remove green halo around rounded buttons on Firefox (Desktop) --- */
 .btn-primary {
-    isolation: isolate;        /* prevents shadow bleeding */
-    box-shadow: 0 3px 8px rgba(5, 150, 105, 0.22); /* softer default shadow */
+    isolation: isolate;
+    box-shadow: 0 3px 8px rgba(5, 150, 105, 0.22);
 }
 
-/* Strong shadows only on hover (PC only) */
 @media (min-width: 768px) {
     .btn-primary:hover {
     }
 }
 
- /* On mobile keep softer shadows */
 @media (max-width: 767px) {
     .btn-primary {
         box-shadow: 0 4px 10px rgba(5, 150, 105, 0.30);
@@ -172,11 +160,11 @@ body.loaded {
 
 .btn-secondary {
     background-color: #ffffff;
-    color: #4b5563; /* gray-600 */
+    color: #4b5563;
     font-weight: bold;
     padding: 0.75rem 2rem;
     border-radius: 9999px;
-    border: 2px solid #e5e7eb; /* gray-200 border */
+    border: 2px solid #e5e7eb;
     opacity: 0.7;
     cursor: not-allowed;
     display: inline-block;
@@ -192,7 +180,6 @@ body.loaded {
     cursor: not-allowed;
 }
 
-/* Feature Cards */
 .feature-card {
     background-color: white;
     padding: 2rem;
@@ -210,7 +197,6 @@ body.loaded {
     transform: translateY(-3px);
 }
 
-/* --- Gallery (Updated: Arrows removed) --- */
 .gallery-container {
     position: relative;
     width: 100%;
@@ -251,16 +237,12 @@ body.loaded {
 
 @media (min-width: 640px), (min-width: 1024px) {
     .gallery-item {
-        /* Reset to standard inline-block style for the new structure */
         flex: auto;
         max-width: 100%;
         height: auto;
     }
 }
 
-/* Removed styles for .gallery-nav, .gallery-prev, and .gallery-next */
-
-/* Dots Navigation */
 .gallery-dots {
     display: flex;
     justify-content: center;
@@ -271,7 +253,7 @@ body.loaded {
 .gallery-dot {
     width: 0.625rem;
     height: 0.625rem;
-    background: #d1d5db; /* gray-300 */
+    background: #d1d5db;
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
@@ -280,21 +262,20 @@ body.loaded {
 
 .gallery-dot:hover,
 .gallery-dot:focus {
-    background: #6ee7b7; /* emerald-300 */
+    background: #6ee7b7;
     outline: none;
 }
 
 .gallery-dot:focus-visible {
-    outline: 2px solid #10b981; /* emerald-500 */
+    outline: 2px solid #10b981;
     outline-offset: 2px;
 }
 
 .gallery-dot.active {
-    background: #059669; /* emerald-600 */
+    background: #059669;
     transform: scale(1.2);
 }
 
-/* --- Lightbox --- */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -371,7 +352,7 @@ body.loaded {
         font-size: 2rem;
     }
 }
-/* --- App Carousel --- */
+
 .app-carousel-container {
   perspective: 1000px;
   position: relative;

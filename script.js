@@ -1,11 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // === Utility Functions ===
     const query = selector => document.querySelector(selector);
     const queryAll = selector => document.querySelectorAll(selector);
 
-    const warnMissingElement = (name) => console.warn(`${name} element not found`);
-
-    // === Constants: DOM Elements ===
     const elements = {
         titleEl: query('h1.font-display'),
         subtitleEl: query('header p'),
@@ -31,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         contactText: query('#contact-section p'),
     };
 
-    // === Language Button Navigation ===
     const langButtonsContainer = query('#language-buttons');
     if (langButtonsContainer) {
         langButtonsContainer.addEventListener('click', (e) => {
@@ -92,7 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     lightbox.appendChild(contentWrapper);
     document.body.appendChild(lightbox);
 
-    // === Lightbox Functions ===
     function openLightbox(index) {
         currentIndex = index;
         imageElement.src = galleryItems[index].src;
@@ -122,7 +116,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateLightboxNav();
     }
 
-    // === Gallery Dots Setup ===
     const dots = [];
     galleryItems.forEach((_, index) => {
         const dot = document.createElement('div');
@@ -133,7 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         dots.push(dot);
     });
 
-    // Event delegation for dots
     dotsContainer.addEventListener('click', (e) => {
         const clickedDot = e.target.closest('.gallery-dot');
         if (!clickedDot) return;
@@ -145,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
     }
 
-    // === Gallery Item Click & Keyboard ===
     galleryItems.forEach((item, index) => {
         item.setAttribute('tabindex', '0');
         item.addEventListener('click', () => openLightbox(index));
@@ -157,7 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // === Lightbox Navigation ===
     lbPrev.addEventListener('click', () => {
         if (currentIndex > 0) openLightbox(currentIndex - 1);
     });
@@ -179,7 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (e.key === 'ArrowLeft' && currentIndex > 0) openLightbox(currentIndex - 1);
     });
 
-    // === Scroll Snap Active Dot Update ===
     if (galleryContainer) {
         galleryContainer.addEventListener('scroll', () => {
             const containerCenter = galleryContainer.scrollLeft + galleryContainer.offsetWidth / 2;
@@ -201,12 +190,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateLightboxNav();
             }
         });
-    } else warnMissingElement('Gallery container');
+    }
 
-    // === Resize: Recalculate scroll positions ===
 window.addEventListener('resize', () => scrollToImage(currentIndex));
 
-// === App Carousel Logic ===
 const cards = document.querySelectorAll('.app-card');
 const nextBtn = document.getElementById('carousel-next');
 const prevBtn = document.getElementById('carousel-prev');
@@ -235,7 +222,6 @@ prevBtn?.addEventListener('click', () => {
   updateCarousel();
 });
 
-// Touch support
 let startX = 0;
 const carousel = document.querySelector('.app-carousel');
 if (window.innerWidth > 640) {
@@ -247,7 +233,6 @@ if (window.innerWidth > 640) {
     });
 }
 
-// Keyboard arrow support — skip when lightbox or modal is open
 document.addEventListener('keydown', e => {
   if (lightbox.classList.contains('open')) return;
   if (loginModal?.style.display === 'flex') return;
@@ -255,7 +240,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') prevBtn?.click();
 });
 
-// === Profile / Login Modal ===
 const auth = window.EverydayLillyAuth;
 const profileButtons = [...document.querySelectorAll('[data-profile-trigger]')];
 const profileLabels = [...document.querySelectorAll('[data-profile-label]')];

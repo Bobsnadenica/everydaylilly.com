@@ -47,7 +47,6 @@
       const raw = storage.getItem(key);
       return raw ? JSON.parse(raw) : null;
     } catch (error) {
-      console.warn("Unable to parse stored auth payload.", error);
       return null;
     }
   }
@@ -164,7 +163,6 @@
     try {
       return JSON.parse(atob(padded));
     } catch (error) {
-      console.warn("Unable to decode JWT payload.", error);
       return null;
     }
   }
@@ -191,7 +189,6 @@
         try {
           return normalizeClaimValues(JSON.parse(trimmed));
         } catch (error) {
-          console.warn("Unable to parse structured claim string.", error);
         }
       }
 
@@ -283,7 +280,6 @@
       popup.document.body.innerHTML =
         '<div style="padding:24px 28px;border-radius:24px;background:white;box-shadow:0 24px 60px -24px rgba(15,23,42,0.24);text-align:center;color:#065f46;font-size:15px;line-height:1.6;">Opening secure sign-in…</div>';
     } catch (error) {
-      console.warn("Unable to paint popup loading state.", error);
     }
 
     return popup;
@@ -521,7 +517,6 @@
     try {
       return await refreshSession(session, options);
     } catch (error) {
-      console.warn("Unable to refresh Cognito session.", error);
       clearSession();
       return null;
     }

@@ -147,9 +147,7 @@
 ════════════════════════════════════════════════ -->
 <canvas id="starfield"></canvas>
 
-<!-- ════════════════════════════════════════════════
-     NAV
-════════════════════════════════════════════════ -->
+
 <nav class="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
   <a href="#" class="font-boogaloo text-2xl text-gold-gradient select-none">
     ⭐ Who Wants to Be Smart?
@@ -170,9 +168,7 @@
   </div>
 </nav>
 
-<!-- ════════════════════════════════════════════════
-     HERO
-════════════════════════════════════════════════ -->
+
 <header class="relative z-10 text-center px-6 pt-16 pb-24">
   <!-- floating emoji mascot -->
   <div class="text-7xl mb-6 inline-block" style="animation: float 4s ease-in-out infinite;">🎓</div>
@@ -216,9 +212,7 @@
   </div>
 </header>
 
-<!-- ════════════════════════════════════════════════
-     PACK GRID
-════════════════════════════════════════════════ -->
+
 <section id="packs" class="relative z-10 max-w-6xl mx-auto px-6 pb-24">
   <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-2">Question Packs</h2>
   <p class="text-white/50 text-center mb-10 font-nunito">Tap any card to preview the pack details</p>
@@ -239,9 +233,7 @@
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════
-     HOW IT WORKS
-════════════════════════════════════════════════ -->
+
 <section id="how" class="relative z-10 max-w-3xl mx-auto px-6 pb-28">
   <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-12">How It Works</h2>
 
@@ -298,9 +290,7 @@
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════
-     DEV SETUP
-════════════════════════════════════════════════ -->
+
 <section id="setup" class="relative z-10 max-w-4xl mx-auto px-6 pb-32">
   <h2 class="font-boogaloo text-4xl text-gold-gradient text-center mb-4">Developer Setup</h2>
   <p class="text-white/50 text-center mb-10 font-nunito">
@@ -386,9 +376,7 @@ python3 scripts/build_packs.py
   </div>
 </section>
 
-<!-- ════════════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════════════ -->
+
 <footer class="relative z-10 border-t border-white/10 py-10 px-6 text-center">
   <p class="font-boogaloo text-2xl text-gold-gradient mb-2">⭐ Who Wants to Be Smart?</p>
   <p class="text-white/40 text-sm font-nunito">
@@ -407,9 +395,7 @@ python3 scripts/build_packs.py
   </div>
 </footer>
 
-<!-- ════════════════════════════════════════════════
-     PACK DETAIL MODAL
-════════════════════════════════════════════════ -->
+
 <div id="modal-backdrop"
      class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center
             justify-center px-4 py-8 hidden"
@@ -457,15 +443,10 @@ python3 scripts/build_packs.py
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════════ -->
+
 <script>
-  // ── Configuration ────────────────────────────────────────────────────────────
-  // IMPORTANT: update this to your deployed URL before shipping.
   const MANIFEST_URL = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + 'manifest.json';
 
-  // ── Starfield ─────────────────────────────────────────────────────────────────
   (function () {
     const canvas = document.getElementById('starfield');
     const ctx    = canvas.getContext('2d');
@@ -508,7 +489,6 @@ python3 scripts/build_packs.py
     window.addEventListener('resize', () => { resize(); initStars(220); });
   })();
 
-  // ── Manifest loading ──────────────────────────────────────────────────────────
   let loadedManifest = null;
 
   async function loadManifest() {
@@ -599,7 +579,6 @@ python3 scripts/build_packs.py
     grid.classList.remove('hidden');
   }
 
-  // ── Modal ─────────────────────────────────────────────────────────────────────
   function openModal(pack) {
     const box = document.getElementById('modal-box');
     document.getElementById('modal-icon').textContent       = pack.icon_emoji || '📦';
@@ -635,7 +614,6 @@ python3 scripts/build_packs.py
 
   function handleEsc(e) { if (e.key === 'Escape') closeModal(); }
 
-  // ── Manifest URL copy ─────────────────────────────────────────────────────────
   function copyManifest() {
     navigator.clipboard.writeText(MANIFEST_URL).then(() => {
       const btn = document.getElementById('copy-btn');
@@ -648,10 +626,8 @@ python3 scripts/build_packs.py
     });
   }
 
-  // ── Set manifest URL display ──────────────────────────────────────────────────
   document.getElementById('manifest-url').textContent = MANIFEST_URL;
 
-  // ── Init ──────────────────────────────────────────────────────────────────────
   loadManifest();
 </script>
 
