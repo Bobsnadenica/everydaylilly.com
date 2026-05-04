@@ -7,105 +7,107 @@
   <link rel="icon" type="image/png" href="/images/icons/everyday_lilly.png">
   <meta name="description" content="Explore Everyday Stuff: a collection of fun, free educational games for kids. From learning to tell time with Kid's Clock Game to picture matching and trivia.">
   <meta name="keywords" content="kids games, learning games, educational apps, toddler games, clock game, trivia for kids, free educational games, everyday stuff">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+  
   <style>
     body {
-      font-family: Inter, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 40px 20px;
-      color: #333;
+      font-family: 'Inter', sans-serif;
     }
-    h1 {
-      text-align: center;
-      font-size: 2.4rem;
-      margin-bottom: 40px;
+    .font-fun {
+      font-family: 'Bubblegum Sans', cursive;
     }
-    .project-list {
-      max-width: 600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     }
-    .project {
-      display: flex;
-      align-items: center;
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      gap: 16px;
-    }
-    .project img {
-      width: 72px;
-      height: 72px;
-      border-radius: 12px;
-      object-fit: cover;
-      flex: 0 0 72px;
-    }
-    .project-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-    .soon {
-      font-size: 0.9rem;
-      color: #059669;
-      margin-top: 4px;
-    }
-    .project-link {
-      color: #2563eb;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .project-link:hover,
-    .project-link:focus-visible {
-      text-decoration: underline;
+    .bg-dots {
+      background-image: radial-gradient(#ffffff 2px, transparent 2px);
+      background-size: 30px 30px;
     }
   </style>
 </head>
-<body>
+<body class="bg-amber-50 min-h-screen">
 
-  <h1>More Everyday Stuff</h1>
+  <!-- Header / Navigation -->
+  <nav class="p-6">
+    <a href="../index.html" class="inline-flex items-center text-amber-700 hover:text-amber-900 font-semibold transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Everyday Lilly
+    </a>
+  </nav>
 
-  <div class="project-list">
+  <!-- Hero Section -->
+  <header class="text-center px-4 py-12 relative overflow-hidden">
+    <div class="absolute inset-0 bg-dots opacity-20 pointer-events-none"></div>
+    <h1 class="font-fun text-5xl md:text-7xl text-amber-600 mb-4 drop-shadow-sm">More Everyday Stuff</h1>
+    <p class="text-xl text-amber-800 max-w-2xl mx-auto font-medium">
+      Discover our collection of fun, free, and educational games designed specifically for curious kids!
+    </p>
+  </header>
 
-    <div class="project">
-      <img src="../images/icons/kids_games.png" alt="Kid's Clock Game">
-      <div>
-        <div class="project-title">Kid's Clock Game</div>
-        <div class="soon">Available on iOS &amp; Android — Coming Soon</div>
-        <div class="soon">
-          <a href="clock_game_privacy_policy.html" class="project-link">Privacy Policy</a>
+  <!-- Games Grid -->
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Kid's Clock Game -->
+      <div class="bg-white rounded-3xl p-6 shadow-lg transition-all duration-300 card-hover border-b-8 border-emerald-400">
+        <div class="flex items-center gap-4 mb-6">
+          <img src="../images/icons/kids_games.png" alt="Kid's Clock Game" class="w-20 h-20 rounded-2xl shadow-md border-2 border-emerald-100">
+          <h2 class="font-fun text-3xl text-emerald-600">Kid's Clock Game</h2>
+        </div>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+          The perfect way for children to learn how to tell time! Interactive and engaging gameplay that makes learning fun.
+        </p>
+        <div class="space-y-3">
+          <span class="inline-block bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wide">Coming Soon</span>
+          <div class="flex items-center gap-3">
+            <a href="clock_game_privacy_policy.html" class="text-emerald-600 hover:text-emerald-800 text-sm font-semibold underline decoration-2 underline-offset-4 transition-colors">Privacy Policy</a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="project">
-      <img src="howwenamethings/logo.png" alt="How We Name Things">
-      <div>
-        <div class="project-title">How We Name Things</div>
-        <div class="soon">A picture-matching game for everyday words</div>
-        <div class="soon">
-          <a href="howwenamethings/index.html" class="project-link">Visit the game page</a>
+      <!-- How We Name Things -->
+      <div class="bg-white rounded-3xl p-6 shadow-lg transition-all duration-300 card-hover border-b-8 border-sky-400">
+        <div class="flex items-center gap-4 mb-6">
+          <img src="howwenamethings/logo.png" alt="How We Name Things" class="w-20 h-20 rounded-2xl shadow-md border-2 border-sky-100">
+          <h2 class="font-fun text-3xl text-sky-600">How We Name Things</h2>
         </div>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+          A vibrant picture-matching game that helps kids build their vocabulary with everyday words and objects.
+        </p>
+        <a href="howwenamethings/index.html" class="inline-block w-full text-center bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-md hover:shadow-lg">
+          Play Game
+        </a>
       </div>
-    </div>
 
-    <div class="project">
-      <img src="Who_Wants_to_be_smart/icon.png" alt="Who Wants to Be Smart">
-      <div>
-        <div class="project-title">Who Wants to Be Smart?</div>
-        <div class="soon">A Who Wants to Be a Millionaire style game for kids</div>
-        <div class="soon">
-          <a href="Who_Wants_to_be_smart/index.html" class="project-link">Visit the game page</a>
+      <!-- Who Wants to Be Smart? -->
+      <div class="bg-white rounded-3xl p-6 shadow-lg transition-all duration-300 card-hover border-b-8 border-indigo-400">
+        <div class="flex items-center gap-4 mb-6">
+          <img src="Who_Wants_to_be_smart/icon.png" alt="Who Wants to Be Smart" class="w-20 h-20 rounded-2xl shadow-md border-2 border-indigo-100">
+          <h2 class="font-fun text-3xl text-indigo-600">Who Wants to Be Smart?</h2>
         </div>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+          Test your knowledge in this Millionaire-style trivia game! Designed with kid-friendly questions and exciting rewards.
+        </p>
+        <a href="Who_Wants_to_be_smart/index.html" class="inline-block w-full text-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-md hover:shadow-lg">
+          Play Game
+        </a>
       </div>
-    </div>
 
-  </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-12 text-amber-800/60 font-medium">
+    <p>&copy; 2024 Everyday Stuff. All rights reserved.</p>
+  </footer>
 
 </body>
 </html>
