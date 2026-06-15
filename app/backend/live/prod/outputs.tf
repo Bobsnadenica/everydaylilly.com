@@ -23,6 +23,16 @@ output "gallery_manifest_api_direct_url" {
   value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${trimprefix(local.gallery_manifest_path, "/")}"
 }
 
+output "gallery_upload_url" {
+  description = "JWT-protected endpoint that returns duplicate-safe S3 upload URLs for gallery admins."
+  value       = "${var.gallery_public_base_url}${local.gallery_upload_path}"
+}
+
+output "gallery_upload_api_direct_url" {
+  description = "Direct API Gateway URL for requesting duplicate-safe gallery upload URLs."
+  value       = "${aws_apigatewayv2_stage.gallery.invoke_url}${trimprefix(local.gallery_upload_path, "/")}"
+}
+
 output "gallery_cache_version" {
   description = "Stable gallery cache version string used in signed CloudFront media URLs."
   value       = var.gallery_cache_version
@@ -51,6 +61,16 @@ output "cognito_user_pool_id" {
 output "cognito_app_client_id" {
   description = "Cognito web app client id."
   value       = aws_cognito_user_pool_client.gallery.id
+}
+
+output "cognito_gallery_admin_group" {
+  description = "Cognito group whose members can view and upload gallery media."
+  value       = aws_cognito_user_group.gallery_admin.name
+}
+
+output "cognito_gallery_viewer_group" {
+  description = "Cognito group whose members can view gallery media."
+  value       = aws_cognito_user_group.gallery_viewers.name
 }
 
 output "cognito_hosted_ui_base_url" {

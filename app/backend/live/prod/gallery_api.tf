@@ -25,7 +25,7 @@ resource "aws_cloudfront_key_group" "local_signer" {
 }
 
 resource "aws_cloudfront_origin_request_policy" "gallery_api" {
-  comment = "Forward auth and CORS headers to the private gallery manifest API."
+  comment = "Forward auth, content type, and CORS headers to the private gallery API."
   name    = "${local.prefix}-gallery-api-origin-request"
 
   cookies_config {
@@ -40,6 +40,7 @@ resource "aws_cloudfront_origin_request_policy" "gallery_api" {
         "Access-Control-Request-Headers",
         "Access-Control-Request-Method",
         "Authorization",
+        "Content-Type",
         "Origin"
       ]
     }
@@ -89,6 +90,14 @@ resource "aws_iam_role_policy" "gallery_manifest_lambda" {
         ]
         Effect   = "Allow"
         Resource = aws_s3_bucket.gallery.arn
+      },
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ]
+        Effect   = "Allow"
+        Resource = "${aws_s3_bucket.gallery.arn}/${var.gallery_month_prefix}/*"
       }
     ]
   })
@@ -113,6 +122,8 @@ resource "aws_lambda_function" "gallery_manifest" {
       GALLERY_CACHE_VERSION      = var.gallery_cache_version
       GALLERY_SIGNED_URL_TTL     = tostring(var.gallery_signed_url_ttl_seconds)
       GALLERY_SIGNER_KEY_PAIR_ID = aws_cloudfront_public_key.local_signer.id
+      GALLERY_UPLOAD_PATH        = local.gallery_upload_path
+      GALLERY_UPLOAD_URL_TTL     = "900"
     }
   }
 
@@ -132,7 +143,8 @@ resource "aws_apigatewayv2_api" "gallery" {
     ]
     allow_methods = [
       "GET",
-      "OPTIONS"
+      "OPTIONS",
+      "POST"
     ]
     allow_origins = var.gallery_api_allowed_origins
     max_age       = 600
@@ -162,6 +174,14 @@ resource "aws_apigatewayv2_authorizer" "gallery_jwt" {
 resource "aws_apigatewayv2_route" "gallery_manifest" {
   api_id             = aws_apigatewayv2_api.gallery.id
   route_key          = "GET ${local.gallery_manifest_path}"
+  target             = "integrations/${aws_apigatewayv2_integration.gallery_manifest.id}"
+  authorizer_id      = aws_apigatewayv2_authorizer.gallery_jwt.id
+  authorization_type = "JWT"
+}
+
+resource "aws_apigatewayv2_route" "gallery_upload_url" {
+  api_id             = aws_apigatewayv2_api.gallery.id
+  route_key          = "POST ${local.gallery_upload_path}"
   target             = "integrations/${aws_apigatewayv2_integration.gallery_manifest.id}"
   authorizer_id      = aws_apigatewayv2_authorizer.gallery_jwt.id
   authorization_type = "JWT"

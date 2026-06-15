@@ -141,6 +141,18 @@ resource "aws_s3_bucket_ownership_controls" "gallery" {
   }
 }
 
+resource "aws_s3_bucket_cors_configuration" "gallery_uploads" {
+  bucket = aws_s3_bucket.gallery.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT"]
+    allowed_origins = var.gallery_api_allowed_origins
+    expose_headers  = ["ETag"]
+    max_age_seconds = 600
+  }
+}
+
 resource "aws_cloudfront_origin_access_control" "gallery" {
   name                              = "${local.prefix}-gallery-oac"
   description                       = "Origin access control for the private gallery bucket."
@@ -206,8 +218,8 @@ resource "aws_cloudfront_distribution" "gallery" {
     origin_id           = local.gallery_api_origin_id
 
     custom_origin_config {
-      http_port              = 80
-      https_port             = 443
+      http_port                = 80
+      https_port               = 443
       origin_keepalive_timeout = 5
       origin_protocol_policy   = "https-only"
       origin_read_timeout      = 30
@@ -242,7 +254,7 @@ resource "aws_cloudfront_distribution" "gallery" {
     path_pattern             = "/api/*"
     target_origin_id         = local.gallery_api_origin_id
     viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods          = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods           = ["GET", "HEAD"]
     compress                 = true
     cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
@@ -312,7 +324,7 @@ data "aws_iam_policy_document" "gallery_bucket" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceArn"
-      values   = ["arn:aws:cloudfront::010419877195:distribution/E1CGP9WRXR343M"]
+      values   = [aws_cloudfront_distribution.gallery.arn]
     }
   }
 }
@@ -350,6 +362,20 @@ resource "aws_cognito_user_pool" "gallery" {
     require_uppercase                = false
     temporary_password_validity_days = 7
   }
+}
+
+resource "aws_cognito_user_group" "gallery_admin" {
+  name         = "admin"
+  user_pool_id = aws_cognito_user_pool.gallery.id
+  description  = "Gallery admins can view and upload monthly photos."
+  precedence   = 10
+}
+
+resource "aws_cognito_user_group" "gallery_viewers" {
+  name         = "viewers"
+  user_pool_id = aws_cognito_user_pool.gallery.id
+  description  = "Gallery viewers can view private photos but cannot upload."
+  precedence   = 20
 }
 
 resource "aws_cognito_user_pool_client" "gallery" {

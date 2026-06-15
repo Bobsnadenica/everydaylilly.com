@@ -30,6 +30,11 @@ Last updated: 2026-06-15 Europe/Sofia
 - After login, users land in private gallery routes. The backend manifest remains authoritative for whether the user sees `months/` or `test/`.
 - `gallery/app.js` renders pictures, GIFs, and movies from the signed manifest feed, with filter chips and different `months` vs `test` layouts.
 - If the callback page shows `invalid_scope`, the Cognito app client likely needs Terraform reapplied so allowed scopes match the website code.
+- 2026-06-15 gallery backend update: Cognito groups are now `admin` and `viewers`; `admin` can view and upload, `viewers` can view only, and `test` still routes to the test collection. Assign existing users to one of these groups after Terraform apply or the manifest Lambda will return 403.
+- Gallery admin uploads now use `POST /api/gallery/upload-url`, then a short-lived duplicate-safe S3 PUT URL. Upload keys are `months/<0-11>/<filename>`, existing flat keys still display, and duplicate filenames in the same month return 409 before upload. S3 PUT URLs are signed with `If-None-Match: *` so overwrite races fail too.
+- Gallery media remains CloudFront cached with long-lived immutable caching and signed URLs. The duplicate-safe upload model is what makes the immutable cache safe for newly uploaded media.
+- Gallery manifests now include `lastModified`/`size`, and frontend month/test views sort by object date with filename fallback. The popup viewer explicitly contains images/videos and preserves `[hidden]` media so the unused video element cannot steal modal space.
+- 2026-06-15 gallery validation: `node --check` passed for `gallery/app.js` and `app/backend/live/prod/lambda/gallery_manifest/index.mjs`; `terraform fmt -check app/backend/live/prod` and `terraform validate` passed. Browser QA used a temporary local mock at `http://127.0.0.1:8001/everyday-lilly-gallery-mock.html`; desktop and 390x844 mobile checks showed admin upload panel visible for `canUpload`, no console errors, sorted month detail, no horizontal overflow, and contained popup media.
 
 ## Maintenance Notes
 

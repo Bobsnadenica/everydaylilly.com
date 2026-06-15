@@ -34,6 +34,7 @@
       const parsed = JSON.parse(data);
       // Cache for 1 hour
       if (Date.now() - parsed.timestamp > 3600000) return null;
+      if (!parsed.manifest?.user || typeof parsed.manifest.user.canUpload !== "boolean") return null;
       return parsed.manifest;
     } catch (e) {
       return null;
@@ -49,6 +50,12 @@
     } catch (e) {}
   }
 
+  function clearCachedManifest(collection) {
+    try {
+      localStorage.removeItem(getStorageKey("manifest", collection));
+    } catch (e) {}
+  }
+
   function normalizeCollection(value) {
     return value === "test" ? "test" : "months";
   }
@@ -60,6 +67,11 @@
   function getManifestUrl() {
     const baseDomain = document.body.dataset.galleryDomain || "";
     return `${baseDomain.replace(/\/+$/, "")}/api/gallery/manifest`;
+  }
+
+  function getUploadUrl() {
+    const baseDomain = document.body.dataset.galleryDomain || "";
+    return `${baseDomain.replace(/\/+$/, "")}/api/gallery/upload-url`;
   }
 
   function escapeHtml(value) {
@@ -88,19 +100,19 @@
   }
 
   function getMonthBucket(photo) {
+    const key = String(photo?.key || "");
+    const nestedMonthMatch = key.match(/\/([0-9]|1[01])\/[^/]+$/);
+
+    if (nestedMonthMatch) {
+      return Number.parseInt(nestedMonthMatch[1], 10);
+    }
+
     const stem = getPhotoStem(photo);
     const match = stem.match(/\d+/);
     return match ? Number.parseInt(match[0], 10) : 0;
   }
 
-  function compareMonthsPhotos(left, right) {
-    const leftBucket = getMonthBucket(left);
-    const rightBucket = getMonthBucket(right);
-
-    if (leftBucket !== rightBucket) {
-      return leftBucket - rightBucket;
-    }
-
+  function comparePhotoNames(left, right) {
     const leftStem = getPhotoStem(left);
     const rightStem = getPhotoStem(right);
     const leftNumber = Number.parseInt(leftStem, 10);
@@ -118,6 +130,37 @@
     });
   }
 
+  function getPhotoTimestamp(photo) {
+    const timestamp = Date.parse(photo?.lastModified || "");
+    return Number.isFinite(timestamp) ? timestamp : null;
+  }
+
+  function comparePhotosByDate(left, right) {
+    const leftTimestamp = getPhotoTimestamp(left);
+    const rightTimestamp = getPhotoTimestamp(right);
+
+    if (leftTimestamp !== null && rightTimestamp !== null && leftTimestamp !== rightTimestamp) {
+      return leftTimestamp - rightTimestamp;
+    }
+
+    if (leftTimestamp !== null || rightTimestamp !== null) {
+      return leftTimestamp !== null ? -1 : 1;
+    }
+
+    return comparePhotoNames(left, right);
+  }
+
+  function compareMonthsPhotos(left, right) {
+    const leftBucket = getMonthBucket(left);
+    const rightBucket = getMonthBucket(right);
+
+    if (leftBucket !== rightBucket) {
+      return leftBucket - rightBucket;
+    }
+
+    return comparePhotosByDate(left, right);
+  }
+
   function buildMonthGroups(photos) {
     const groups = new Map();
 
@@ -133,17 +176,6 @@
     });
 
     return [...groups.entries()].map(([month, items]) => ({ month, items }));
-  }
-
-  function shufflePhotos(photos) {
-    const next = [...photos];
-
-    for (let index = next.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
-      [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
-    }
-
-    return next;
   }
 
   function pickTestCardStyle(index) {
@@ -340,7 +372,9 @@
 
   function renderMonthDetail(content, state) {
     const month = state.selectedMonth;
-    const photos = (state.manifest.photos || []).filter(p => getMonthBucket(p) === month);
+    const photos = (state.manifest.photos || [])
+      .filter(p => getMonthBucket(p) === month)
+      .sort(comparePhotosByDate);
     const monthLabel = MONTH_NAMES[month];
 
     content.className = "month-detail";
@@ -371,10 +405,10 @@
   }
 
   function renderTestGallery(content, manifest, visiblePhotos) {
-    const randomized = shufflePhotos(visiblePhotos);
+    const sortedPhotos = [...visiblePhotos].sort(comparePhotosByDate);
 
     content.className = "test-collage";
-    content.innerHTML = randomized
+    content.innerHTML = sortedPhotos
       .map((photo, index) => {
         const style = pickTestCardStyle(index);
 
@@ -690,6 +724,97 @@
     return manifest;
   }
 
+  async function requestUploadUrl(session, payload) {
+    const response = await fetch(getUploadUrl(), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.tokens?.id_token || ""}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    const body = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const error = new Error(body?.error || "Unable to prepare this upload.");
+      error.status = response.status;
+      throw error;
+    }
+
+    return body;
+  }
+
+  function renderUploadPanel(container, state) {
+    if (!container) {
+      return;
+    }
+
+    const canUpload = state.actualCollection === "months" && Boolean(state.manifest?.user?.canUpload);
+    container.hidden = !canUpload;
+
+    if (!canUpload) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `
+      <form class="upload-form" data-gallery-upload-form>
+        <div class="upload-copy">
+          <p class="upload-kicker">Admin</p>
+          <h2>Качи нов спомен</h2>
+        </div>
+        <label>
+          <span>Месец</span>
+          <select name="month">
+            ${MONTH_NAMES.map((name, index) => `
+              <option value="${index}"${state.selectedMonth === index ? " selected" : ""}>${escapeHtml(name)}</option>
+            `).join("")}
+          </select>
+        </label>
+        <label>
+          <span>Файл</span>
+          <input
+            name="file"
+            type="file"
+            accept="image/avif,image/gif,image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,.m4v"
+            required
+          >
+        </label>
+        <label>
+          <span>Име</span>
+          <input name="filename" type="text" maxlength="140" placeholder="Оригиналното име">
+        </label>
+        <button class="btn btn-primary" type="submit">Качи</button>
+        <p class="upload-message" data-upload-message aria-live="polite"></p>
+      </form>
+    `;
+  }
+
+  function setUploadMessage(form, message, tone = "") {
+    const messageElement = form?.querySelector("[data-upload-message]");
+
+    if (!messageElement) {
+      return;
+    }
+
+    messageElement.textContent = message || "";
+    messageElement.dataset.tone = tone;
+  }
+
+  function setUploadBusy(form, isBusy) {
+    const submitButton = form?.querySelector('button[type="submit"]');
+
+    form?.querySelectorAll("input, select, button").forEach((control) => {
+      control.disabled = isBusy;
+    });
+
+    if (submitButton) {
+      submitButton.textContent = isBusy ? "Качване..." : "Качи";
+    }
+  }
+
   function renderFilters(container, photos, activeFilter) {
     if (!container) {
       return;
@@ -768,6 +893,7 @@
     const status = document.getElementById("gallery-status");
     const content = document.getElementById("gallery-content");
     const userPill = document.getElementById("gallery-user");
+    const uploadPanel = document.getElementById("gallery-upload-panel");
     const state = {
       requestedCollection,
       actualCollection: requestedCollection,
@@ -808,6 +934,7 @@
         });
       } catch (error) {
         if (status) status.textContent = "Грешка при зареждане на архива.";
+        renderUploadPanel(uploadPanel, state);
         if (content) {
           content.className = "loading-state";
           content.textContent = error.message || "Възникна проблем. Моля, влезте отново.";
@@ -824,6 +951,7 @@
 
       state.actualCollection = actualCollection;
       
+      renderUploadPanel(uploadPanel, state);
       renderGalleryState(content, status, state);
       if (content) {
         enableViewer(content);
@@ -853,6 +981,89 @@
       writeRefreshToken(state.actualCollection, state.refreshToken);
       if (status) status.textContent = "Опресняване...";
       await loadManifest({ manualRefresh: true });
+    });
+
+    uploadPanel?.addEventListener("change", (event) => {
+      const fileInput = event.target.closest('input[name="file"]');
+
+      if (!fileInput?.files?.length) {
+        return;
+      }
+
+      const form = fileInput.closest("[data-gallery-upload-form]");
+      const filenameInput = form?.querySelector('input[name="filename"]');
+
+      if (filenameInput && !filenameInput.value.trim()) {
+        filenameInput.value = fileInput.files[0].name;
+      }
+    });
+
+    uploadPanel?.addEventListener("submit", async (event) => {
+      const form = event.target.closest("[data-gallery-upload-form]");
+
+      if (!form) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const fileInput = form.querySelector('input[name="file"]');
+      const monthInput = form.querySelector('select[name="month"]');
+      const filenameInput = form.querySelector('input[name="filename"]');
+      const file = fileInput?.files?.[0];
+
+      if (!file) {
+        setUploadMessage(form, "Избери файл за качване.", "error");
+        return;
+      }
+
+      const month = Number.parseInt(monthInput?.value || "0", 10);
+      const filename = filenameInput?.value.trim() || file.name;
+
+      setUploadBusy(form, true);
+      setUploadMessage(form, "Подготвяме качването...", "");
+
+      try {
+        const upload = await requestUploadUrl(session, {
+          month,
+          filename,
+          contentType: file.type || "",
+        });
+
+        setUploadMessage(form, "Качваме към защитения архив...", "");
+
+        const uploadResponse = await fetch(upload.url, {
+          method: "PUT",
+          headers: upload.headers || {
+            "Content-Type": upload.contentType || file.type || "application/octet-stream",
+          },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          const message = uploadResponse.status === 409 || uploadResponse.status === 412
+            ? "Вече има файл с това име за избрания месец."
+            : "S3 отказа качването. Опитай пак след малко.";
+          const error = new Error(message);
+          error.status = uploadResponse.status;
+          throw error;
+        }
+
+        form.reset();
+        setUploadMessage(form, "Готово. Обновяваме галерията...", "success");
+        clearCachedManifest(state.actualCollection);
+        state.selectedMonth = month;
+        state.refreshToken = createRefreshToken();
+        writeRefreshToken(state.actualCollection, state.refreshToken);
+        await loadManifest({ manualRefresh: true });
+      } catch (error) {
+        const duplicateMessage = error.status === 409
+          ? "Вече има файл с това име за избрания месец."
+          : error.message || "Качването не успя.";
+        setUploadMessage(form, duplicateMessage, "error");
+      } finally {
+        setUploadBusy(form, false);
+      }
     });
 
     await loadManifest();

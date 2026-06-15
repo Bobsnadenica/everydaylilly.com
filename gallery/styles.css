@@ -76,6 +76,86 @@ body {
     font-weight: 600;
 }
 
+.upload-panel[hidden] {
+    display: none !important;
+}
+
+.upload-panel {
+    margin: 0 auto 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.upload-form {
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.7fr) minmax(180px, 1fr) minmax(160px, 1fr) auto;
+    gap: 0.85rem;
+    align-items: end;
+}
+
+.upload-copy {
+    align-self: center;
+}
+
+.upload-kicker,
+.upload-copy h2,
+.upload-message {
+    margin: 0;
+}
+
+.upload-kicker {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.upload-copy h2 {
+    font-family: "Baloo 2", cursive;
+    font-size: 1.25rem;
+    line-height: 1.1;
+}
+
+.upload-form label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #475569;
+}
+
+.upload-form input,
+.upload-form select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 2.55rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem;
+    font: inherit;
+    color: var(--text);
+    background: #fff;
+}
+
+.upload-message {
+    grid-column: 1 / -1;
+    min-height: 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--muted);
+}
+
+.upload-message[data-tone="success"] {
+    color: #047857;
+}
+
+.upload-message[data-tone="error"] {
+    color: #be123c;
+}
+
 /* --- Vertical Hero Stack --- */
 .calendar-stack {
     display: flex;
@@ -190,8 +270,8 @@ body {
 
 .viewer-card {
     position: relative;
-    width: min(92vw, 800px);
-    height: min(85vh, 550px);
+    width: min(96vw, 1100px);
+    height: min(90vh, 820px);
     background: #000;
     border-radius: 24px;
     overflow: hidden;
@@ -205,10 +285,37 @@ body {
 .viewer-frame {
     flex: 1;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.viewer-stage,
+.viewer-media {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viewer-media [hidden] {
+    display: none !important;
+}
+
+.viewer-media img,
+.viewer-media video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .viewer-close {
@@ -260,6 +367,10 @@ body {
 .viewer-nav-next { right: 1rem; }
 
 @media (max-width: 720px) {
+    .upload-form {
+        grid-template-columns: 1fr;
+    }
+
     .viewer { padding: 1rem; }
     .viewer-card {
         width: 100vw;

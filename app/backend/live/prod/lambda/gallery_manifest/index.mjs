@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -19,6 +19,25 @@ const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
   ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
   : minimumSignedUrlTtlSeconds;
 const mediaExtensionPattern = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
+const configuredUploadUrlTtlSeconds = Number.parseInt(process.env.GALLERY_UPLOAD_URL_TTL || "900", 10);
+const uploadUrlTtlSeconds = Number.isFinite(configuredUploadUrlTtlSeconds)
+  ? Math.max(60, Math.min(configuredUploadUrlTtlSeconds, 900))
+  : 900;
+const uploadPath = process.env.GALLERY_UPLOAD_PATH || "/api/gallery/upload-url";
+const adminGroupNames = new Set(["admin", "admins"]);
+const viewerGroupNames = new Set(["viewer", "viewers"]);
+const mediaContentTypesByExtension = new Map([
+  [".avif", "image/avif"],
+  [".gif", "image/gif"],
+  [".jpg", "image/jpeg"],
+  [".jpeg", "image/jpeg"],
+  [".m4v", "video/x-m4v"],
+  [".mov", "video/quicktime"],
+  [".mp4", "video/mp4"],
+  [".png", "image/png"],
+  [".webm", "video/webm"],
+  [".webp", "image/webp"],
+]);
 
 let cachedPrivateKey = null;
 
@@ -105,6 +124,22 @@ function normalizeClaimValues(value) {
   return [];
 }
 
+function getGroups(claims) {
+  return normalizeClaimValues(claims?.["cognito:groups"]);
+}
+
+function isGalleryAdmin(claims) {
+  return getGroups(claims).some((group) => adminGroupNames.has(group));
+}
+
+function isGalleryViewer(claims) {
+  return getGroups(claims).some((group) => viewerGroupNames.has(group) || adminGroupNames.has(group));
+}
+
+function hasGalleryAccess(claims) {
+  return isGalleryViewer(claims) || isTestAccount(claims);
+}
+
 function getMediaKind(key) {
   if (/\.gif$/i.test(key)) {
     return "gif";
@@ -145,6 +180,12 @@ function encodePathSegments(path) {
     .join("/");
 }
 
+function encodeRfc3986(value) {
+  return encodeURIComponent(String(value)).replace(/[!'()*]/g, (character) =>
+    `%${character.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+}
+
 function buildCannedPolicy(resourceUrl, expiresAtEpochSeconds) {
   return JSON.stringify({
     Statement: [
@@ -167,8 +208,8 @@ function signPolicy(policy) {
   return signature.replace(/\+/g, "-").replace(/\//g, "~").replace(/=/g, "_");
 }
 
-async function listGalleryKeys(prefix) {
-  const keys = [];
+async function listGalleryItems(prefix) {
+  const items = [];
   let continuationToken;
 
   do {
@@ -182,14 +223,35 @@ async function listGalleryKeys(prefix) {
 
     for (const item of response.Contents || []) {
       if (item.Key && !item.Key.endsWith("/") && mediaExtensionPattern.test(item.Key)) {
-        keys.push(item.Key);
+        items.push({
+          key: item.Key,
+          lastModified: item.LastModified ? item.LastModified.toISOString() : null,
+          size: item.Size ?? null,
+        });
       }
     }
 
     continuationToken = response.NextContinuationToken;
   } while (continuationToken);
 
-  return keys.sort((left, right) => compareGalleryKeys(left, right));
+  return items.sort(compareGalleryItems);
+}
+
+function compareGalleryItems(left, right) {
+  const leftTime = Date.parse(left.lastModified || "");
+  const rightTime = Date.parse(right.lastModified || "");
+  const leftHasTime = Number.isFinite(leftTime);
+  const rightHasTime = Number.isFinite(rightTime);
+
+  if (leftHasTime && rightHasTime && leftTime !== rightTime) {
+    return leftTime - rightTime;
+  }
+
+  if (leftHasTime !== rightHasTime) {
+    return leftHasTime ? -1 : 1;
+  }
+
+  return compareGalleryKeys(left.key, right.key);
 }
 
 function compareGalleryKeys(left, right) {
@@ -212,7 +274,8 @@ function buildLabel(key) {
   return filename.replace(/\.[^.]+$/, "");
 }
 
-async function buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion) {
+async function buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion) {
+  const key = typeof item === "string" ? item : item.key;
   const signedUrl = new URL(`${publicBaseUrl}/${encodePathSegments(key)}`);
 
   if (cacheVersion) {
@@ -231,6 +294,8 @@ async function buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion) {
     key,
     label: buildLabel(key),
     kind: getMediaKind(key),
+    lastModified: typeof item === "string" ? null : item.lastModified,
+    size: typeof item === "string" ? null : item.size,
     url: signedUrl.toString(),
   };
 }
@@ -240,59 +305,293 @@ function getStableExpiryEpochSeconds() {
   return Math.ceil(now / signedUrlTtlSeconds) * signedUrlTtlSeconds;
 }
 
+function getRequestMethod(event) {
+  return event?.requestContext?.http?.method || event?.httpMethod || "GET";
+}
+
+function getRequestPath(event) {
+  return event?.rawPath || event?.path || "";
+}
+
+function parseJsonBody(event) {
+  const rawBody = event?.body
+    ? event.isBase64Encoded
+      ? Buffer.from(event.body, "base64").toString("utf8")
+      : event.body
+    : "{}";
+
+  try {
+    const parsed = JSON.parse(rawBody);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    throw Object.assign(new Error("Request body must be valid JSON."), { statusCode: 400 });
+  }
+}
+
+function normalizeUploadMonth(value) {
+  const month = Number.parseInt(String(value ?? ""), 10);
+
+  if (!Number.isInteger(month) || month < 0 || month > 11) {
+    throw Object.assign(new Error("Choose a month between 0 and 11."), { statusCode: 400 });
+  }
+
+  return month;
+}
+
+function sanitizeFilename(value) {
+  const baseName = String(value || "")
+    .split(/[\\/]/)
+    .pop()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^A-Za-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+/, "")
+    .slice(0, 140);
+
+  if (!baseName || !mediaExtensionPattern.test(baseName)) {
+    throw Object.assign(new Error("Upload a supported photo, GIF, or movie file."), { statusCode: 400 });
+  }
+
+  return baseName;
+}
+
+function getFileExtension(filename) {
+  return (filename.match(/\.[^.]+$/)?.[0] || "").toLowerCase();
+}
+
+function normalizeContentType(value, filename) {
+  const fallback = mediaContentTypesByExtension.get(getFileExtension(filename)) || "application/octet-stream";
+  const normalized = String(value || fallback).trim().toLowerCase();
+
+  if (
+    normalized.startsWith("image/") ||
+    normalized === "video/mp4" ||
+    normalized === "video/quicktime" ||
+    normalized === "video/webm" ||
+    normalized === "video/x-m4v"
+  ) {
+    return normalized === "image/jpg" ? "image/jpeg" : normalized;
+  }
+
+  return fallback;
+}
+
+async function objectExists(key) {
+  try {
+    await s3.send(new HeadObjectCommand({ Bucket: bucketName, Key: key }));
+    return true;
+  } catch (error) {
+    const statusCode = error?.$metadata?.httpStatusCode;
+
+    if (statusCode === 404 || error?.name === "NotFound" || error?.name === "NoSuchKey") {
+      return false;
+    }
+
+    throw error;
+  }
+}
+
+function hmac(key, data, encoding) {
+  return crypto.createHmac("sha256", key).update(data, "utf8").digest(encoding);
+}
+
+function getSigningKey(secretAccessKey, dateStamp, region) {
+  const dateKey = hmac(`AWS4${secretAccessKey}`, dateStamp);
+  const regionKey = hmac(dateKey, region);
+  const serviceKey = hmac(regionKey, "s3");
+  return hmac(serviceKey, "aws4_request");
+}
+
+function hashHex(value) {
+  return crypto.createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function formatAmzDate(date) {
+  return date.toISOString().replace(/[:-]|\.\d{3}/g, "");
+}
+
+function buildCanonicalQuery(parameters) {
+  return Object.entries(parameters)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, value]) => `${encodeRfc3986(key)}=${encodeRfc3986(value)}`)
+    .join("&");
+}
+
+function createPresignedPutUrl(key, contentType) {
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const sessionToken = process.env.AWS_SESSION_TOKEN;
+  const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "eu-central-1";
+
+  if (!accessKeyId || !secretAccessKey) {
+    throw Object.assign(new Error("Lambda credentials are unavailable for upload signing."), { statusCode: 500 });
+  }
+
+  const now = new Date();
+  const amzDate = formatAmzDate(now);
+  const dateStamp = amzDate.slice(0, 8);
+  const host = `${bucketName}.s3.${region}.amazonaws.com`;
+  const canonicalUri = `/${encodePathSegments(key)}`;
+  const signedHeaders = "content-type;host;if-none-match;x-amz-content-sha256";
+  const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
+  const queryParameters = {
+    "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
+    "X-Amz-Credential": `${accessKeyId}/${credentialScope}`,
+    "X-Amz-Date": amzDate,
+    "X-Amz-Expires": String(uploadUrlTtlSeconds),
+    "X-Amz-SignedHeaders": signedHeaders,
+  };
+
+  if (sessionToken) {
+    queryParameters["X-Amz-Security-Token"] = sessionToken;
+  }
+
+  const canonicalQuery = buildCanonicalQuery(queryParameters);
+  const canonicalHeaders = [
+    `content-type:${contentType}`,
+    `host:${host}`,
+    "if-none-match:*",
+    "x-amz-content-sha256:UNSIGNED-PAYLOAD",
+    "",
+  ].join("\n");
+  const canonicalRequest = [
+    "PUT",
+    canonicalUri,
+    canonicalQuery,
+    canonicalHeaders,
+    signedHeaders,
+    "UNSIGNED-PAYLOAD",
+  ].join("\n");
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    hashHex(canonicalRequest),
+  ].join("\n");
+  const signature = hmac(getSigningKey(secretAccessKey, dateStamp, region), stringToSign, "hex");
+
+  queryParameters["X-Amz-Signature"] = signature;
+
+  return {
+    expiresInSeconds: uploadUrlTtlSeconds,
+    headers: {
+      "Content-Type": contentType,
+      "If-None-Match": "*",
+      "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+    },
+    url: `https://${host}${canonicalUri}?${buildCanonicalQuery(queryParameters)}`,
+  };
+}
+
+async function handleUploadUrl(event, claims) {
+  if (!isGalleryAdmin(claims)) {
+    return json(403, {
+      error: "Only gallery admins can upload photos.",
+    });
+  }
+
+  const payload = parseJsonBody(event);
+  const month = normalizeUploadMonth(payload.month);
+  const filename = sanitizeFilename(payload.filename);
+  const contentType = normalizeContentType(payload.contentType, filename);
+  const key = `${defaultPrefix}/${month}/${filename}`;
+
+  if (await objectExists(key)) {
+    return json(409, {
+      error: "A file with this name already exists for that month.",
+      key,
+    });
+  }
+
+  const upload = createPresignedPutUrl(key, contentType);
+
+  return json(200, {
+    key,
+    contentType,
+    ...upload,
+  });
+}
+
+async function handleManifest(event, claims) {
+  if (!publicBaseUrl || !signerKeyPairId) {
+    return json(500, {
+      error: "Gallery manifest backend is missing required configuration.",
+    });
+  }
+
+  if (!hasGalleryAccess(claims)) {
+    return json(403, {
+      error: "This account is not assigned to a gallery role.",
+    });
+  }
+
+  const refreshToken = sanitizeOptionalCacheVersion(event?.queryStringParameters?.refresh || "");
+  const cacheVersion = refreshToken
+    ? `${defaultCacheVersion}.${refreshToken}`
+    : defaultCacheVersion;
+
+  const isTest = isTestAccount(claims);
+  const prefix = isTest ? testPrefix : defaultPrefix;
+  const heroPrefix = `${prefix}/hero`;
+  const items = await listGalleryItems(prefix);
+  const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
+  const photos = [];
+  const heroPhotos = [];
+
+  for (const item of items) {
+    const signedMedia = await buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion);
+    if (item.key.startsWith(heroPrefix)) {
+      heroPhotos.push(signedMedia);
+    } else {
+      photos.push(signedMedia);
+    }
+  }
+
+  return json(200, {
+    collection: isTest ? "test" : "months",
+    prefix,
+    expiresAt: expiresAtEpochSeconds,
+    cacheTtlSeconds: signedUrlTtlSeconds,
+    cacheVersion,
+    user: {
+      email: claims.email || null,
+      roles: getGroups(claims),
+      canUpload: isGalleryAdmin(claims),
+    },
+    photos,
+    heroPhotos,
+  });
+}
+
 export const handler = async (event) => {
   try {
-    if (!bucketName || !publicBaseUrl || !signerKeyPairId) {
+    if (!bucketName) {
       return json(500, {
-        error: "Gallery manifest backend is missing required configuration.",
+        error: "Gallery backend is missing required bucket configuration.",
       });
     }
 
     const claims = event?.requestContext?.authorizer?.jwt?.claims || {};
-    const refreshToken = sanitizeOptionalCacheVersion(event?.queryStringParameters?.refresh || "");
-    const cacheVersion = refreshToken
-      ? `${defaultCacheVersion}.${refreshToken}`
-      : defaultCacheVersion;
 
     if (claims.token_use !== "id") {
       return json(403, {
-        error: "Gallery manifest requests must use a Cognito ID token.",
+        error: "Gallery requests must use a Cognito ID token.",
       });
     }
 
-    const isTest = isTestAccount(claims);
-    const prefix = isTest ? testPrefix : defaultPrefix;
-    const heroPrefix = `${prefix}/hero`;
-    const keys = await listGalleryKeys(prefix);
-    const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
-    const photos = [];
-    const heroPhotos = [];
+    const method = getRequestMethod(event).toUpperCase();
+    const path = getRequestPath(event);
 
-    for (const key of keys) {
-      const signedMedia = await buildSignedMedia(key, expiresAtEpochSeconds, cacheVersion);
-      if (key.startsWith(heroPrefix)) {
-        heroPhotos.push(signedMedia);
-      } else {
-        photos.push(signedMedia);
-      }
+    if (method === "POST" && path === uploadPath) {
+      return await handleUploadUrl(event, claims);
     }
 
-    return json(200, {
-      collection: isTest ? "test" : "months",
-      prefix,
-      expiresAt: expiresAtEpochSeconds,
-      cacheTtlSeconds: signedUrlTtlSeconds,
-      cacheVersion,
-      user: {
-        email: claims.email || null,
-      },
-      photos,
-      heroPhotos,
-    });
+    return await handleManifest(event, claims);
   } catch (error) {
-    console.error("Unable to build gallery manifest.", error);
-    return json(500, {
-      error: "Unable to load the private gallery right now.",
+    console.error("Unable to handle gallery request.", error);
+    return json(error.statusCode || 500, {
+      error: error.statusCode ? error.message : "Unable to load the private gallery right now.",
     });
   }
 };

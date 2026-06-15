@@ -84,17 +84,23 @@ months/
   1.jpg
   2.jpg
   11.jpg
+  2/
+    IMG_1234.jpg
+    birthday.gif
   ...
 ```
 
-This follows your flat numeric naming convention rather than `01.jpg` through `12.jpg`.
+Existing flat numeric keys are still supported so the current gallery keeps working.
+New website uploads use `months/<month>/<filename>` where `<month>` is `0` through `11`.
 For example:
 
 - `1.jpg` can be the first picture in the first month
 - `2.jpg` can be the first picture in the second month
 - `11.jpg` can be another picture for the first month
+- `2/IMG_1234.jpg` belongs explicitly to month 2
 
-Because this is a custom convention, the gallery now treats these keys with your grouping rules instead of assuming calendar month filenames.
+Because uploaded objects are never overwritten, CloudFront can keep immutable media caching enabled safely.
+If an admin tries to upload the same sanitized filename to the same month twice, the upload URL request returns `409`.
 
 ## Apply Flow
 
@@ -140,11 +146,15 @@ Current environment values and reference keys:
 - gallery bucket: `everyday-lilly-vault-prod-gallery-rnk3lm46`
 - CloudFront domain: `d1fxhro74spn7q.cloudfront.net`
 - gallery manifest URL: `https://d1fxhro74spn7q.cloudfront.net/api/gallery/manifest`
+- gallery upload URL: `https://d1fxhro74spn7q.cloudfront.net/api/gallery/upload-url`
 - gallery month prefix: `months`
 - example gallery object key: `months/0.jpg`
 - example same-series gallery object key: `months/11.jpg`
+- example explicit-month upload key: `months/2/IMG_1234.jpg`
 - Cognito user pool id: `eu-central-1_vaA1ovTyr`
 - Cognito app client id: `680v9kq2oue5323c6r63egrltg`
+- Cognito gallery admin group: `admin`
+- Cognito gallery viewer group: `viewers`
 - Cognito hosted UI base URL: `https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com`
 - Cognito hosted UI login URL:
   `https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com/login?client_id=680v9kq2oue5323c6r63egrltg&response_type=code&scope=openid+email+profile+aws.cognito.signin.user.admin&redirect_uri=https%3A%2F%2Fwww.everydaylilly.com%2Fauth%2Fcallback.html`
@@ -197,10 +207,12 @@ Until that is built end to end, the best-practice website behavior is:
 
 The backend gallery routing rules are:
 
-- standard accounts receive the `months/` collection
+- accounts in the Cognito group `admin` receive the `months/` collection and can upload
+- accounts in the Cognito group `viewers` receive the `months/` collection and cannot upload
 - accounts in the Cognito group `test` receive the `test/` collection
 - accounts with a tag-like claim of `test` also receive the `test/` collection
   Supported claim keys are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`
+- accounts without `admin`, `viewers`, or `test` access are denied by the manifest Lambda
 
 The enforcement model is:
 
@@ -208,15 +220,24 @@ The enforcement model is:
 2. the gallery page calls `GET /api/gallery/manifest` through CloudFront with a Cognito ID token
 3. API Gateway validates the JWT
 4. the Lambda manifest function decides the allowed prefix and lists the matching objects
-5. the Lambda uses AWS KMS plus a trusted CloudFront key group to mint signed URLs inside a stable cache window
+5. the Lambda uses the local CloudFront private key plus a trusted key group to mint signed URLs inside a stable cache window
 6. CloudFront serves photo objects only when the URL signature is valid
+
+Admin upload flow:
+
+1. the months gallery shows an upload panel only when the manifest returns `user.canUpload = true`
+2. the browser calls `POST /api/gallery/upload-url` with the selected month and filename
+3. the Lambda verifies the user is in the `admin` Cognito group
+4. the Lambda checks whether `months/<month>/<filename>` already exists
+5. if the key is free, the Lambda returns a short-lived S3 PUT URL signed with `If-None-Match: *`
+6. S3 rejects overwrite races, and new immutable object keys appear in the next manifest refresh
 
 The current website routing model is:
 
 - after Cognito login, browser-side claims send likely test accounts to `/gallery/test/` and everyone else to `/gallery/months/`
 - the backend manifest remains authoritative and the frontend corrects the route if someone opens the wrong page manually
 - `months/` is rendered as a month-by-month ordered gallery
-- `test/` is rendered as a randomized collage on each page load
+- `test/` is rendered as a collage sorted by object date
 - both gallery routes now support pictures, GIFs, and movies through the same signed manifest feed, with frontend media filters layered on top
 
 The current caching model is:
