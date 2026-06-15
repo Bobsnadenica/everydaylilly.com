@@ -9,50 +9,7 @@
   <meta property="og:description" content="Free downloadable question packs for Who Wants to Be Smart?" />
   <meta property="og:type"        content="website" />
 
-  <!-- Tailwind CDN (play CDN for static sites) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            bgDark:    '#0A0A2E',
-            bgCard:    '#16155A',
-            bgSurface: '#1F1D7A',
-            gold:      '#FFD700',
-            goldDim:   '#B8970A',
-            correct:   '#00C853',
-            wrong:     '#EF5350',
-            muted:     'rgba(255,255,255,0.55)',
-          },
-          fontFamily: {
-            boogaloo: ['"Boogaloo"', 'cursive'],
-            nunito:   ['"Nunito"',   'sans-serif'],
-          },
-          boxShadow: {
-            gold:    '0 0 24px 4px rgba(255,215,0,0.35)',
-            card:    '0 8px 32px rgba(0,0,0,0.5)',
-            correct: '0 0 16px 2px rgba(0,200,83,0.4)',
-          },
-          animation: {
-            twinkle:  'twinkle 3s ease-in-out infinite',
-            float:    'float 4s ease-in-out infinite',
-            pulse100: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
-          },
-          keyframes: {
-            twinkle: {
-              '0%,100%': { opacity: '0.2', transform: 'scale(0.8)' },
-              '50%':     { opacity: '1',   transform: 'scale(1.2)' },
-            },
-            float: {
-              '0%,100%': { transform: 'translateY(0)' },
-              '50%':     { transform: 'translateY(-12px)' },
-            },
-          },
-        },
-      },
-    }
-  </script>
+  <link rel="stylesheet" href="../../../tailwind-static.css" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -68,6 +25,20 @@
       color: #fff;
       font-family: 'Nunito', sans-serif;
       overflow-x: hidden;
+    }
+
+    nav,
+    header,
+    section,
+    footer,
+    .glass {
+      min-width: 0;
+    }
+
+    code,
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     /* ── starfield canvas ─────────────────────────── */
@@ -136,6 +107,33 @@
       width: 2px;
       flex: 1;
       background: linear-gradient(to bottom, rgba(255,215,0,0.4), transparent);
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+
+      nav > a {
+        min-width: 0;
+        max-width: 11rem;
+        overflow-wrap: anywhere;
+        line-height: 1.15;
+      }
+
+      nav > div {
+        min-width: 0;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      #manifest-strip {
+        width: 100%;
+      }
     }
   </style>
 </head>

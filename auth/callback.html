@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lilly's Vault Sign In</title>
+    <meta name="description" content="Secure callback page that completes the Everyday Lilly Vault sign-in flow and returns users to the private gallery." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap">
@@ -16,11 +17,18 @@
             color-scheme: light;
         }
 
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
             display: grid;
             place-items: center;
+            padding: 1rem;
             font-family: "Inter", sans-serif;
             background:
                 radial-gradient(circle at top, rgba(16, 185, 129, 0.18), transparent 42%),
@@ -29,13 +37,14 @@
         }
 
         .card {
-            width: min(92vw, 30rem);
+            width: min(100%, 30rem);
             background: rgba(255, 255, 255, 0.96);
             border: 1px solid rgba(16, 185, 129, 0.18);
             border-radius: 1.5rem;
             box-shadow: 0 24px 60px -24px rgba(15, 23, 42, 0.28);
             padding: 2rem;
             text-align: center;
+            overflow-wrap: anywhere;
         }
 
         .badge {
@@ -135,12 +144,17 @@
                     window.location.replace(destination);
                 }, 450);
             } catch (error) {
-                console.error(error);
+                const message = error.message || "Something went wrong while completing sign-in.";
+                const expectedDirectOpen = message === "Missing authorization code.";
+
+                if (!expectedDirectOpen) {
+                    console.error(error);
+                }
 
                 if (window.opener && !window.opener.closed) {
                     window.opener.postMessage({
                         type: "everydayLillyAuth:popupResult",
-                        error: error.message || "Something went wrong while completing sign-in."
+                        error: message
                     }, window.location.origin);
                     window.setTimeout(() => {
                         window.close();
@@ -150,7 +164,7 @@
 
                 title.textContent = "We could not finish sign-in";
                 copy.textContent = "The secure sign-in flow returned an error. You can head back and try again.";
-                status.textContent = error.message || "Something went wrong while completing sign-in.";
+                status.textContent = message;
                 status.classList.add("error");
                 link.hidden = false;
             }

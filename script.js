@@ -117,21 +117,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const dots = [];
-    galleryItems.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('gallery-dot');
-        if (index === 0) dot.classList.add('active');
-        dot.setAttribute('aria-label', `Go to image ${index + 1}`);
-        dotsContainer.appendChild(dot);
-        dots.push(dot);
-    });
+    if (dotsContainer) {
+        galleryItems.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('gallery-dot');
+            if (index === 0) dot.classList.add('active');
+            dot.setAttribute('aria-label', `Go to image ${index + 1}`);
+            dotsContainer.appendChild(dot);
+            dots.push(dot);
+        });
 
-    dotsContainer.addEventListener('click', (e) => {
-        const clickedDot = e.target.closest('.gallery-dot');
-        if (!clickedDot) return;
-        const index = dots.indexOf(clickedDot);
-        if (index !== -1) scrollToImage(index);
-    });
+        dotsContainer.addEventListener('click', (e) => {
+            const clickedDot = e.target.closest('.gallery-dot');
+            if (!clickedDot) return;
+            const index = dots.indexOf(clickedDot);
+            if (index !== -1) scrollToImage(index);
+        });
+    }
 
     function updateDots() {
         dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
@@ -192,7 +194,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-window.addEventListener('resize', () => scrollToImage(currentIndex));
+window.addEventListener('resize', () => {
+    if (galleryItems.length && galleryContainer) {
+        scrollToImage(currentIndex);
+    }
+});
 
 const cards = document.querySelectorAll('.app-card');
 const nextBtn = document.getElementById('carousel-next');
