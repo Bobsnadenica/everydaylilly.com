@@ -1,0 +1,4 @@
+interface:
+  display_name: "Everyday Lilly Website"
+  short_description: "Repo runbook for Everyday Lilly site work"
+  default_prompt: "Use $everyday-lilly-website to continue work on the Everyday Lilly website repo."
