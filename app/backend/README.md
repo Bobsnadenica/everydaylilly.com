@@ -84,6 +84,9 @@ months/
   1.jpg
   2.jpg
   11.jpg
+  hero/
+    2/
+      cover.jpg
   2/
     IMG_1234.jpg
     birthday.gif
@@ -92,11 +95,13 @@ months/
 
 Existing flat numeric keys are still supported so the current gallery keeps working.
 New website uploads use `months/<month>/<filename>` where `<month>` is `0` through `11`.
+Hero images uploaded from an empty month use `months/hero/<month>/<filename>`.
 For example:
 
 - `1.jpg` can be the first picture in the first month
 - `2.jpg` can be the first picture in the second month
 - `11.jpg` can be another picture for the first month
+- `hero/2/cover.jpg` is the month 2 hero image
 - `2/IMG_1234.jpg` belongs explicitly to month 2
 
 Because uploaded objects are never overwritten, CloudFront can keep immutable media caching enabled safely.
@@ -150,6 +155,7 @@ Current environment values and reference keys:
 - gallery month prefix: `months`
 - example gallery object key: `months/0.jpg`
 - example same-series gallery object key: `months/11.jpg`
+- example explicit-month hero key: `months/hero/2/cover.jpg`
 - example explicit-month upload key: `months/2/IMG_1234.jpg`
 - Cognito user pool id: `eu-central-1_vaA1ovTyr`
 - Cognito app client id: `680v9kq2oue5323c6r63egrltg`
@@ -225,12 +231,14 @@ The enforcement model is:
 
 Admin upload flow:
 
-1. the months gallery shows an upload panel only when the manifest returns `user.canUpload = true`
-2. the browser calls `POST /api/gallery/upload-url` with the selected month and filename
-3. the Lambda verifies the user is in the `admin` Cognito group
-4. the Lambda checks whether `months/<month>/<filename>` already exists
-5. if the key is free, the Lambda returns a short-lived S3 PUT URL signed with `If-None-Match: *`
-6. S3 rejects overwrite races, and new immutable object keys appear in the next manifest refresh
+1. the months overview lets admins open empty months
+2. an empty month shows a hero-image upload tile first
+3. a month with a hero or photos shows an `Upload pictures` tile as the last grid card
+4. the browser calls `POST /api/gallery/upload-url` with the selected month, filename, and upload kind
+5. the Lambda verifies the user is in the `admin` Cognito group
+6. the Lambda checks whether the target key already exists
+7. if the key is free, the Lambda returns a short-lived S3 PUT URL signed with `If-None-Match: *`
+8. S3 rejects overwrite races, and new immutable object keys appear in the next manifest refresh
 
 The current website routing model is:
 

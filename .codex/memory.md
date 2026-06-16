@@ -1,6 +1,6 @@
 # Everyday Lilly Project Memory
 
-Last updated: 2026-06-15 Europe/Sofia
+Last updated: 2026-06-16 Europe/Sofia
 
 ## Repo Snapshot
 
@@ -34,6 +34,8 @@ Last updated: 2026-06-15 Europe/Sofia
 - Gallery media remains CloudFront cached with long-lived immutable caching and signed URLs. The duplicate-safe upload model is what makes the immutable cache safe for newly uploaded media.
 - Gallery manifests now include `lastModified`/`size`, and frontend month/test views sort by object date with filename fallback. The popup viewer explicitly contains images/videos and preserves `[hidden]` media so the unused video element cannot steal modal space.
 - 2026-06-15 gallery validation: `node --check` passed for `gallery/app.js` and `app/backend/live/prod/lambda/gallery_manifest/index.mjs`; `terraform fmt -check app/backend/live/prod` and `terraform validate` passed. Browser QA used a temporary local mock at `http://127.0.0.1:8001/everyday-lilly-gallery-mock.html`; desktop and 390x844 mobile checks showed admin upload panel visible for `canUpload`, no console errors, sorted month detail, no horizontal overflow, and contained popup media.
+- 2026-06-16 gallery upload UI revision: the top admin upload panel was removed. Admins now open a month and use an upload tile inside the month grid; empty months show a hero-image tile first, and months with a hero/photos show an `Upload pictures` drag/drop tile as the last grid card. Photo tile supports many files. Hero uploads target `months/hero/<month>/<filename>`; normal photos target `months/<month>/<filename>`.
+- 2026-06-16 gallery validation: `node --check` passed for `gallery/app.js` and `app/backend/live/prod/lambda/gallery_manifest/index.mjs`; `terraform fmt -check app/backend/live/prod` and `terraform validate` passed. Browser QA used temporary mock `http://127.0.0.1:8001/everyday-lilly-gallery-upload-mock.html`: empty month 2 showed only one hero upload tile, generated hero drop switched to photo upload mode, generated two-photo drop produced two photo cards plus upload tile last, desktop/mobile had no console errors or horizontal overflow.
 
 ## Maintenance Notes
 

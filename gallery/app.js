@@ -112,6 +112,36 @@
     return match ? Number.parseInt(match[0], 10) : 0;
   }
 
+  function getHeroMonthBucket(photo) {
+    const key = String(photo?.key || "");
+    const nestedHeroMatch = key.match(/\/hero\/([0-9]|1[01])\/[^/]+$/);
+
+    if (nestedHeroMatch) {
+      return Number.parseInt(nestedHeroMatch[1], 10);
+    }
+
+    const stem = getPhotoStem(photo);
+    if (/^(?:[0-9]|0[0-9]|1[01])$/.test(stem)) {
+      return Number.parseInt(stem, 10);
+    }
+
+    return null;
+  }
+
+  function canUploadToGallery(state) {
+    return state.actualCollection === "months" && Boolean(state.manifest?.user?.canUpload);
+  }
+
+  function getMonthHero(state, month) {
+    return (state.manifest?.heroPhotos || []).find((photo) => getHeroMonthBucket(photo) === month) || null;
+  }
+
+  function getMonthPhotos(state, month) {
+    return (state.manifest?.photos || [])
+      .filter((photo) => getMonthBucket(photo) === month)
+      .sort(comparePhotosByDate);
+  }
+
   function comparePhotoNames(left, right) {
     const leftStem = getPhotoStem(left);
     const rightStem = getPhotoStem(right);
@@ -344,25 +374,23 @@
   ];
 
   function renderMonthOverview(content, state) {
-    const heroPhotos = state.manifest.heroPhotos || [];
     const allPhotos = state.manifest.photos || [];
+    const adminCanUpload = canUploadToGallery(state);
 
     content.className = "calendar-stack";
     content.innerHTML = Array.from({ length: 12 }, (_, month) => {
-        const hero = heroPhotos.find(p => {
-          const stem = getPhotoStem(p);
-          return stem === String(month) || stem === `0${month}`.slice(-2);
-        }) || allPhotos.find(p => getMonthBucket(p) === month);
+        const hero = getMonthHero(state, month) || allPhotos.find(p => getMonthBucket(p) === month);
 
         const hasPhotos = allPhotos.some(p => getMonthBucket(p) === month);
+        const canOpenMonth = hasPhotos || Boolean(hero) || adminCanUpload;
 
         return `
           <div class="calendar-stack-card" 
-               ${hasPhotos ? `data-month-trigger="${month}"` : ""}
+               ${canOpenMonth ? `data-month-trigger="${month}"` : ""}
                style="--idx: ${month}"
                role="button" 
                aria-label="Месец ${month}">
-            ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : '<div class="calendar-card-placeholder"><span>Няма снимки</span></div>'}
+            ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : `<div class="calendar-card-placeholder"><span>${adminCanUpload ? "Качи корица" : "Няма снимки"}</span></div>`}
             <span class="calendar-stack-label">${month}</span>
           </div>
         `;
@@ -370,15 +398,47 @@
       .join("");
   }
 
+  function buildMonthUploadTileMarkup(month, uploadKind) {
+    const isHero = uploadKind === "hero";
+    const inputId = `month-${month}-${uploadKind}-upload`;
+
+    return `
+      <article class="photo-card month-upload-card${isHero ? " month-upload-card-hero" : ""}" data-upload-drop-zone>
+        <form
+          class="month-upload-form"
+          data-month-upload-form
+          data-upload-kind="${escapeHtml(uploadKind)}"
+          data-upload-month="${month}"
+        >
+          <input
+            class="upload-file-input"
+            id="${escapeHtml(inputId)}"
+            name="files"
+            type="file"
+            ${isHero ? "" : "multiple"}
+            accept="${isHero ? "image/avif,image/gif,image/jpeg,image/png,image/webp" : "image/avif,image/gif,image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,.m4v"}"
+          >
+          <label class="upload-drop-label" for="${escapeHtml(inputId)}">
+            <span class="upload-kicker">Admin</span>
+            <span class="upload-drop-icon" aria-hidden="true">+</span>
+            <span class="upload-drop-title">${isHero ? "Качи hero image" : "Upload pictures"}</span>
+            <span class="upload-drop-copy">${isHero ? "Първо добави корица за този месец." : "Пусни много файлове тук или избери от компютъра."}</span>
+          </label>
+          <p class="upload-message" data-upload-message aria-live="polite"></p>
+        </form>
+      </article>
+    `;
+  }
+
   function renderMonthDetail(content, state) {
     const month = state.selectedMonth;
-    const photos = (state.manifest.photos || [])
-      .filter(p => getMonthBucket(p) === month)
-      .sort(comparePhotosByDate);
+    const photos = getMonthPhotos(state, month);
+    const hero = getMonthHero(state, month);
+    const adminCanUpload = canUploadToGallery(state);
     const monthLabel = MONTH_NAMES[month];
 
     content.className = "month-detail";
-    const cards = photos
+    const photoCards = photos
       .map((photo, index) =>
         buildPhotoCardMarkup(photo, {
           title: `${monthLabel} · ${getPhotoStem(photo)}`,
@@ -388,13 +448,17 @@
         })
       )
       .join("");
+    const shouldUploadHeroFirst = adminCanUpload && !hero && photos.length === 0;
+    const uploadTile = adminCanUpload
+      ? buildMonthUploadTileMarkup(month, shouldUploadHeroFirst ? "hero" : "photo")
+      : "";
 
     content.innerHTML = `
       <div class="detail-header">
         <button class="btn btn-secondary" id="detail-back">← Назад</button>
         <h2 class="detail-title">${monthLabel}</h2>
       </div>
-      <div class="month-grid">${cards}</div>
+      <div class="month-grid">${photoCards}${uploadTile}</div>
     `;
 
     document.getElementById("detail-back")?.addEventListener("click", () => {
@@ -746,52 +810,6 @@
     return body;
   }
 
-  function renderUploadPanel(container, state) {
-    if (!container) {
-      return;
-    }
-
-    const canUpload = state.actualCollection === "months" && Boolean(state.manifest?.user?.canUpload);
-    container.hidden = !canUpload;
-
-    if (!canUpload) {
-      container.innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = `
-      <form class="upload-form" data-gallery-upload-form>
-        <div class="upload-copy">
-          <p class="upload-kicker">Admin</p>
-          <h2>Качи нов спомен</h2>
-        </div>
-        <label>
-          <span>Месец</span>
-          <select name="month">
-            ${MONTH_NAMES.map((name, index) => `
-              <option value="${index}"${state.selectedMonth === index ? " selected" : ""}>${escapeHtml(name)}</option>
-            `).join("")}
-          </select>
-        </label>
-        <label>
-          <span>Файл</span>
-          <input
-            name="file"
-            type="file"
-            accept="image/avif,image/gif,image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,.m4v"
-            required
-          >
-        </label>
-        <label>
-          <span>Име</span>
-          <input name="filename" type="text" maxlength="140" placeholder="Оригиналното име">
-        </label>
-        <button class="btn btn-primary" type="submit">Качи</button>
-        <p class="upload-message" data-upload-message aria-live="polite"></p>
-      </form>
-    `;
-  }
-
   function setUploadMessage(form, message, tone = "") {
     const messageElement = form?.querySelector("[data-upload-message]");
 
@@ -804,15 +822,46 @@
   }
 
   function setUploadBusy(form, isBusy) {
-    const submitButton = form?.querySelector('button[type="submit"]');
-
-    form?.querySelectorAll("input, select, button").forEach((control) => {
+    form?.closest("[data-upload-drop-zone]")?.classList.toggle("is-uploading", isBusy);
+    form?.querySelectorAll("input, button").forEach((control) => {
       control.disabled = isBusy;
     });
+  }
 
-    if (submitButton) {
-      submitButton.textContent = isBusy ? "Качване..." : "Качи";
+  function getDroppedFiles(event) {
+    return Array.from(event.dataTransfer?.files || []).filter((file) => file && file.size > 0);
+  }
+
+  function getSelectedFiles(input) {
+    return Array.from(input?.files || []).filter((file) => file && file.size > 0);
+  }
+
+  async function uploadSingleFile(session, file, month, uploadKind) {
+    const upload = await requestUploadUrl(session, {
+      month,
+      uploadKind,
+      filename: file.name,
+      contentType: file.type || "",
+    });
+
+    const uploadResponse = await fetch(upload.url, {
+      method: "PUT",
+      headers: upload.headers || {
+        "Content-Type": upload.contentType || file.type || "application/octet-stream",
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      const message = uploadResponse.status === 409 || uploadResponse.status === 412
+        ? "Вече има файл с това име за избрания месец."
+        : "S3 отказа качването. Опитай пак след малко.";
+      const error = new Error(message);
+      error.status = uploadResponse.status;
+      throw error;
     }
+
+    return upload;
   }
 
   function renderFilters(container, photos, activeFilter) {
@@ -893,7 +942,6 @@
     const status = document.getElementById("gallery-status");
     const content = document.getElementById("gallery-content");
     const userPill = document.getElementById("gallery-user");
-    const uploadPanel = document.getElementById("gallery-upload-panel");
     const state = {
       requestedCollection,
       actualCollection: requestedCollection,
@@ -934,7 +982,6 @@
         });
       } catch (error) {
         if (status) status.textContent = "Грешка при зареждане на архива.";
-        renderUploadPanel(uploadPanel, state);
         if (content) {
           content.className = "loading-state";
           content.textContent = error.message || "Възникна проблем. Моля, влезте отново.";
@@ -951,13 +998,84 @@
 
       state.actualCollection = actualCollection;
       
-      renderUploadPanel(uploadPanel, state);
       renderGalleryState(content, status, state);
       if (content) {
         enableViewer(content);
       }
       if (refreshButton) updateRefreshButton(refreshButton, false);
       return true;
+    }
+
+    async function handleMonthUpload(form, files) {
+      const month = Number.parseInt(form?.dataset.uploadMonth || "", 10);
+      const uploadKind = form?.dataset.uploadKind === "hero" ? "hero" : "photo";
+      const selectedFiles = uploadKind === "hero" ? files.slice(0, 1) : files;
+
+      if (!Number.isInteger(month) || month < 0 || month > 11) {
+        setUploadMessage(form, "Не разпознах месеца за качване.", "error");
+        return;
+      }
+
+      if (!selectedFiles.length) {
+        setUploadMessage(form, "Избери файл за качване.", "error");
+        return;
+      }
+
+      setUploadBusy(form, true);
+
+      if (uploadKind === "hero" && files.length > 1) {
+        setUploadMessage(form, "Качваме първия файл като hero image...", "");
+      } else {
+        setUploadMessage(form, `Подготвяме ${selectedFiles.length} файл${selectedFiles.length === 1 ? "" : "а"}...`, "");
+      }
+
+      let uploadedCount = 0;
+      let duplicateCount = 0;
+      let lastError = null;
+
+      try {
+        for (let index = 0; index < selectedFiles.length; index += 1) {
+          const file = selectedFiles[index];
+          setUploadMessage(form, `Качване ${index + 1}/${selectedFiles.length}: ${file.name}`, "");
+
+          try {
+            await uploadSingleFile(session, file, month, uploadKind);
+            uploadedCount += 1;
+          } catch (error) {
+            if (error.status === 409 || error.status === 412) {
+              duplicateCount += 1;
+              lastError = error;
+              continue;
+            }
+
+            throw error;
+          }
+        }
+
+        if (uploadedCount > 0) {
+          const duplicateCopy = duplicateCount ? ` ${duplicateCount} вече съществува${duplicateCount === 1 ? "" : "т"}.` : "";
+          setUploadMessage(form, `Готово: качени ${uploadedCount}.${duplicateCopy} Обновяваме...`, "success");
+          clearCachedManifest(state.actualCollection);
+          state.selectedMonth = month;
+          state.refreshToken = createRefreshToken();
+          writeRefreshToken(state.actualCollection, state.refreshToken);
+          await loadManifest({ manualRefresh: true });
+          return;
+        }
+
+        const duplicateOnly = duplicateCount > 0
+          ? "Всички избрани файлове вече съществуват за този месец."
+          : lastError?.message || "Качването не успя.";
+        setUploadMessage(form, duplicateOnly, "error");
+      } catch (error) {
+        setUploadMessage(form, error.message || "Качването не успя.", "error");
+      } finally {
+        setUploadBusy(form, false);
+        const input = form?.querySelector(".upload-file-input");
+        if (input) {
+          input.value = "";
+        }
+      }
     }
 
     content?.addEventListener("click", (event) => {
@@ -976,94 +1094,67 @@
       }
     });
 
+    content?.addEventListener("change", async (event) => {
+      const input = event.target.closest(".upload-file-input");
+
+      if (!input) {
+        return;
+      }
+
+      const form = input.closest("[data-month-upload-form]");
+      await handleMonthUpload(form, getSelectedFiles(input));
+    });
+
+    content?.addEventListener("dragenter", (event) => {
+      const dropZone = event.target.closest("[data-upload-drop-zone]");
+
+      if (!dropZone) {
+        return;
+      }
+
+      event.preventDefault();
+      dropZone.classList.add("is-dragover");
+    });
+
+    content?.addEventListener("dragover", (event) => {
+      const dropZone = event.target.closest("[data-upload-drop-zone]");
+
+      if (!dropZone) {
+        return;
+      }
+
+      event.preventDefault();
+      dropZone.classList.add("is-dragover");
+    });
+
+    content?.addEventListener("dragleave", (event) => {
+      const dropZone = event.target.closest("[data-upload-drop-zone]");
+
+      if (!dropZone || dropZone.contains(event.relatedTarget)) {
+        return;
+      }
+
+      dropZone.classList.remove("is-dragover");
+    });
+
+    content?.addEventListener("drop", async (event) => {
+      const dropZone = event.target.closest("[data-upload-drop-zone]");
+
+      if (!dropZone) {
+        return;
+      }
+
+      event.preventDefault();
+      dropZone.classList.remove("is-dragover");
+      const form = dropZone.querySelector("[data-month-upload-form]");
+      await handleMonthUpload(form, getDroppedFiles(event));
+    });
+
     refreshButton?.addEventListener("click", async () => {
       state.refreshToken = createRefreshToken();
       writeRefreshToken(state.actualCollection, state.refreshToken);
       if (status) status.textContent = "Опресняване...";
       await loadManifest({ manualRefresh: true });
-    });
-
-    uploadPanel?.addEventListener("change", (event) => {
-      const fileInput = event.target.closest('input[name="file"]');
-
-      if (!fileInput?.files?.length) {
-        return;
-      }
-
-      const form = fileInput.closest("[data-gallery-upload-form]");
-      const filenameInput = form?.querySelector('input[name="filename"]');
-
-      if (filenameInput && !filenameInput.value.trim()) {
-        filenameInput.value = fileInput.files[0].name;
-      }
-    });
-
-    uploadPanel?.addEventListener("submit", async (event) => {
-      const form = event.target.closest("[data-gallery-upload-form]");
-
-      if (!form) {
-        return;
-      }
-
-      event.preventDefault();
-
-      const fileInput = form.querySelector('input[name="file"]');
-      const monthInput = form.querySelector('select[name="month"]');
-      const filenameInput = form.querySelector('input[name="filename"]');
-      const file = fileInput?.files?.[0];
-
-      if (!file) {
-        setUploadMessage(form, "Избери файл за качване.", "error");
-        return;
-      }
-
-      const month = Number.parseInt(monthInput?.value || "0", 10);
-      const filename = filenameInput?.value.trim() || file.name;
-
-      setUploadBusy(form, true);
-      setUploadMessage(form, "Подготвяме качването...", "");
-
-      try {
-        const upload = await requestUploadUrl(session, {
-          month,
-          filename,
-          contentType: file.type || "",
-        });
-
-        setUploadMessage(form, "Качваме към защитения архив...", "");
-
-        const uploadResponse = await fetch(upload.url, {
-          method: "PUT",
-          headers: upload.headers || {
-            "Content-Type": upload.contentType || file.type || "application/octet-stream",
-          },
-          body: file,
-        });
-
-        if (!uploadResponse.ok) {
-          const message = uploadResponse.status === 409 || uploadResponse.status === 412
-            ? "Вече има файл с това име за избрания месец."
-            : "S3 отказа качването. Опитай пак след малко.";
-          const error = new Error(message);
-          error.status = uploadResponse.status;
-          throw error;
-        }
-
-        form.reset();
-        setUploadMessage(form, "Готово. Обновяваме галерията...", "success");
-        clearCachedManifest(state.actualCollection);
-        state.selectedMonth = month;
-        state.refreshToken = createRefreshToken();
-        writeRefreshToken(state.actualCollection, state.refreshToken);
-        await loadManifest({ manualRefresh: true });
-      } catch (error) {
-        const duplicateMessage = error.status === 409
-          ? "Вече има файл с това име за избрания месец."
-          : error.message || "Качването не успя.";
-        setUploadMessage(form, duplicateMessage, "error");
-      } finally {
-        setUploadBusy(form, false);
-      }
     });
 
     await loadManifest();

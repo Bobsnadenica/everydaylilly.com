@@ -19,6 +19,7 @@ const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
   ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
   : minimumSignedUrlTtlSeconds;
 const mediaExtensionPattern = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
+const heroExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
 const configuredUploadUrlTtlSeconds = Number.parseInt(process.env.GALLERY_UPLOAD_URL_TTL || "900", 10);
 const uploadUrlTtlSeconds = Number.isFinite(configuredUploadUrlTtlSeconds)
   ? Math.max(60, Math.min(configuredUploadUrlTtlSeconds, 900))
@@ -338,6 +339,10 @@ function normalizeUploadMonth(value) {
   return month;
 }
 
+function normalizeUploadKind(value) {
+  return String(value || "photo").trim().toLowerCase() === "hero" ? "hero" : "photo";
+}
+
 function sanitizeFilename(value) {
   const baseName = String(value || "")
     .split(/[\\/]/)
@@ -375,6 +380,14 @@ function normalizeContentType(value, filename) {
   }
 
   return fallback;
+}
+
+function getUploadKey(uploadKind, month, filename) {
+  if (uploadKind === "hero") {
+    return `${defaultPrefix}/hero/${month}/${filename}`;
+  }
+
+  return `${defaultPrefix}/${month}/${filename}`;
 }
 
 async function objectExists(key) {
@@ -493,9 +506,17 @@ async function handleUploadUrl(event, claims) {
 
   const payload = parseJsonBody(event);
   const month = normalizeUploadMonth(payload.month);
+  const uploadKind = normalizeUploadKind(payload.uploadKind || payload.kind || payload.target);
   const filename = sanitizeFilename(payload.filename);
   const contentType = normalizeContentType(payload.contentType, filename);
-  const key = `${defaultPrefix}/${month}/${filename}`;
+
+  if (uploadKind === "hero" && !heroExtensionPattern.test(filename)) {
+    return json(400, {
+      error: "Hero uploads must be image files.",
+    });
+  }
+
+  const key = getUploadKey(uploadKind, month, filename);
 
   if (await objectExists(key)) {
     return json(409, {
@@ -508,6 +529,7 @@ async function handleUploadUrl(event, claims) {
 
   return json(200, {
     key,
+    uploadKind,
     contentType,
     ...upload,
   });
