@@ -21,7 +21,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap">
     </noscript>
 
-    <link rel="stylesheet" href="style.css?v=20260616-hero">
+    <link rel="stylesheet" href="style.css">
 
     <style>
         .header-bg {
@@ -43,8 +43,7 @@
 <body class="text-gray-800 font-sans"
       data-auth-base-url="https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com"
       data-auth-client-id="680v9kq2oue5323c6r63egrltg"
-      data-auth-scope="openid email profile aws.cognito.signin.user.admin"
-      data-gallery-domain="https://d1fxhro74spn7q.cloudfront.net">
+      data-auth-scope="openid email profile aws.cognito.signin.user.admin">
 
     <nav class="sticky-nav transition duration-300 hidden md:block" role="navigation" aria-label="Основна навигация">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -136,9 +135,9 @@
         </div>
     </div>
 
-    <header role="banner" class="hero-section relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" data-gallery-hero>
+    <header role="banner" class="hero-section relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" style="background-image: url('images/hero.jpg');">
         <div class="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
-        <div class="relative z-30 p-4 md:p-8 rounded-lg hero-content-card">
+        <div class="relative z-30 p-4 md:p-8 rounded-lg">
             <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-4 text-shadow-lg">Всеки ден Лили</h1>
             <p class="hero-text text-base font-medium leading-relaxed break-words whitespace-normal max-w-[260px] mx-auto text-center">
                 Уловете <strong>ежедневния разцвет</strong> на вашата лилия.<br>
@@ -474,6 +473,6 @@
     </div>
 
     <script src="auth/auth.js" defer></script>
-    <script src="script.js?v=20260616-hero" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

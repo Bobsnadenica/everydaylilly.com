@@ -30,14 +30,29 @@
             </div>
         </header>
 
-        <p id="gallery-status" class="gallery-status">Зареждаме вашите спомени...</p>
+        <section class="hero">
+            <div class="eyebrow" id="gallery-eyebrow">Частен архив</div>
+            <h1 id="gallery-title">Хрониката на Лили</h1>
+            <p id="gallery-copy">Спомените са подредени по месеци, със защитени CloudFront снимки и бързо качване за администратори.</p>
+            <div class="meta">
+                <span class="meta-pill" id="gallery-user">Сигурна сесия</span>
+                <span class="meta-pill" id="gallery-total">Зареждаме архива</span>
+                <span class="meta-pill" id="gallery-cache">Случаен фон от галерията</span>
+            </div>
+        </section>
 
         <section class="gallery-card">
+            <div class="gallery-toolbar">
+                <div>
+                    <p id="gallery-status" class="gallery-status">Зареждаме вашите спомени...</p>
+                    <p class="toolbar-copy">Изберете месец, за да разгледате снимките или да качите нови спомени.</p>
+                </div>
+                <button id="gallery-refresh" class="btn btn-secondary" type="button">Ръчно опресняване</button>
+            </div>
             <div id="gallery-content" class="loading-state">Моля, изчакайте...</div>
         </section>
         
         <div id="gallery-media-filters" style="display: none;"></div>
-        <button id="gallery-refresh" style="display: none;"></button>
     </div>
 
     <script src="/auth/auth.js" defer></script>

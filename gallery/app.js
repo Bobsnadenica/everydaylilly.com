@@ -246,6 +246,88 @@
     return isKnownMediaKind(explicit) ? explicit : inferMediaKindFromKey(photo?.key || "");
   }
 
+  function isBackgroundCandidate(photo) {
+    return Boolean(photo?.url) && getMediaKind(photo) !== "movie";
+  }
+
+  function pickGalleryBackgroundPhoto(manifest) {
+    const heroPhotos = Array.isArray(manifest?.heroPhotos) ? manifest.heroPhotos.filter(isBackgroundCandidate) : [];
+    const photos = Array.isArray(manifest?.photos) ? manifest.photos.filter(isBackgroundCandidate) : [];
+    const candidates = heroPhotos.length ? heroPhotos : photos;
+
+    if (!candidates.length) {
+      return null;
+    }
+
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  function preloadImage(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(src);
+      image.onerror = reject;
+      image.src = src;
+    });
+  }
+
+  function applyGalleryBackground(manifest) {
+    const photo = pickGalleryBackgroundPhoto(manifest);
+
+    if (!photo?.url) {
+      document.body.classList.remove("has-vault-background");
+      document.body.style.removeProperty("--vault-bg-image");
+      return;
+    }
+
+    preloadImage(photo.url)
+      .then(() => {
+        document.body.style.setProperty("--vault-bg-image", `url("${escapeCssUrl(photo.url)}")`);
+        document.body.classList.add("has-vault-background");
+      })
+      .catch(() => {});
+  }
+
+  function getGalleryTotal(manifest) {
+    const photoCount = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
+    const heroCount = Array.isArray(manifest?.heroPhotos) ? manifest.heroPhotos.length : 0;
+    return photoCount + heroCount;
+  }
+
+  function pluralizeBg(count, one, many) {
+    return count === 1 ? one : many;
+  }
+
+  function setText(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  function updateGalleryChrome(collection, manifest, session) {
+    const isBg = document.documentElement.lang === "bg";
+    const email = session?.claims?.email || "";
+    const total = getGalleryTotal(manifest);
+    const adminLabel = manifest?.user?.canUpload
+      ? (isBg ? "Администратор" : "Admin")
+      : (isBg ? "Преглед" : "Viewer");
+    const totalLabel = isBg
+      ? `${total} ${pluralizeBg(total, "спомен", "спомена")}`
+      : `${total} ${pluralizeBg(total, "memory", "memories")}`;
+    const cacheLabel = isBg
+      ? "Случаен фон от защитената галерия"
+      : "Random signed gallery background";
+
+    setText("gallery-user", email ? `${adminLabel} · ${email}` : adminLabel);
+    setText("gallery-total", totalLabel);
+    setText("gallery-cache", cacheLabel);
+
+    if (collection === "test") {
+      setText("gallery-prefix", "Collection prefix: test/");
+    }
+  }
+
 
   function sanitizeRefreshToken(value) {
     return String(value || "")
@@ -380,6 +462,11 @@
     content.className = "calendar-stack";
     content.innerHTML = Array.from({ length: 12 }, (_, month) => {
         const hero = getMonthHero(state, month) || allPhotos.find(p => getMonthBucket(p) === month);
+        const monthPhotos = getMonthPhotos(state, month);
+        const itemCount = monthPhotos.length + (getMonthHero(state, month) ? 1 : 0);
+        const countLabel = itemCount
+          ? `${itemCount} ${itemCount === 1 ? "спомен" : "спомена"}`
+          : (adminCanUpload ? "Готов за първа снимка" : "Очаква снимки");
 
         const hasPhotos = allPhotos.some(p => getMonthBucket(p) === month);
         const canOpenMonth = hasPhotos || Boolean(hero) || adminCanUpload;
@@ -391,6 +478,8 @@
                role="button" 
                aria-label="Месец ${month}">
             ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : `<div class="calendar-card-placeholder"><span>${adminCanUpload ? "Качи корица" : "Няма снимки"}</span></div>`}
+            <span class="calendar-stack-name">${escapeHtml(MONTH_NAMES[month])}</span>
+            <span class="calendar-stack-count">${escapeHtml(countLabel)}</span>
             <span class="calendar-stack-label">${month}</span>
           </div>
         `;
@@ -456,7 +545,11 @@
     content.innerHTML = `
       <div class="detail-header">
         <button class="btn btn-secondary" id="detail-back">← Назад</button>
-        <h2 class="detail-title">${monthLabel}</h2>
+        <div>
+          <p class="detail-kicker">Хрониката на Лили</p>
+          <h2 class="detail-title">${monthLabel}</h2>
+          <p class="detail-subtitle">${photos.length} ${photos.length === 1 ? "снимка" : "снимки"}${hero ? " · има корица" : ""}</p>
+        </div>
       </div>
       <div class="month-grid">${photoCards}${uploadTile}</div>
     `;
@@ -997,6 +1090,17 @@
       }
 
       state.actualCollection = actualCollection;
+      applyGalleryBackground(state.manifest);
+      updateGalleryChrome(actualCollection, state.manifest, session);
+
+      state.activeFilter = ensureAvailableFilter(state.activeFilter, state.manifest.photos || []);
+      if (filterContainer) {
+        const showFilters = actualCollection === "test";
+        filterContainer.style.display = showFilters ? "" : "none";
+        if (showFilters) {
+          renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+        }
+      }
       
       renderGalleryState(content, status, state);
       if (content) {
@@ -1077,6 +1181,18 @@
         }
       }
     }
+
+    filterContainer?.addEventListener("click", (event) => {
+      const filterButton = event.target.closest("[data-gallery-filter]");
+
+      if (!filterButton || !state.manifest) {
+        return;
+      }
+
+      state.activeFilter = ensureAvailableFilter(filterButton.dataset.galleryFilter, state.manifest.photos || []);
+      renderFilters(filterContainer, state.manifest.photos || [], state.activeFilter);
+      renderGalleryState(content, status, state);
+    });
 
     content?.addEventListener("click", (event) => {
       const flipBtn = event.target.closest("[data-flip]");
