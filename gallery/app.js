@@ -18,6 +18,10 @@
     movie: "movies",
   };
 
+  const MONTHS_PER_YEAR = 12;
+  const GALLERY_YEAR_COUNT = 5;
+  const GALLERY_MONTH_COUNT = MONTHS_PER_YEAR * GALLERY_YEAR_COUNT;
+
   const STORAGE_KEYS = {
     refresh: "everyday-lilly.gallery-refresh.",
     manifest: "everyday-lilly.gallery-manifest.",
@@ -99,30 +103,52 @@
     return filename.replace(/\.[^.]+$/, "");
   }
 
+  function parseGalleryMonth(value) {
+    if (!/^\d+$/.test(String(value ?? ""))) {
+      return null;
+    }
+
+    const month = Number.parseInt(String(value), 10);
+    return Number.isInteger(month) && month >= 0 && month < GALLERY_MONTH_COUNT ? month : null;
+  }
+
+  function getTimelineYear(month) {
+    return Math.floor(month / MONTHS_PER_YEAR) + 1;
+  }
+
+  function getMonthInYear(month) {
+    return month % MONTHS_PER_YEAR;
+  }
+
+  function getTimelineLabel(month) {
+    return `Година ${getTimelineYear(month)} · Месец ${getMonthInYear(month)}`;
+  }
+
   function getMonthBucket(photo) {
     const key = String(photo?.key || "");
-    const nestedMonthMatch = key.match(/\/([0-9]|1[01])\/[^/]+$/);
+    const nestedMonthMatch = key.match(/\/(\d{1,2})\/[^/]+$/);
 
     if (nestedMonthMatch) {
-      return Number.parseInt(nestedMonthMatch[1], 10);
+      return parseGalleryMonth(nestedMonthMatch[1]) ?? -1;
     }
 
     const stem = getPhotoStem(photo);
     const match = stem.match(/\d+/);
-    return match ? Number.parseInt(match[0], 10) : 0;
+    return match ? parseGalleryMonth(match[0]) ?? -1 : -1;
   }
 
   function getHeroMonthBucket(photo) {
     const key = String(photo?.key || "");
-    const nestedHeroMatch = key.match(/\/hero\/([0-9]|1[01])\/[^/]+$/);
+    const nestedHeroMatch = key.match(/\/hero\/(\d{1,2})\/[^/]+$/);
 
     if (nestedHeroMatch) {
-      return Number.parseInt(nestedHeroMatch[1], 10);
+      return parseGalleryMonth(nestedHeroMatch[1]);
     }
 
     const stem = getPhotoStem(photo);
-    if (/^(?:[0-9]|0[0-9]|1[01])$/.test(stem)) {
-      return Number.parseInt(stem, 10);
+    const parsedMonth = parseGalleryMonth(stem);
+    if (parsedMonth !== null) {
+      return parsedMonth;
     }
 
     return null;
@@ -194,13 +220,13 @@
   function buildMonthGroups(photos) {
     const groups = new Map();
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < GALLERY_MONTH_COUNT; i++) {
       groups.set(i, []);
     }
 
     [...photos].sort(compareMonthsPhotos).forEach((photo) => {
       const bucket = getMonthBucket(photo);
-      if (bucket >= 0 && bucket < 12) {
+      if (bucket >= 0 && bucket < GALLERY_MONTH_COUNT) {
         groups.get(bucket).push(photo);
       }
     });
@@ -450,17 +476,18 @@
     `;
   }
 
-  const MONTH_NAMES = [
-    "Месец 0", "Месец 1", "Месец 2", "Месец 3", "Месец 4", "Месец 5",
-    "Месец 6", "Месец 7", "Месец 8", "Месец 9", "Месец 10", "Месец 11"
-  ];
+  const MONTH_NAMES = Array.from({ length: GALLERY_MONTH_COUNT }, (_, month) => `Месец ${month}`);
 
   function renderMonthOverview(content, state) {
     const allPhotos = state.manifest.photos || [];
     const adminCanUpload = canUploadToGallery(state);
 
     content.className = "calendar-stack";
-    content.innerHTML = Array.from({ length: 12 }, (_, month) => {
+    content.innerHTML = Array.from({ length: GALLERY_YEAR_COUNT }, (_, yearIndex) => {
+      const yearStart = yearIndex * MONTHS_PER_YEAR;
+      const yearEnd = yearStart + MONTHS_PER_YEAR - 1;
+      const monthsMarkup = Array.from({ length: MONTHS_PER_YEAR }, (_, monthOffset) => {
+        const month = yearStart + monthOffset;
         const hero = getMonthHero(state, month) || allPhotos.find(p => getMonthBucket(p) === month);
         const monthPhotos = getMonthPhotos(state, month);
         const itemCount = monthPhotos.length + (getMonthHero(state, month) ? 1 : 0);
@@ -478,13 +505,24 @@
                role="button" 
                aria-label="Месец ${month}">
             ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : `<div class="calendar-card-placeholder"><span>${adminCanUpload ? "Качи корица" : "Няма снимки"}</span></div>`}
-            <span class="calendar-stack-name">${escapeHtml(MONTH_NAMES[month])}</span>
+            <span class="calendar-stack-name">${escapeHtml(getTimelineLabel(month))}</span>
             <span class="calendar-stack-count">${escapeHtml(countLabel)}</span>
             <span class="calendar-stack-label">${month}</span>
           </div>
         `;
       })
       .join("");
+
+      return `
+        <section class="calendar-year-section" aria-label="Година ${yearIndex + 1}">
+          <div class="calendar-year-divider">
+            <span>Година ${yearIndex + 1}</span>
+            <strong>Месеци ${yearStart}-${yearEnd}</strong>
+          </div>
+          ${monthsMarkup}
+        </section>
+      `;
+    }).join("");
   }
 
   function buildMonthUploadTileMarkup(month, uploadKind) {
@@ -525,6 +563,7 @@
     const hero = getMonthHero(state, month);
     const adminCanUpload = canUploadToGallery(state);
     const monthLabel = MONTH_NAMES[month];
+    const timelineLabel = getTimelineLabel(month);
 
     content.className = "month-detail";
     const photoCards = photos
@@ -548,7 +587,7 @@
         <div>
           <p class="detail-kicker">Хрониката на Лили</p>
           <h2 class="detail-title">${monthLabel}</h2>
-          <p class="detail-subtitle">${photos.length} ${photos.length === 1 ? "снимка" : "снимки"}${hero ? " · има корица" : ""}</p>
+          <p class="detail-subtitle">${timelineLabel} · ${photos.length} ${photos.length === 1 ? "снимка" : "снимки"}${hero ? " · има корица" : ""}</p>
         </div>
       </div>
       <div class="month-grid">${photoCards}${uploadTile}</div>
@@ -1115,8 +1154,8 @@
       const uploadKind = form?.dataset.uploadKind === "hero" ? "hero" : "photo";
       const selectedFiles = uploadKind === "hero" ? files.slice(0, 1) : files;
 
-      if (!Number.isInteger(month) || month < 0 || month > 11) {
-        setUploadMessage(form, "Не разпознах месеца за качване.", "error");
+      if (!Number.isInteger(month) || month < 0 || month >= GALLERY_MONTH_COUNT) {
+        setUploadMessage(form, `Избери месец между 0 и ${GALLERY_MONTH_COUNT - 1}.`, "error");
         return;
       }
 

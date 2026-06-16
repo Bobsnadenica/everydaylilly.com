@@ -25,6 +25,7 @@ const uploadUrlTtlSeconds = Number.isFinite(configuredUploadUrlTtlSeconds)
   ? Math.max(60, Math.min(configuredUploadUrlTtlSeconds, 900))
   : 900;
 const uploadPath = process.env.GALLERY_UPLOAD_PATH || "/api/gallery/upload-url";
+const galleryMonthCount = 60;
 const adminGroupNames = new Set(["admin", "admins"]);
 const viewerGroupNames = new Set(["viewer", "viewers"]);
 const mediaContentTypesByExtension = new Map([
@@ -332,8 +333,8 @@ function parseJsonBody(event) {
 function normalizeUploadMonth(value) {
   const month = Number.parseInt(String(value ?? ""), 10);
 
-  if (!Number.isInteger(month) || month < 0 || month > 11) {
-    throw Object.assign(new Error("Choose a month between 0 and 11."), { statusCode: 400 });
+  if (!Number.isInteger(month) || month < 0 || month >= galleryMonthCount) {
+    throw Object.assign(new Error(`Choose a month between 0 and ${galleryMonthCount - 1}.`), { statusCode: 400 });
   }
 
   return month;

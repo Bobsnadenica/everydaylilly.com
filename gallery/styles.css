@@ -333,6 +333,49 @@ body.has-vault-background::after {
     padding: 0.25rem 0 1rem;
 }
 
+.calendar-year-section {
+    width: min(100%, 680px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.1rem;
+}
+
+.calendar-year-section + .calendar-year-section {
+    margin-top: 1.25rem;
+}
+
+.calendar-year-divider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(20, 83, 45, 0.12);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+}
+
+.calendar-year-divider span,
+.calendar-year-divider strong {
+    display: block;
+}
+
+.calendar-year-divider span {
+    color: var(--accent-strong);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.calendar-year-divider strong {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
 .calendar-stack-card {
     position: relative;
     width: min(100%, 680px);
@@ -839,6 +882,17 @@ body.has-vault-background::after {
         width: 100%;
         border-radius: 22px;
         aspect-ratio: 1 / 1;
+    }
+
+    .calendar-year-section {
+        width: 100%;
+    }
+
+    .calendar-year-divider {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.25rem;
+        border-radius: 16px;
     }
 
     .calendar-stack-label {
