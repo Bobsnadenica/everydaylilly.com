@@ -267,6 +267,123 @@ const signedInProfileLabel =
   profileButtons[0]?.dataset.signedInText || 'Vault';
 let lastFocusedElement = null;
 let currentAuthSession = null;
+const HERO_MANIFEST_CACHE_MS = 10 * 60 * 1000;
+const HERO_MANIFEST_CACHE_PREFIX = 'everyday-lilly.hero-manifest.';
+
+function getHeroManifestUrl() {
+    const baseDomain = document.body.dataset.galleryDomain || '';
+    if (!baseDomain) return '';
+    return `${baseDomain.replace(/\/+$/, '')}/api/gallery/manifest`;
+}
+
+function getHeroManifestCacheKey(session) {
+    const identity = session?.claims?.sub || session?.claims?.email || 'active';
+    return `${HERO_MANIFEST_CACHE_PREFIX}${identity}`;
+}
+
+function readCachedHeroManifest(session) {
+    try {
+        const cached = localStorage.getItem(getHeroManifestCacheKey(session));
+        if (!cached) return null;
+
+        const parsed = JSON.parse(cached);
+        if (Date.now() - parsed.timestamp > HERO_MANIFEST_CACHE_MS) return null;
+
+        return parsed.manifest || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function writeCachedHeroManifest(session, manifest) {
+    try {
+        localStorage.setItem(getHeroManifestCacheKey(session), JSON.stringify({
+            timestamp: Date.now(),
+            manifest,
+        }));
+    } catch (error) {
+    }
+}
+
+function escapeCssUrl(value) {
+    return String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+}
+
+function inferHeroMediaKind(photo) {
+    const explicit = String(photo?.kind || '').trim().toLowerCase();
+    if (explicit === 'picture' || explicit === 'gif' || explicit === 'movie') {
+        return explicit;
+    }
+
+    const key = String(photo?.key || photo?.url || '').split('?')[0];
+    if (/\.gif$/i.test(key)) return 'gif';
+    if (/\.(m4v|mov|mp4|webm)$/i.test(key)) return 'movie';
+    return 'picture';
+}
+
+function isHeroBackgroundCandidate(photo) {
+    return Boolean(photo?.url) && inferHeroMediaKind(photo) !== 'movie';
+}
+
+function pickRandomHeroPhoto(manifest) {
+    const heroPhotos = Array.isArray(manifest?.heroPhotos) ? manifest.heroPhotos : [];
+    const photos = Array.isArray(manifest?.photos) ? manifest.photos : [];
+    const candidates = [...heroPhotos, ...photos].filter(isHeroBackgroundCandidate);
+
+    if (!candidates.length) return null;
+
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function preloadHeroImage(src) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(src);
+        image.onerror = reject;
+        image.src = src;
+    });
+}
+
+async function fetchHeroManifest(session) {
+    const cached = readCachedHeroManifest(session);
+    if (cached) return cached;
+
+    const manifestUrl = getHeroManifestUrl();
+    const token = session?.tokens?.id_token || '';
+    if (!manifestUrl || !token) return null;
+
+    const response = await fetch(manifestUrl, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+    });
+
+    const manifest = await response.json().catch(() => null);
+    if (!response.ok || !manifest) return null;
+
+    writeCachedHeroManifest(session, manifest);
+    return manifest;
+}
+
+async function applyGalleryHeroBackground(session) {
+    const hero = document.querySelector('[data-gallery-hero]');
+    if (!hero || !session?.tokens?.id_token) return;
+
+    try {
+        const manifest = await fetchHeroManifest(session);
+        const photo = pickRandomHeroPhoto(manifest);
+        if (!photo?.url) return;
+
+        await preloadHeroImage(photo.url);
+        hero.style.setProperty('--hero-bg-image', `url("${escapeCssUrl(photo.url)}")`);
+        hero.classList.add('hero-has-gallery-photo');
+        hero.dataset.galleryHeroSource = photo.key || 'signed-gallery-photo';
+    } catch (error) {
+    }
+}
 
 function setLoginFeedback(message) {
     if (!loginFeedback) return;
@@ -448,6 +565,14 @@ document.addEventListener('keydown', e => {
     }
 });
 
-renderAuthSession(auth ? await auth.getSession() : null);
+let initialSession = null;
+if (auth) {
+    try {
+        initialSession = await auth.getSession();
+    } catch (error) {
+    }
+}
+renderAuthSession(initialSession);
+applyGalleryHeroBackground(initialSession);
 updateCarousel();
 });

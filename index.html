@@ -21,7 +21,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&family=Playfair+Display:wght@700&display=swap">
     </noscript>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260616-hero">
 
     <style>
         .header-bg {
@@ -42,7 +42,8 @@
 <body class="text-gray-800 font-sans"
       data-auth-base-url="https://everyday-lilly-vault-prod-1234.auth.eu-central-1.amazoncognito.com"
       data-auth-client-id="680v9kq2oue5323c6r63egrltg"
-      data-auth-scope="openid email profile aws.cognito.signin.user.admin">
+      data-auth-scope="openid email profile aws.cognito.signin.user.admin"
+      data-gallery-domain="https://d1fxhro74spn7q.cloudfront.net">
 
     <nav class="sticky-nav transition duration-300 hidden md:block" role="navigation" aria-label="Main navigation">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -134,9 +135,9 @@
         </div>
     </div>
 
-    <header role="banner" class="hero-section relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" style="background-image: url('images/hero.jpg');">
+    <header role="banner" class="hero-section relative min-h-screen flex items-center justify-center text-center text-white px-4 header-bg" data-gallery-hero>
         <div class="absolute inset-0 bg-black opacity-50 pointer-events-none"></div>
-        <div class="relative z-30 p-4 md:p-8 rounded-lg">
+        <div class="relative z-30 p-4 md:p-8 rounded-lg hero-content-card">
             <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-4 text-shadow-lg">Everyday Lilly</h1>
             <p class="hero-text text-base sm:text-lg md:text-2xl font-medium leading-relaxed">Capture the <strong>daily bloom</strong> of your lily.<br class="block sm:hidden"> 
             A simple, beautiful way to watch life <strong>unfold</strong>.</p>
@@ -471,6 +472,6 @@
     </div>
 
     <script src="auth/auth.js" defer></script>
-    <script src="script.js" defer></script>
+    <script src="script.js?v=20260616-hero" defer></script>
 </body>
 </html>
