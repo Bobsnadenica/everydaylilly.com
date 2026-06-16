@@ -116,8 +116,12 @@
     return Math.floor(month / MONTHS_PER_YEAR) + 1;
   }
 
+  function getDisplayMonthNumber(month) {
+    return month + 1;
+  }
+
   function getMonthInYear(month) {
-    return month % MONTHS_PER_YEAR;
+    return (month % MONTHS_PER_YEAR) + 1;
   }
 
   function getTimelineLabel(month) {
@@ -476,7 +480,7 @@
     `;
   }
 
-  const MONTH_NAMES = Array.from({ length: GALLERY_MONTH_COUNT }, (_, month) => `Месец ${month}`);
+  const MONTH_NAMES = Array.from({ length: GALLERY_MONTH_COUNT }, (_, month) => `Месец ${getDisplayMonthNumber(month)}`);
 
   function renderMonthOverview(content, state) {
     const allPhotos = state.manifest.photos || [];
@@ -486,8 +490,12 @@
     content.innerHTML = Array.from({ length: GALLERY_YEAR_COUNT }, (_, yearIndex) => {
       const yearStart = yearIndex * MONTHS_PER_YEAR;
       const yearEnd = yearStart + MONTHS_PER_YEAR - 1;
+      const yearStartDisplay = getDisplayMonthNumber(yearStart);
+      const yearEndDisplay = getDisplayMonthNumber(yearEnd);
       const monthsMarkup = Array.from({ length: MONTHS_PER_YEAR }, (_, monthOffset) => {
         const month = yearStart + monthOffset;
+        const monthLabel = MONTH_NAMES[month];
+        const timelineLabel = getTimelineLabel(month);
         const hero = getMonthHero(state, month) || allPhotos.find(p => getMonthBucket(p) === month);
         const monthPhotos = getMonthPhotos(state, month);
         const itemCount = monthPhotos.length + (getMonthHero(state, month) ? 1 : 0);
@@ -503,11 +511,11 @@
                ${canOpenMonth ? `data-month-trigger="${month}"` : ""}
                style="--idx: ${month}"
                role="button" 
-               aria-label="Месец ${month}">
-            ${hero ? buildMediaMarkup(hero, `Месец ${month}`, month < 2) : `<div class="calendar-card-placeholder"><span>${adminCanUpload ? "Качи корица" : "Няма снимки"}</span></div>`}
-            <span class="calendar-stack-name">${escapeHtml(getTimelineLabel(month))}</span>
+               aria-label="${escapeHtml(timelineLabel)}">
+            ${hero ? buildMediaMarkup(hero, monthLabel, month < 2) : `<div class="calendar-card-placeholder"><span>${adminCanUpload ? "Качи корица" : "Няма снимки"}</span></div>`}
+            <span class="calendar-stack-name">${escapeHtml(timelineLabel)}</span>
             <span class="calendar-stack-count">${escapeHtml(countLabel)}</span>
-            <span class="calendar-stack-label">${month}</span>
+            <span class="calendar-stack-label">${getDisplayMonthNumber(month)}</span>
           </div>
         `;
       })
@@ -517,7 +525,7 @@
         <section class="calendar-year-section" aria-label="Година ${yearIndex + 1}">
           <div class="calendar-year-divider">
             <span>Година ${yearIndex + 1}</span>
-            <strong>Месеци ${yearStart}-${yearEnd}</strong>
+            <strong>Месеци ${yearStartDisplay}-${yearEndDisplay}</strong>
           </div>
           ${monthsMarkup}
         </section>
@@ -1155,7 +1163,7 @@
       const selectedFiles = uploadKind === "hero" ? files.slice(0, 1) : files;
 
       if (!Number.isInteger(month) || month < 0 || month >= GALLERY_MONTH_COUNT) {
-        setUploadMessage(form, `Избери месец между 0 и ${GALLERY_MONTH_COUNT - 1}.`, "error");
+        setUploadMessage(form, `Избери месец между 1 и ${GALLERY_MONTH_COUNT}.`, "error");
         return;
       }
 
