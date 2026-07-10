@@ -1,6 +1,6 @@
 # Everyday Lilly Project Memory
 
-Last updated: 2026-06-16 Europe/Sofia
+Last updated: 2026-07-10 Europe/Sofia
 
 ## Repo Snapshot
 
@@ -17,6 +17,8 @@ Last updated: 2026-06-16 Europe/Sofia
 
 ## Website QA Notes
 
+- 2026-07-10 public landing improvement pass: replaced the overlapping 3D app carousel with one visible app card at a time, kept previous/next controls visible at desktop and mobile sizes, added a `1 / 4` status, confined arrow-key navigation to the focused carousel, and made inactive app links untabbable. Replaced 15 tiny non-focusable gallery dots with 44px previous/next buttons and a `1 / 15` status; gallery/lightbox initialization now safely skips pages without gallery markup, fixing the shared `supportus.html` script error. Added reduced-motion handling and normalized English `FAQ` capitalization. `node --check script.js`, `git diff --check`, and browser QA passed on English/Bulgarian pages at `1280x720` and `390x844`: one card visible, controls present, no horizontal overflow, longest Bulgarian Filetrap card contained, gallery counter advanced, support page had no console errors, and landing pages had no console errors.
+- 2026-07-10 public landing-page design review at `http://localhost:8000/`: desktop `1280x720` and mobile `390x844` screenshots confirmed that the core visual identity, copy hierarchy, gallery section, support, and contact sections are clean and coherent. The highest-impact issue is the app carousel: on desktop its controls sit below the initial viewport and navigating exposes overlapping adjacent cards; on mobile the carousel grows wider than the viewport, clips the Android CTA, and hides the control container at `0x0`. The gallery uses 15 non-focusable `div` dots at roughly `12x12`, so keyboard access and target size need improvement. The page still logs the Tailwind CDN production warning. No public-site code was changed during this review.
 - 2026-06-15 desktop smoke test at `http://localhost:8000/` passed: the intended title loaded, the DOM was not blank, there was no error overlay, no console errors appeared, and `#carousel-next` advanced the active card from `Everyday Lilly` to `Everyday Dandelion`.
 - Known console warning: `cdn.tailwindcss.com should not be used in production`. This comes from the current static Tailwind CDN setup.
 - 2026-06-15 mobile check at `390x844`: the page loaded with no horizontal document overflow, but `#carousel-prev` and `#carousel-next` had `0x0` bounding boxes and were not clickable. The carousel/card row can appear partially clipped on mobile. Treat this as a known responsive issue to fix if carousel interaction matters on phones.

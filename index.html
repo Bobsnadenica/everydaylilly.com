@@ -59,7 +59,7 @@
                 <a href="#how-it-works" class="text-gray-600 hover:text-emerald-600 transition">How it Works</a>
                 <a href="#gallery" class="text-gray-600 hover:text-emerald-600 transition">Gallery</a>
                 <a href="#developer-story" class="text-gray-600 hover:text-emerald-600 transition">Our Story</a>
-                <a href="#faq" class="text-gray-600 hover:text-emerald-600 transition">Faq</a>
+                <a href="#faq" class="text-gray-600 hover:text-emerald-600 transition">FAQ</a>
                 <a href="#support" class="text-gray-600 hover:text-emerald-600 transition">Support</a>
                 <div style="display:flex; gap:0.375rem; margin-left:0.25rem;">
                     <button id="lang-en" aria-label="Switch to English language" class="w-7 h-7 rounded overflow-hidden border-2 border-gray-200 hover:border-emerald-400 transition">
@@ -140,7 +140,7 @@
             <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold mb-4 text-shadow-lg">Everyday Lilly</h1>
             <p class="hero-text text-base sm:text-lg md:text-2xl font-medium leading-relaxed">Capture the <strong>daily bloom</strong> of your lily.<br class="block sm:hidden"> 
             A simple, beautiful way to watch life <strong>unfold</strong>.</p>
-            <div class="app-carousel-container">
+            <div class="app-carousel-container" role="region" aria-roledescription="carousel" aria-label="Everyday apps" tabindex="0">
               <div class="app-carousel">
                 <div class="app-card active" data-app="lilly">
                   <img src="images/icons/everyday_lilly.png" alt="Everyday Lilly" class="app-icon" />
@@ -183,8 +183,9 @@
               </div>
 
               <div class="carousel-controls">
-                <button id="carousel-prev" aria-label="Previous app">&#10094;</button>
-                <button id="carousel-next" aria-label="Next app">&#10095;</button>
+                <button id="carousel-prev" type="button" aria-label="Previous app">&#10094;</button>
+                <span id="carousel-status" class="carousel-status" aria-live="polite">1 / 4</span>
+                <button id="carousel-next" type="button" aria-label="Next app">&#10095;</button>
               </div>
             </div>
         </div>
@@ -273,7 +274,11 @@
                             <img src="images/screenshot14.jpg" alt="Everyday Lilly app screenshot showing app notifications" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
                             <img src="images/screenshot15.jpg" alt="Everyday Lilly app screenshot showing app help and support" class="gallery-item cursor-pointer" draggable="false" loading="lazy">
                         </div>
-                        <div class="gallery-dots" role="navigation" aria-label="Gallery pagination"></div>
+                        <div class="gallery-controls" role="group" aria-label="Gallery controls">
+                            <button id="gallery-prev" type="button" aria-label="Previous screenshot">&#10094;</button>
+                            <span id="gallery-status" aria-live="polite">1 / 15</span>
+                            <button id="gallery-next" type="button" aria-label="Next screenshot">&#10095;</button>
+                        </div>
                     </div>
                     <div class="md:w-1/2">
                         <h2 class="text-4xl md:text-5xl font-bold mb-4 font-display">Relive Every Day of Growth</h2>
@@ -399,7 +404,7 @@
                 <a href="#features" class="hover:text-emerald-400 transition">Features</a>
                 <a href="#developer-story" class="hover:text-emerald-400 transition">Our Story</a>
                 <a href="#testimonials" class="hover:text-emerald-400 transition">Testimonials</a>
-                <a href="#faq" class="hover:text-emerald-400 transition">Faq</a>
+                <a href="#faq" class="hover:text-emerald-400 transition">FAQ</a>
                 <a href="contactus.html?lang=en" class="hover:text-emerald-400 transition">Contact</a>
                 <a href="privacypolicy.html" class="hover:text-emerald-400 transition" aria-label="Privacy Policy">Privacy Policy</a>
             </div>
