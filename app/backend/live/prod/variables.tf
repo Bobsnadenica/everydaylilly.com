@@ -101,3 +101,10 @@ variable "gallery_timeline_start_date" {
   sensitive   = true
   default     = ""
 }
+
+variable "gallery_grandma_legacy_contributors" {
+  description = "Private contributor hashes whose retired shared paths must remain restricted to grandma. Restore from live configuration before applying."
+  type        = list(string)
+  sensitive   = true
+  default     = []
+}

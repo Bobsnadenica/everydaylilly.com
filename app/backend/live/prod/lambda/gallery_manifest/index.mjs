@@ -28,6 +28,8 @@ const uploadPath = process.env.GALLERY_UPLOAD_PATH || "/api/gallery/upload-url";
 const galleryMonthCount = 60;
 const adminGroupNames = new Set(["admin", "admins"]);
 const viewerGroupNames = new Set(["viewer", "viewers"]);
+// Retired contributor paths stay restricted during and after private-album migration.
+const grandmaLegacyContributors = new Set((process.env.GALLERY_GRANDMA_LEGACY_CONTRIBUTORS || "").split(",").filter(Boolean));
 const mediaContentTypesByExtension = new Map([
   [".avif", "image/avif"],
   [".gif", "image/gif"],
@@ -155,8 +157,36 @@ function contributorId(claims) {
 
 function ownsMedia(key, claims) {
   const owner = contributorId(claims);
-  const parts = key.split("/");
+  const parts = key.replace(`${defaultPrefix}/grandma/`, `${defaultPrefix}/`).split("/");
   return Boolean(owner && parts[0] === defaultPrefix && /^\d{1,2}$/.test(parts[1]) && parts[2] === "by" && parts[3] === owner && parts.length === 5);
+}
+
+function isGrandmaMedia(key) {
+  const parts = key.split("/");
+  return key.startsWith(`${defaultPrefix}/grandma/`) ||
+    (parts[0] === defaultPrefix && parts[2] === "by" && grandmaLegacyContributors.has(parts[3]));
+}
+
+function captureDate(value) {
+  const match = String(value || "").split("/").pop().match(/^(?:IMG_)?(20\d{2})-?(\d{2})-?(\d{2})(?:[T_ ](\d{2})[:-]?(\d{2})[:-]?(\d{2}))?(?:Z)?(?=$|[_. -])/i);
+  if (!match) return null;
+  const [, year, month, day, hour = "00", minute = "00", second = "00"] = match;
+  const iso = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`;
+  const date = new Date(iso);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 19) === iso.slice(0, 19) ? iso : null;
+}
+
+function captureMonth(capturedAt) {
+  const start = captureDate(process.env.GALLERY_TIMELINE_START_DATE);
+  if (!start) throw Object.assign(new Error("The album timeline is not configured."), { statusCode: 503 });
+  const anchor = new Date(start), taken = new Date(capturedAt);
+  if (taken < anchor || taken > new Date()) return null;
+  const anniversary = offset => Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + offset,
+    Math.min(anchor.getUTCDate(), new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + offset + 1, 0)).getUTCDate()));
+  for (let month = 0; month < galleryMonthCount; month += 1) {
+    if (taken.getTime() >= anniversary(month) && taken.getTime() < anniversary(month + 1)) return month;
+  }
+  return null;
 }
 
 function hasGalleryAccess(claims) {
@@ -262,8 +292,8 @@ async function listGalleryItems(prefix) {
 }
 
 function compareGalleryItems(left, right) {
-  const leftTime = Date.parse(left.lastModified || "");
-  const rightTime = Date.parse(right.lastModified || "");
+  const leftTime = Date.parse(captureDate(left.key) || "");
+  const rightTime = Date.parse(captureDate(right.key) || "");
   const leftHasTime = Number.isFinite(leftTime);
   const rightHasTime = Number.isFinite(rightTime);
 
@@ -323,6 +353,7 @@ async function buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion) {
     key,
     label: buildLabel(key),
     kind: getMediaKind(key),
+    capturedAt: captureDate(key),
     lastModified: typeof item === "string" ? null : item.lastModified,
     size: typeof item === "string" ? null : item.size,
     url: signedUrl.toString(),
@@ -539,7 +570,7 @@ async function handleUploadUrl(event, claims) {
   const contentType = normalizeContentType(payload.contentType, filename);
   const owner = contributorId(claims);
   if (!owner) return json(403, { error: "An authenticated contributor is required." });
-  if (!isGalleryAdmin(claims) && (uploadKind === "hero" || getMediaKind(filename) === "movie")) {
+  if (isGrandma(claims) && (uploadKind === "hero" || getMediaKind(filename) === "movie")) {
     return json(403, { error: "Grandma accounts can add photos to their own memories." });
   }
 
@@ -549,8 +580,20 @@ async function handleUploadUrl(event, claims) {
     });
   }
 
-  const key = uploadKind === "hero" ? getUploadKey(uploadKind, month, filename)
-    : `${defaultPrefix}/${month}/by/${owner}/${filename}`;
+  const namedDate = captureDate(filename);
+  const explicitDate = payload.capturedAt ? captureDate(payload.capturedAt) : null;
+  if (payload.capturedAt && !explicitDate) return json(400, { error: "Enter a valid capture date." });
+  if (namedDate && explicitDate && namedDate.slice(0, 10) !== explicitDate.slice(0, 10)) {
+    return json(400, { error: "The capture date conflicts with the dated filename." });
+  }
+  const capturedAt = namedDate || explicitDate;
+  if (!capturedAt) return json(400, { error: "A known capture date is required. File modification and upload dates are not capture dates." });
+  const actualMonth = captureMonth(capturedAt);
+  if (actualMonth === null || actualMonth !== month) return json(400, { error: "The capture date does not belong to the selected month." });
+  const datedFilename = namedDate ? filename : `${capturedAt.slice(0, 19).replaceAll(":", "-")}--${filename}`;
+  const prefix = isGrandma(claims) ? `${defaultPrefix}/grandma` : defaultPrefix;
+  const key = uploadKind === "hero" ? getUploadKey(uploadKind, month, datedFilename)
+    : `${prefix}/${month}/by/${owner}/${datedFilename}`;
 
   if (await objectExists(key)) {
     return json(409, {
@@ -565,6 +608,7 @@ async function handleUploadUrl(event, claims) {
     key,
     uploadKind,
     contentType,
+    capturedAt,
     ...upload,
   });
 }
@@ -601,6 +645,7 @@ async function handleManifest(event, claims) {
   let pendingCount = 0;
 
   for (const item of items) {
+    if (!isTest && isGrandmaMedia(item.key) && !isGrandma(claims)) continue;
     const isMine = !isTest && ownsMedia(item.key, claims);
     if (scope === "mine" && !isMine) continue;
     const previewKey = thumbnailKey(item, prefix);
@@ -609,6 +654,7 @@ async function handleManifest(event, claims) {
     if (needsDisplay && !previews.has(displayKey)) { pendingCount += 1; continue; }
     const signedMedia = await buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion);
     signedMedia.isMine = isMine;
+    signedMedia.audience = isGrandmaMedia(item.key) ? "grandma" : "family";
     if (needsDisplay) signedMedia.url = (await buildSignedMedia(displayKey, expiresAtEpochSeconds, cacheVersion)).url;
     if (previews.has(previewKey)) {
       signedMedia.thumbnailUrl = (await buildSignedMedia(previewKey, expiresAtEpochSeconds, cacheVersion)).url;

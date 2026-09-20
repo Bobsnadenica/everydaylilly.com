@@ -180,15 +180,48 @@
     });
   }
 
-  function getPhotoTimestamp(photo) {
-    // Backup exports name photos by the day taken; S3 modification dates are upload dates.
-    const taken = getPhotoStem(photo).match(/^(\d{4})-(\d{2})-(\d{2})(?:$|[T_ -])/);
-    if (taken) {
-      const date = new Date(`${taken[1]}-${taken[2]}-${taken[3]}T00:00:00Z`);
-      if (date.getUTCFullYear() === Number(taken[1]) && date.getUTCMonth() + 1 === Number(taken[2]) && date.getUTCDate() === Number(taken[3])) return date.getTime();
+  function captureDate(value) {
+    const match = String(value || "").split("/").pop().match(/^(?:IMG_)?(20\d{2})-?(\d{2})-?(\d{2})(?:[T_ ](\d{2})[:-]?(\d{2})[:-]?(\d{2}))?(?:Z)?(?=$|[_. -])/i);
+    if (!match) return null;
+    const [, year, month, day, hour = "00", minute = "00", second = "00"] = match;
+    const iso = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`;
+    const date = new Date(iso);
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 19) === iso.slice(0, 19) ? iso : null;
+  }
+
+  function captureMonth(capturedAt, manifest) {
+    const start = captureDate(manifest?.timelineStartDate);
+    if (!start || !capturedAt) return null;
+    const anchor = new Date(start), taken = new Date(capturedAt);
+    if (taken < anchor || taken > new Date()) return null;
+    const anniversary = offset => Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + offset,
+      Math.min(anchor.getUTCDate(), new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + offset + 1, 0)).getUTCDate()));
+    for (let month = 0; month < GALLERY_MONTH_COUNT; month += 1) {
+      if (taken.getTime() >= anniversary(month) && taken.getTime() < anniversary(month + 1)) return month;
     }
-    const timestamp = Date.parse(photo?.lastModified || "");
-    return Number.isFinite(timestamp) ? timestamp : null;
+    return null;
+  }
+
+  function getPhotoTimestamp(photo) {
+    // Never substitute S3 upload time or a file modification time for capture time.
+    const captured = captureDate(photo?.capturedAt) || captureDate(photo?.key);
+    return captured ? Date.parse(captured) : null;
+  }
+
+  function photoDateLabel(photo) {
+    const time = getPhotoTimestamp(photo);
+    return time === null ? "" : new Intl.DateTimeFormat("bg-BG", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(time);
+  }
+
+  function uploadDateError(item, state) {
+    const date = captureDate(item.capturedAt);
+    if (!date) return "Добави точната дата или премахни снимката, ако не я знаеш.";
+    const month = captureMonth(date, state.manifest);
+    if (month === null) return "Датата е извън месеците на Лили или е в бъдещето.";
+    const namedDate = captureDate(item.file.name);
+    if (namedDate && namedDate.slice(0, 10) !== date.slice(0, 10)) return "Датата не съвпада с името на файла.";
+    if (!state.grandmaPage && month !== state.selectedMonth) return "Снимката е от друг месец. Премахни я и отвори правилния месец.";
+    return "";
   }
 
   function comparePhotosByDate(left, right) {
@@ -633,7 +666,7 @@
             <div id="upload-queue" class="upload-queue"></div>
           </section>` : `<p class="viewer-note">Разглеждаш семейния албум. Снимки могат да добавят администраторите.</p>`}
         <p id="upload-notice" class="upload-notice" role="status" data-tone="${state.uploadNotice?.tone || ""}">${escapeHtml(state.uploadNotice?.message || "")}</p>
-        ${items.length ? `<div class="month-grid">${items.map((photo, i) => buildPhotoCardMarkup(photo, {title: `Месец ${month + 1} · Спомен ${i + 1}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms`})).join("")}</div>` : `
+        ${items.length ? `<div class="month-grid">${items.map((photo, i) => buildPhotoCardMarkup(photo, {title: `Месец ${month + 1} · ${photoDateLabel(photo) || `Спомен ${i + 1}`}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms`})).join("")}</div>` : `
           <div class="album-empty"><span class="empty-flower" aria-hidden="true">✿</span><h3>Малките мигове започват тук.</h3><p>${canUploadToGallery(state) ? `Добави първите снимки за Месец ${month + 1}.<br>Те ще се появят само на тази страница.` : "Този месец още очаква своите първи снимки."}</p></div>`}
         <p class="album-footnote">Месец ${month + 1} от 60 <span aria-hidden="true">·</span> Малко по малко, цял един свят.</p>
       </section>`;
@@ -669,18 +702,15 @@
         <button type="button" data-memory-scope="family" aria-pressed="${!mine}" ${locked ? "disabled" : ""}>Цялото семейство</button>
       </nav>
       ${canUploadToGallery(state) ? `<section class="album-upload grandma-upload" data-upload-drop-zone aria-label="Добави снимки с Лили">
-        <div class="upload-intro"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Още един миг заедно.</h3><p>Избери снимки от телефона. Ще ги запазим сред твоите спомени и в семейния албум.</p></div></div>
+        <div class="upload-intro"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Още един миг заедно.</h3><p>Избери снимки от телефона. Твоите снимки се виждат само от профили с роля „баба“.</p></div></div>
         <label class="btn btn-primary choose-files">Добави снимки<input class="upload-file-input" type="file" multiple accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/avif,image/gif,.heic,.heif" ${state.uploading ? "disabled" : ""}></label>
-        <label class="grandma-month">Към кой месец на Лили?
-          <select data-upload-month ${locked ? "disabled" : ""}>${Array.from({length: GALLERY_MONTH_COUNT}, (_, month) => `<option value="${month}" ${month === state.selectedMonth ? "selected" : ""}>Месец ${month + 1} · ${escapeHtml(getMonthDateRange(state.manifest, month) || "")}</option>`).join("")}</select>
-        </label>
-        <p class="upload-format-hint">Приемаме и HEIC снимки от iPhone. Остави страницата отворена, докато завърши качването.</p>
+        <p class="upload-format-hint">Потвърди точната дата на всяка снимка. Месецът се избира автоматично. Ако не знаеш датата, премахни снимката. Приемаме и HEIC от iPhone.</p>
         <div id="upload-queue" class="upload-queue"></div>
       </section>` : ""}
       <p id="upload-notice" class="upload-notice" role="status" data-tone="${state.uploadNotice?.tone || ""}">${escapeHtml(state.uploadNotice?.message || "")}</p>
       ${state.manifest.pendingCount ? `<p class="viewer-note" role="status">Подготвяме ${state.manifest.pendingCount} снимки за разглеждане. След малко натисни „Обнови албума“.</p>` : ""}
       <div class="grandma-album-heading"><div><p class="section-kicker">${mine ? "ВАШАТА МАЛКА ИСТОРИЯ" : "ВСИЧКИ, КОИТО Я ОБИЧАТ"}</p><h2>${mine ? "Прегръдки за цял живот." : "Лили, през нашите очи."}</h2></div><span>${photos.length} спомена</span></div>
-      ${photos.length ? `<div class="month-grid grandma-grid">${photos.slice(0, state.memoryLimit).map((photo, i) => buildPhotoCardMarkup(photo, { title: `${mine ? "С баба" : "Семейство"} · Месец ${getMonthBucket(photo) + 1} · Спомен ${i + 1}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms` })).join("")}</div>`
+      ${photos.length ? `<div class="month-grid grandma-grid">${photos.slice(0, state.memoryLimit).map((photo, i) => buildPhotoCardMarkup(photo, { title: `${mine ? "С баба" : "Семейство"} · Месец ${getMonthBucket(photo) + 1} · ${photoDateLabel(photo) || `Спомен ${i + 1}`}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms` })).join("")}</div>`
       : '<div class="album-empty"><span class="empty-flower" aria-hidden="true">♡</span><h3>Всяка прегръдка е начало.</h3><p>Добави първите си снимки с Лили. Тук винаги ще бъдат лесни за намиране.</p></div>'}
       ${photos.length > state.memoryLimit ? '<div class="memory-more"><button class="btn btn-secondary" data-memory-more type="button">Покажи още спомени</button></div>' : ""}
       <p class="grandma-dedication">Най-хубавото в тези снимки е, че сте заедно. <span aria-hidden="true">♡</span></p>`;
@@ -690,13 +720,22 @@
   function renderUploadQueue(state) {
     const queue = document.getElementById("upload-queue");
     if (!queue) return;
+    const invalid = state.uploadQueue.some(item => uploadDateError(item, state));
+    const destination = state.grandmaPage ? "по дата на заснемане" : `за Месец ${state.selectedMonth + 1}`;
     queue.innerHTML = state.uploadQueue.length ? `
-      <div class="queue-heading"><strong>${state.uploadQueue.length} ${state.uploadQueue.length === 1 ? "избран файл" : "избрани файла"} за Месец ${state.selectedMonth + 1}</strong><span>Първо качи или откажи избраните файлове, за да смениш месеца.</span></div>
-      <ul class="queue-list">${state.uploadQueue.map(item => `<li class="queue-item" data-status="${item.status}">
-        ${item.preview ? `<img src="${escapeHtml(item.preview)}" alt="" loading="lazy">` : `<span class="queue-file-icon" aria-hidden="true">▧</span>`}
-        <span class="queue-filename">${escapeHtml(item.file.name)}</span><span class="queue-status">${escapeHtml(item.error || ({pending: "Готово за качване", uploading: "Качва се…", uploaded: "Качено", duplicate: "Вече е в албума", failed: "Неуспешно"}[item.status]))}</span>
-      </li>`).join("")}</ul>
-      ${state.uploading ? `<progress max="${state.uploadQueue.length}" value="${state.uploadQueue.filter(item => ["uploaded", "duplicate", "failed"].includes(item.status)).length}" aria-label="Качени файлове"></progress><p role="status">Качваме в Месец ${state.selectedMonth + 1}. Остави страницата отворена.</p>` : `<div class="queue-actions"><button class="btn btn-primary" data-upload-start type="button">Качи ${state.uploadQueue.length} в Месец ${state.selectedMonth + 1}</button><button class="btn btn-secondary" data-upload-cancel type="button">Откажи избраните</button></div>`}` : "";
+      <div class="queue-heading"><strong>${state.uploadQueue.length} избрани файла · ${destination}</strong><span>Само снимки с точна дата. Не използваме датата на качване.</span></div>
+      <ul class="queue-list">${state.uploadQueue.map((item, index) => {
+        const issue = uploadDateError(item, state);
+        const month = captureMonth(captureDate(item.capturedAt), state.manifest);
+        return `<li class="queue-item" data-status="${item.status}">
+          ${item.preview ? `<img src="${escapeHtml(item.preview)}" alt="" loading="lazy">` : '<span class="queue-file-icon" aria-hidden="true">▧</span>'}
+          <span class="queue-filename">${escapeHtml(item.file.name)}</span>
+          <label class="queue-date">Дата на снимката<input type="date" data-capture-date="${index}" value="${escapeHtml(item.capturedAt?.slice(0, 10) || "")}" min="${escapeHtml(state.manifest.timelineStartDate || "")}" max="${new Date().toISOString().slice(0, 10)}" required ${state.uploading ? "disabled" : ""} aria-invalid="${Boolean(issue)}"></label>
+          <span class="queue-status">${escapeHtml(item.error || issue || ({pending: `Месец ${month + 1}`, uploading: "Качва се…", uploaded: "Качено", duplicate: "Вече е в албума", failed: "Неуспешно"}[item.status]))}</span>
+          ${!state.uploading ? `<button type="button" class="btn btn-secondary" data-upload-remove="${index}" aria-label="Премахни ${escapeHtml(item.file.name)}">Премахни</button>` : ""}
+        </li>`;
+      }).join("")}</ul>
+      ${state.uploading ? `<progress max="${state.uploadQueue.length}" value="${state.uploadQueue.filter(item => ["uploaded", "duplicate", "failed"].includes(item.status)).length}" aria-label="Качени файлове"></progress><p role="status">Запазваме спомените по дата. Остави страницата отворена.</p>` : `<div class="queue-actions"><button class="btn btn-primary" data-upload-start type="button" ${invalid ? "disabled" : ""}>Качи ${state.uploadQueue.length} ${state.uploadQueue.length === 1 ? "снимка" : "снимки"}</button><button class="btn btn-secondary" data-upload-cancel type="button">Откажи избраните</button></div>`}` : "";
   }
 
   function renderTestGallery(content, manifest, visiblePhotos) {
@@ -1045,11 +1084,12 @@
     return body;
   }
 
-  async function uploadSingleFile(session, file, month, uploadKind) {
+  async function uploadSingleFile(session, file, month, uploadKind, capturedAt) {
     const upload = await requestUploadUrl(session, {
       month,
       uploadKind,
       filename: file.name,
+      capturedAt,
       contentType: file.type || "",
     });
 
@@ -1271,14 +1311,14 @@
       for (const file of selected) {
         if (!file.size || !supported.test(file.name)) { rejected += 1; continue; }
         if (state.uploadQueue.some(item => item.file.name === file.name && item.file.size === file.size && item.file.lastModified === file.lastModified)) continue;
-        state.uploadQueue.push({ file, status: "pending", preview: /^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name) ? URL.createObjectURL(file) : "" });
+        state.uploadQueue.push({ file, capturedAt: captureDate(file.name)?.slice(0, 10) || "", status: "pending", preview: /^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name) ? URL.createObjectURL(file) : "" });
       }
       state.uploadNotice = rejected ? {tone: "error", message: `${rejected} файла не са добавени. Избери поддържани снимки (включително HEIC от iPhone).`} : null;
       render();
     }
 
     async function uploadQueue() {
-      if (state.uploading || !state.uploadQueue.length || !canUploadToGallery(state)) return;
+      if (state.uploading || !state.uploadQueue.length || !canUploadToGallery(state) || state.uploadQueue.some(item => uploadDateError(item, state))) return;
       state.uploading = true;
       const month = state.selectedMonth;
       const signout = document.getElementById("gallery-signout");
@@ -1289,7 +1329,7 @@
         item.error = "";
         renderUploadQueue(state);
         try {
-          await uploadSingleFile(await currentSession(), item.file, month, "photo");
+          await uploadSingleFile(await currentSession(), item.file, state.grandmaPage ? captureMonth(captureDate(item.capturedAt), state.manifest) : month, "photo", item.capturedAt);
           item.status = "uploaded";
         } catch (error) {
           item.status = [409, 412].includes(error.status) ? "duplicate" : "failed";
@@ -1311,7 +1351,7 @@
       state.uploadQueue = failed;
       state.uploading = false;
       if (signout) signout.disabled = false;
-      state.uploadNotice = { tone: failed.length ? "error" : "success", message: `${uploaded} ${uploaded === 1 ? "качен файл" : "качени файла"} в Месец ${month + 1}.${duplicate ? ` ${duplicate} вече са в албума.` : ""}${failed.length ? ` ${failed.length} ${failed.length === 1 ? "файл не успя" : "файла не успяха"}. Можеш да опиташ отново.` : ""}` };
+      state.uploadNotice = { tone: failed.length ? "error" : "success", message: `${uploaded} ${uploaded === 1 ? "качен файл" : "качени файла"} ${state.grandmaPage ? "по дата на заснемане" : `в Месец ${month + 1}`}.${duplicate ? ` ${duplicate} вече са в албума.` : ""}${failed.length ? ` ${failed.length} ${failed.length === 1 ? "файл не успя" : "файла не успяха"}. Можеш да опиташ отново.` : ""}` };
       if (uploaded || duplicate) await loadManifest();
       if (uploaded) scheduleThumbnailRefresh();
       if (state.manifest) render();
@@ -1320,6 +1360,12 @@
     content.addEventListener("click", event => {
       if (event.target.closest("[data-upload-start]")) { uploadQueue(); return; }
       if (event.target.closest("[data-upload-cancel]")) { if (!state.uploading) { clearQueue(); state.uploadNotice = null; render(); } return; }
+      const remove = event.target.closest("[data-upload-remove]");
+      if (remove && !state.uploading) {
+        const [item] = state.uploadQueue.splice(Number(remove.dataset.uploadRemove), 1);
+        if (item?.preview) URL.revokeObjectURL(item.preview);
+        render(); return;
+      }
       const scope = event.target.closest("[data-memory-scope]");
       if (scope && !state.uploading && !state.uploadQueue.length) {
         state.memoryScope = scope.dataset.memoryScope === "family" ? "family" : "mine";
@@ -1337,7 +1383,10 @@
       }
     });
     content.addEventListener("change", event => {
-      if (event.target.matches("[data-upload-month]")) selectMonth(parseGalleryMonth(event.target.value));
+      if (event.target.matches("[data-capture-date]") && !state.uploading) {
+        const item = state.uploadQueue[Number(event.target.dataset.captureDate)];
+        if (item) { item.capturedAt = event.target.value; item.error = ""; renderUploadQueue(state); }
+      }
       if (event.target.matches("#gallery-year")) {
         selectMonth(Number(event.target.value) * 12 + state.selectedMonth % 12);
         document.getElementById("gallery-year")?.focus({ preventScroll: true });

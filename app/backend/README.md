@@ -1,10 +1,19 @@
 # Everyday Lilly vault backend
 
+## Grandma isolation and capture dates — 2026-09-21
+
+- Grandma originals use `months/grandma/<month>/by/<server-derived-owner>/<capture-timestamp>-<filename>`. The manifest filters these paths before signing for every request, including admin identities and `scope=mine`; only `grandma` claims grant visibility. Test-account isolation retains priority. Dual admin/grandma accounts still write only grandma photos, with no cover/movie bypass.
+- Retired shared contributor paths remain restricted through private `GALLERY_GRANDMA_LEGACY_CONTRIBUTORS`. Terraform mirrors this as sensitive `gallery_grandma_legacy_contributors`; recover the live values along with the timeline date before applying. Do not commit contributor identifiers.
+- Upload URLs require a capture date from a recognized filename or explicit `capturedAt`. The backend rejects invalid, conflicting, future and pre-birth dates, computes the month from clamped monthly anniversaries and verifies the requested month. Undated filenames gain a canonical date prefix. Client date confirmation is not forensic EXIF verification: the uploader must know the date. No file modification or upload-time fallback is allowed.
+- Manifests expose `capturedAt` and order by capture time. iPhone `IMG_YYYYMMDD_HHMMSS`, compact dates, ISO dates and timestamped migration names are recognized. Legacy undated files are retained with stable name ordering, not assigned fictional dates.
+- The correction migrates retained originals without changing their bytes, copies/verifies matching previews and full JPEG derivatives, removes all retired import keys and invalidates the old original/preview CloudFront paths including query variants. Removed objects have recoverable S3 delete markers; old version IDs are not returned or signed by the gallery. Previously downloaded browser content cannot be recalled. Per-file receipts are private and supersede the initial import receipt.
+- Deployment preserves the live Lambda signing package and all unrelated settings. No worker update, IAM expansion, bucket ACL change, group assignment or Terraform apply is needed. Verify viewer/admin exclusion, grandma personal/all views, old URL denial, new signed derivative delivery and unchanged pre-existing originals.
+
 ## Personal albums and iPhone photos — 2026-09-20
 
 - `grandma` grants family viewing and attributed photo uploads, not administrator privileges. Test claims retain priority and cannot upload into the family collection. Add only the owner-approved account; fresh sign-in is required for changed group claims.
-- Regular uploads now use `months/<0-59>/by/<sha256(subject)[0:32]>/<filename>`. The API ignores client-supplied ownership. Hero uploads remain admin-only at the existing path; conditional PUT still prevents replacement.
-- The default manifest shares media across authorized family members and computes `isMine` for the requesting identity. `?scope=mine` filters before signing and provides a live personal manifest; it does not depend on a stale saved list. CloudFront's API origin request policy forwards `scope` as well as `refresh`. No extra API route is needed.
+- Administrator uploads use `months/<0-59>/by/<sha256(subject)[0:32]>/<filename>`; grandma paths and date validation are defined above. The API ignores client-supplied ownership. Hero uploads remain admin-only at the existing path; conditional PUT still prevents replacement.
+- The default manifest includes only media authorized for the requesting role and computes `isMine` for the requesting identity. `?scope=mine` filters before signing and provides a live personal manifest; it does not depend on a stale saved list. CloudFront's API origin request policy forwards `scope` as well as `refresh`. No extra API route is needed.
 - HEIC/HEIF originals remain intact. The worker's pinned Pillow/Pillow-Heif dependencies decode them into private metadata-free `<digest>.display.jpg` full-resolution views and existing `<digest>.jpg` 640px previews. The manifest withholds HEIC without a display derivative and returns `pendingCount`. Existing JPEG/video preview processing remains unchanged. All derivatives stay under the already-authorized `previews/months/` prefix, so no broader worker IAM permissions are required.
 - Deployment used source-verified copies of the live Lambda packages, preserving signing keys and environment configuration. Only Lambda code, API query forwarding and the new Cognito group were changed. No full Terraform apply was performed. Import the group into recovered authoritative state and reconcile these edits before a future apply.
 - Build the worker with `python3 scripts/build-gallery-thumbnails.py /private/tmp/gallery-thumbnails.zip`; the builder verifies pinned Linux x86_64 Python 3.12 wheel hashes. Worker tests need `pip install -r tests/requirements-thumbnail.txt` in an isolated environment, followed by `python -m unittest discover -s tests -p 'test_*.py'`. Frontend/backend tests: `node --test tests/*.test.cjs`.
@@ -142,7 +151,8 @@ New gallery keys use zero-based month IDs:
 
 ```text
 months/<0-59>/<filename>          Legacy normal media
-months/<0-59>/by/<owner>/<file>   New attributed media
+months/<0-59>/by/<owner>/<file>   Attributed family media
+months/grandma/<month>/by/<owner>/<file>  Grandma role only
 months/hero/<0-59>/<filename>     Month cover images
 test/<filename>                  Test collection
 ```

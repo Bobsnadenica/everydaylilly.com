@@ -14,7 +14,7 @@ function harness({ query = '', saved, response, environment = {} } = {}) {
     fetch: async (url, options) => { requests.push({url, options}); return response; },
     ...environment
   });
-  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange, getGrandmaPhotos, renderGrandmaDetail };\n  document.addEventListener("DOMContentLoaded"'), context);
+  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { captureDate, captureMonth, uploadDateError, getPhotoTimestamp, renderUploadQueue, getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange, getGrandmaPhotos, renderGrandmaDetail };\n  document.addEventListener("DOMContentLoaded"'), context);
   return { ...context.window.testing, requests, storage };
 }
 const session = { claims: { iss: 'issuer', sub: 'parent' }, tokens: { id_token: 'test-token' } };
@@ -119,7 +119,7 @@ test('upload heading includes dates and the wheel has no playback toggle', () =>
 
 test('contributor photos stay in their actual month and personal album uses only server ownership flags',()=>{
   const h=harness();
-  const own={key:`months/12/by/${'a'.repeat(32)}/2026-05-12-photo.heic`,url:'https://example.com/display.jpg',isMine:true};
+  const own={key:`months/grandma/12/by/${'a'.repeat(32)}/2026-05-12-photo.heic`,url:'https://example.com/display.jpg',isMine:true};
   const other={key:`months/0/by/${'b'.repeat(32)}/2025-05-11-photo.jpg`,url:'https://example.com/other.jpg',isMine:false};
   const album={photos:[own,other],heroPhotos:[]};
   assert.deepEqual(Array.from(h.getMonthItems({manifest:album},12),p=>p.key),[own.key]);
@@ -149,4 +149,36 @@ test('login sends grandma to her page while preserving admin, viewer and test ro
   assert.equal(destination({claims:{'cognito:groups':['admin']}}),'/gallery/months/');
   assert.equal(destination({claims:{'cognito:groups':['viewers']}}),'/gallery/months/');
   assert.equal(destination({claims:{'cognito:groups':['grandma','test']}}),'/gallery/test/');
+});
+
+
+test('chronological ordering recognizes camera names and full capture time without modification-date fallback',()=>{
+  const h=harness();
+  const photos=[{key:'months/0/IMG_20001210_170000.jpg',url:'late',isMine:true,lastModified:'2001-01-01'}, {key:'months/grandma/0/by/'+ 'a'.repeat(32)+'/2000-12-10T09-00-00--a.jpg',url:'early',isMine:true,lastModified:'2001-02-01'}];
+  assert.deepEqual(Array.from(h.getGrandmaPhotos({photos}),p=>p.url),['early','late']);
+  assert.equal(h.getPhotoTimestamp({key:'IMG_1234.jpg',lastModified:'2025-01-01'}),null);
+  assert.equal(h.captureDate('2000-02-31.jpg'),null);
+});
+
+test('unknown dates block upload, known dates determine grandma month and cannot contaminate a selected family month',()=>{
+  const h=harness();
+  const state={grandmaPage:true,selectedMonth:0,manifest:{timelineStartDate:'2000-12-09'}};
+  const item={file:{name:'IMG_1234.HEIC'},capturedAt:''};
+  assert.ok(h.uploadDateError(item,state));
+  item.capturedAt='2001-01-10';assert.equal(h.uploadDateError(item,state),'');
+  assert.equal(h.captureMonth(h.captureDate(item.capturedAt),state.manifest),1);
+  assert.ok(h.uploadDateError(item,{...state,grandmaPage:false}));
+  item.capturedAt='2000-12-08';assert.ok(h.uploadDateError(item,state));
+  item.capturedAt='2099-01-01';assert.ok(h.uploadDateError(item,state));
+});
+
+test('upload queue offers date correction and removal and disables submit for unknown dates',()=>{
+  const queue={};
+  const h=harness({environment:{document:{addEventListener(){},getElementById(){return queue;}}}});
+  const state={grandmaPage:true,manifest:{timelineStartDate:'2000-12-09'},uploadQueue:[{file:{name:'IMG_1234.heic'},capturedAt:'',status:'pending'}]};
+  h.renderUploadQueue(state);
+  assert.match(queue.innerHTML,/data-upload-start[^>]*disabled/);
+  assert.match(queue.innerHTML,/data-capture-date="0"/);assert.match(queue.innerHTML,/data-upload-remove="0"/);
+  state.uploadQueue[0].capturedAt='2001-01-10';h.renderUploadQueue(state);
+  assert.doesNotMatch(queue.innerHTML,/data-upload-start[^>]*disabled/);assert.match(queue.innerHTML,/Месец 2/);
 });
