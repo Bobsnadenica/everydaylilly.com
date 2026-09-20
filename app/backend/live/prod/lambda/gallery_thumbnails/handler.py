@@ -19,6 +19,10 @@ HEIF = re.compile(r'\.(heic|heif)$', re.I)
 
 
 def thumbnail_key(key, etag):
+    if re.match(r'^(albums/(family|grandma)|covers/family)/month-\d{2}/[^/]+$', key):
+        relative = re.sub(r'^albums/', '', key).rsplit('.', 1)[0]
+        version = hashlib.sha256(etag.strip('"').encode()).hexdigest()[:12]
+        return f'previews/{relative}-{version}.jpg'
     digest = hashlib.sha256((key + '\n' + etag.strip('"')).encode()).hexdigest()
     return f'previews/{PREFIX}/{digest}.jpg'
 
@@ -63,7 +67,8 @@ def generate_heif(key, target, source):
 
 
 def generate(bucket, key):
-    if bucket != BUCKET or not key.startswith(PREFIX + '/') or not MEDIA.search(key):
+    allowed = key.startswith(PREFIX + '/') or re.match(r'^(albums/(family|grandma)|covers/family)/month-(0[1-9]|[1-5][0-9]|60)/[^/]+$', key)
+    if bucket != BUCKET or not allowed or not MEDIA.search(key):
         return 'ignored'
     source = s3.head_object(Bucket=BUCKET, Key=key)
     if not source['ContentLength']:

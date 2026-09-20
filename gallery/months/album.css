@@ -261,3 +261,9 @@ html { background: #faf8f3; }
 @media (max-width: 360px) { .month-strip { grid-template-columns: repeat(4,minmax(0,1fr)); } }
 
 .upload-month-dates { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.5; }
+
+.memory-tabs { display: flex; gap: 5px; padding: 5px; width: fit-content; max-width: 100%; margin: 4px 0 22px; border: 1px solid #dce3d6; border-radius: 30px; background: #fffdf4c9; }
+.memory-tabs a { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; box-sizing: border-box; padding: 11px 23px; border-radius: 25px; font: 800 14px "Nunito", sans-serif; color: var(--muted); text-align: center; text-decoration: none; }
+.memory-tabs a[aria-current="page"] { background: var(--accent); color: #fffdf7; box-shadow: 0 3px 10px #41573718; }
+.memory-tabs a[aria-disabled="true"] { opacity: .65; cursor: default; }
+@media (max-width: 540px) { .memory-tabs { width: 100%; margin-bottom: 18px; box-sizing: border-box; } .memory-tabs a { flex: 1; padding: 10px 7px; font-size: 12px; } }

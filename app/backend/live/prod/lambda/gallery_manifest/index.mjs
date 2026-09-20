@@ -1,4 +1,5 @@
-import { HeadObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, GetObjectCommand, PutObjectCommand, HeadObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
+import { CloudFrontClient, CreateInvalidationCommand } from "@aws-sdk/client-cloudfront";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -30,6 +31,7 @@ const adminGroupNames = new Set(["admin", "admins"]);
 const viewerGroupNames = new Set(["viewer", "viewers"]);
 // Retired contributor paths stay restricted during and after private-album migration.
 const grandmaLegacyContributors = new Set((process.env.GALLERY_GRANDMA_LEGACY_CONTRIBUTORS || "").split(",").filter(Boolean));
+const albumLayout = process.env.GALLERY_STORAGE_LAYOUT === "albums";
 const mediaContentTypesByExtension = new Map([
   [".avif", "image/avif"],
   [".gif", "image/gif"],
@@ -163,8 +165,85 @@ function ownsMedia(key, claims) {
 
 function isGrandmaMedia(key) {
   const parts = key.split("/");
-  return key.startsWith(`${defaultPrefix}/grandma/`) ||
+  return key.startsWith("albums/grandma/") || key.startsWith(`${defaultPrefix}/grandma/`) ||
     (parts[0] === defaultPrefix && parts[2] === "by" && grandmaLegacyContributors.has(parts[3]));
+}
+
+function albumMonth(key) {
+  const match = key.match(/^(?:albums\/(?:family|grandma)|covers\/family)\/month-(\d{2})\/[^/]+$/);
+  const month = match ? Number(match[1]) - 1 : -1;
+  return month >= 0 && month < galleryMonthCount ? month : null;
+}
+
+async function readContributions(owner) {
+  if (!owner) return { photos: [], etag: null };
+  try {
+    const response = await s3.send(new GetObjectCommand({ Bucket: bucketName, Key: `manifests/contributors/${owner}.json` }));
+    const data = JSON.parse(await response.Body.transformToString());
+    if (data.version !== 1 || !Array.isArray(data.photos)) throw new Error("Invalid contributor manifest.");
+    return { photos: data.photos, boardOrder: Array.isArray(data.boardOrder) ? data.boardOrder : [], etag: response.ETag };
+  } catch (error) {
+    if (error?.$metadata?.httpStatusCode === 404 || error?.name === "NoSuchKey") return { photos: [], etag: null };
+    throw error;
+  }
+}
+
+async function rememberContribution(owner, photo) {
+  // Conditional updates preserve simultaneous uploads from two phones.
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const previous = await readContributions(owner);
+    if (previous.photos.some(item => item.key === photo.key)) return;
+    try {
+      await s3.send(new PutObjectCommand({
+        Bucket: bucketName, Key: `manifests/contributors/${owner}.json`,
+        Body: JSON.stringify({ version: 1, photos: [...previous.photos, photo], boardOrder: previous.boardOrder || [] }),
+        ContentType: "application/json", CacheControl: "no-store",
+        ...(previous.etag ? { IfMatch: previous.etag } : { IfNoneMatch: "*" }),
+      }));
+      return;
+    } catch (error) {
+      if (![409, 412].includes(error?.$metadata?.httpStatusCode)) throw error;
+    }
+  }
+  throw Object.assign(new Error("Another upload is updating the album. Please retry."), { statusCode: 409 });
+}
+
+async function handleManage(event, claims) {
+  if (!albumLayout || !isGrandma(claims) || !contributorId(claims)) return json(403, { error: "Only grandma can manage her own memories." });
+  if (process.env.GALLERY_UPLOADS_PAUSED === "true") return json(503, { error: "The album is being organized. Please retry shortly." });
+  const owner = contributorId(claims), payload = parseJsonBody(event);
+  const index = await readContributions(owner);
+  const owns = key => typeof key === "string" && key.startsWith("albums/grandma/") && albumMonth(key) !== null && index.photos.some(photo => photo.key === key);
+  if (payload.action === "order") {
+    if (!Array.isArray(payload.keys) || payload.keys.length > 2000 || new Set(payload.keys).size !== payload.keys.length || !payload.keys.every(owns)) return json(400, { error: "Choose only your own photos for the board." });
+    if ((payload.version || null) !== index.etag) return json(409, { error: "The album changed. Refresh before saving the board." });
+    try {
+      const response = await s3.send(new PutObjectCommand({ Bucket: bucketName, Key: `manifests/contributors/${owner}.json`,
+        Body: JSON.stringify({ version: 1, photos: index.photos, boardOrder: payload.keys }), ContentType: "application/json", CacheControl: "no-store",
+        ...(index.etag ? { IfMatch: index.etag } : { IfNoneMatch: "*" }),
+      }));
+      return json(200, { order: payload.keys, version: response.ETag });
+    } catch (error) {
+      if ([409, 412].includes(error?.$metadata?.httpStatusCode)) return json(409, { error: "The album changed. Refresh before saving the board." });
+      throw error;
+    }
+  }
+  if (payload.action !== "delete" || !owns(payload.key)) return json(403, { error: "You can delete only your own grandma photos." });
+  if (!process.env.GALLERY_DISTRIBUTION_ID) return json(503, { error: "Photo deletion is not configured." });
+  let source;
+  try { source = await s3.send(new HeadObjectCommand({ Bucket: bucketName, Key: payload.key })); }
+  catch (error) { if (error?.$metadata?.httpStatusCode !== 404 && !["NotFound", "NoSuchKey"].includes(error?.name)) throw error; }
+  if (source) {
+    const preview = thumbnailKey({ key: payload.key, etag: String(source.ETag).replaceAll('"', '') }, defaultPrefix);
+    const keys = [payload.key, preview, preview.replace(/\.jpg$/, ".display.jpg")];
+    // Versioned S3 deletion remains recoverable; ownership is checked before every mutation.
+    const result = await s3.send(new DeleteObjectsCommand({ Bucket: bucketName, Delete: { Objects: keys.map(Key => ({ Key })), Quiet: true } }));
+    if (result.Errors?.length) throw new Error("Photo deletion was incomplete. Retry the operation.");
+  }
+  await new CloudFrontClient({}).send(new CreateInvalidationCommand({ DistributionId: process.env.GALLERY_DISTRIBUTION_ID,
+    InvalidationBatch: { CallerReference: crypto.randomUUID(), Paths: { Quantity: 2, Items: ["/albums/grandma/*", "/previews/grandma/*"] } },
+  }));
+  return json(200, { deleted: payload.key });
 }
 
 function captureDate(value) {
@@ -329,6 +408,11 @@ function buildLabel(key) {
 }
 
 export function thumbnailKey(item, prefix) {
+  if (albumMonth(item.key) !== null) {
+    const relative = item.key.replace(/^albums\//, "").replace(/\.[^.]+$/, "");
+    const version = crypto.createHash("sha256").update(item.etag).digest("hex").slice(0, 12);
+    return `previews/${relative}-${version}.jpg`;
+  }
   const digest = crypto.createHash("sha256").update(`${item.key}\n${item.etag}`).digest("hex");
   return `previews/${prefix}/${digest}.jpg`;
 }
@@ -354,6 +438,7 @@ async function buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion) {
     label: buildLabel(key),
     kind: getMediaKind(key),
     capturedAt: captureDate(key),
+    month: albumMonth(key),
     lastModified: typeof item === "string" ? null : item.lastModified,
     size: typeof item === "string" ? null : item.size,
     url: signedUrl.toString(),
@@ -562,6 +647,7 @@ async function handleUploadUrl(event, claims) {
       error: "This account cannot upload to the family gallery.",
     });
   }
+  if (process.env.GALLERY_UPLOADS_PAUSED === "true") return json(503, { error: "The album is being organized. Please retry shortly." });
 
   const payload = parseJsonBody(event);
   const month = normalizeUploadMonth(payload.month);
@@ -592,7 +678,11 @@ async function handleUploadUrl(event, claims) {
   if (actualMonth === null || actualMonth !== month) return json(400, { error: "The capture date does not belong to the selected month." });
   const datedFilename = namedDate ? filename : `${capturedAt.slice(0, 19).replaceAll(":", "-")}--${filename}`;
   const prefix = isGrandma(claims) ? `${defaultPrefix}/grandma` : defaultPrefix;
-  const key = uploadKind === "hero" ? getUploadKey(uploadKind, month, datedFilename)
+  const assetId = crypto.createHash("sha256").update(`${owner}\n${capturedAt}\n${filename}`).digest("hex").slice(0, 20);
+  const monthFolder = `month-${String(month + 1).padStart(2, "0")}`;
+  const cleanFilename = `${capturedAt.slice(0, 19).replaceAll(":", "-")}_${assetId}${getFileExtension(filename)}`;
+  const key = albumLayout ? `${uploadKind === "hero" ? "covers/family" : `albums/${isGrandma(claims) ? "grandma" : "family"}`}/${monthFolder}/${cleanFilename}`
+    : uploadKind === "hero" ? getUploadKey(uploadKind, month, datedFilename)
     : `${prefix}/${month}/by/${owner}/${datedFilename}`;
 
   if (await objectExists(key)) {
@@ -603,6 +693,7 @@ async function handleUploadUrl(event, claims) {
   }
 
   const upload = createPresignedPutUrl(key, contentType);
+  if (albumLayout) await rememberContribution(owner, { key, capturedAt, filename });
 
   return json(200, {
     key,
@@ -633,20 +724,27 @@ async function handleManifest(event, claims) {
 
   const isTest = isTestAccount(claims);
   const scope = event?.queryStringParameters?.scope || "family";
-  if (!["family", "mine"].includes(scope)) return json(400, { error: "Unknown album scope." });
+  if (!["family", "mine", "family-only"].includes(scope)) return json(400, { error: "Unknown album scope." });
   if (scope === "mine" && !contributorId(claims)) return json(403, { error: "An authenticated contributor is required." });
   const prefix = isTest ? testPrefix : defaultPrefix;
   const heroPrefix = `${prefix}/hero`;
-  const items = await listGalleryItems(prefix);
-  const previews = new Set((await listGalleryItems(`previews/${prefix}`)).map(item => item.key));
+  const useAlbums = albumLayout && !isTest;
+  const includeGrandma = isGrandma(claims) && scope !== "family-only";
+  const audiencePrefixes = useAlbums ? ["albums/family", "covers/family", ...(includeGrandma ? ["albums/grandma"] : [])] : [prefix];
+  const previewPrefixes = useAlbums ? ["previews/family", "previews/covers/family", ...(includeGrandma ? ["previews/grandma"] : [])] : [`previews/${prefix}`];
+  const items = (await Promise.all(audiencePrefixes.map(listGalleryItems))).flat().sort(compareGalleryItems);
+  const previews = new Set((await Promise.all(previewPrefixes.map(listGalleryItems))).flat().map(item => item.key));
+  const contributions = useAlbums ? await readContributions(contributorId(claims)) : null;
+  const ownKeys = contributions ? new Set(contributions.photos.map(photo => photo.key)) : null;
   const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
   const photos = [];
   const heroPhotos = [];
   let pendingCount = 0;
 
   for (const item of items) {
-    if (!isTest && isGrandmaMedia(item.key) && !isGrandma(claims)) continue;
-    const isMine = !isTest && ownsMedia(item.key, claims);
+    if (useAlbums && albumMonth(item.key) === null) continue;
+    if (!isTest && isGrandmaMedia(item.key) && !includeGrandma) continue;
+    const isMine = !isTest && (useAlbums ? ownKeys.has(item.key) : ownsMedia(item.key, claims));
     if (scope === "mine" && !isMine) continue;
     const previewKey = thumbnailKey(item, prefix);
     const displayKey = previewKey.replace(/\.jpg$/, ".display.jpg");
@@ -659,7 +757,7 @@ async function handleManifest(event, claims) {
     if (previews.has(previewKey)) {
       signedMedia.thumbnailUrl = (await buildSignedMedia(previewKey, expiresAtEpochSeconds, cacheVersion)).url;
     }
-    if (item.key.startsWith(heroPrefix)) {
+    if (item.key.startsWith(heroPrefix) || item.key.startsWith("covers/family/")) {
       heroPhotos.push(signedMedia);
     } else {
       photos.push(signedMedia);
@@ -675,10 +773,12 @@ async function handleManifest(event, claims) {
     cacheVersion,
     scope,
     pendingCount,
+    board: useAlbums && includeGrandma ? { order: contributions.boardOrder || [], version: contributions.etag } : null,
     user: {
       email: claims.email || null,
       roles: getGroups(claims),
-      canUpload: canUpload(claims),
+      canUpload: process.env.GALLERY_UPLOADS_PAUSED !== "true" && scope !== "family-only" && canUpload(claims),
+      canManage: process.env.GALLERY_UPLOADS_PAUSED !== "true" && useAlbums && includeGrandma,
       isGrandma: isGrandma(claims),
     },
     photos,
@@ -704,6 +804,8 @@ export const handler = async (event) => {
 
     const method = getRequestMethod(event).toUpperCase();
     const path = getRequestPath(event);
+
+    if (method === "POST" && path === "/api/gallery/manage") return await handleManage(event, claims);
 
     if (method === "POST" && path === uploadPath) {
       return await handleUploadUrl(event, claims);

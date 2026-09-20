@@ -1,5 +1,34 @@
 # Everyday Lilly vault backend
 
+## Active storage layout and grandma management — 2026-09-21
+
+The active Lambda configuration uses `GALLERY_STORAGE_LAYOUT=albums`. Originals, covers and previews are separate; numbered folders are one-based while API `month` fields remain zero-based:
+
+```text
+albums/family/month-01/<capture-timestamp>_<asset-id>.<ext>
+albums/grandma/month-01/<capture-timestamp>_<asset-id>.<ext>
+covers/family/month-01/<asset-id>.<ext>
+previews/family/month-01/<stem>-<etag-hash>.jpg
+previews/grandma/month-01/<stem>-<etag-hash>.jpg
+previews/covers/family/month-01/<stem>-<etag-hash>.jpg
+needs-review/family/<asset-id>.<ext>
+manifests/contributors/<server-derived-owner>.json
+manifests/migrations/<private-receipt>.json
+test/<filename>
+```
+
+HEIC/HEIF also has a `.display.jpg` derivative. The preview suffix is the first 12 hex characters of SHA256 of the unquoted source ETag. S3 events watch `albums/` and `covers/`; review files never enter the manifest or preview pipeline. Original bytes were checked by SHA256 where available or required, otherwise matching full-object ETag and size. Unknown, conflicting and out-of-timeline dates are preserved for review, never assigned to a guessed month. Old current `months/` and `previews/months/` objects are retired with versioned delete markers and CloudFront invalidation, without purging original version history. Private receipts retain exact mappings and verification evidence outside Git.
+
+Grandma's personal route uses ownership from `manifests/contributors/`; the file schema is `{version:1, photos:[{key,capturedAt,filename}], boardOrder:[]}`. `scope=mine` returns only that contributor's authorized media. The **Цялото семейство** tab opens `/gallery/months/?view=family`, which requests `scope=family-only`: exactly the normal family viewer media, with `canUpload=false`, `canManage=false`, and no private board. Only the `grandma` role sees grandma originals or preview URLs.
+
+JWT-protected `POST /api/gallery/manage` accepts `{action:"order",keys,version}` or `{action:"delete",key}`. Every key must belong to the authenticated contributor and grandma namespace. Board saves use the contributor manifest ETag for optimistic concurrency; conflicts return 409. Phone arrows and desktop drag reorder the board without changing capture dates. Deletion removes current original/derived objects and invalidates grandma CDN paths; S3 versions remain recoverable. Previously downloaded browser content cannot be recalled. Contributor entries for deleted objects remain as attribution records; absent originals are excluded from all displays.
+
+Upload attribution is saved with conditional S3 writes before issuing the duplicate-safe upload URL. Missing uploads never become visible merely because they have an attribution entry. `GALLERY_UPLOADS_PAUSED=true` temporarily blocks upload URLs and management while keeping viewing available. Normal operation has this flag false. Retired `months/*` PUT permissions are explicitly denied so old upload URLs cannot recreate that layout.
+
+Deployment preserved the live signing package and unrelated environment settings. API/worker code, IAM policies, S3 event prefixes, the new JWT route, and layout configuration were updated directly; no full Terraform apply was performed. Before any future apply, recover authoritative state/variables/keys, import `aws_apigatewayv2_route.gallery_manage` using `<api-id>/<route-id>`, and reconcile the existing IAM policies, notification, Lambda code/env and grandma group. Do not apply from empty state. A rollback requires restoring source versions and matching policy/configuration, not merely changing the layout flag.
+
+Validation: 55 JavaScript and 10 worker tests; synthetic mobile board save/reload/delete and normal family viewer checks; live role manifests, ready derivatives, signed delivery and unsigned denial. A synthetic non-media object exercised live board save/conflict handling, own deletion and forbidden family/viewer deletion. No real grandma Hosted UI sign-in is claimed. The historical sections below describe previous deployments and paths.
+
 ## Grandma isolation and capture dates — 2026-09-21
 
 - Grandma originals use `months/grandma/<month>/by/<server-derived-owner>/<capture-timestamp>-<filename>`. The manifest filters these paths before signing for every request, including admin identities and `scope=mine`; only `grandma` claims grant visibility. Test-account isolation retains priority. Dual admin/grandma accounts still write only grandma photos, with no cover/movie bypass.
@@ -143,11 +172,11 @@ CloudFront endpoints:
 - `GET https://d1fxhro74spn7q.cloudfront.net/api/gallery/manifest`
 - `POST https://d1fxhro74spn7q.cloudfront.net/api/gallery/upload-url`
 
-CloudFront forwards `/api/*` to `ebz7pirts5.execute-api.eu-central-1.amazonaws.com` with caching disabled. Both routes use JWT authorization. The Lambda lists the authorized S3 prefix with pagination and returns metadata plus signed media URLs. The default CloudFront media behavior requires a trusted key group and reaches S3 through Origin Access Control.
+CloudFront forwards `/api/*` to `ebz7pirts5.execute-api.eu-central-1.amazonaws.com` with caching disabled. Manifest, upload-url and manage routes use JWT authorization. The Lambda lists authorized S3 prefixes with pagination and returns metadata plus signed media URLs. The default CloudFront media behavior requires a trusted key group and reaches S3 through Origin Access Control.
 
 Both archive and gallery buckets have all S3 public-access-block settings enabled. The archive's enabled lifecycle rule transitions eligible objects to `DEEP_ARCHIVE` after seven days; S3 lifecycle size eligibility still applies. Archive objects are not served by the gallery Lambda.
 
-New gallery keys use zero-based month IDs:
+Historical keys used zero-based month IDs; the active layout at the top supersedes these paths:
 
 ```text
 months/<0-59>/<filename>          Legacy normal media

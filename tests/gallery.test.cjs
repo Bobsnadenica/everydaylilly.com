@@ -14,7 +14,7 @@ function harness({ query = '', saved, response, environment = {} } = {}) {
     fetch: async (url, options) => { requests.push({url, options}); return response; },
     ...environment
   });
-  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { captureDate, captureMonth, uploadDateError, getPhotoTimestamp, renderUploadQueue, getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange, getGrandmaPhotos, renderGrandmaDetail };\n  document.addEventListener("DOMContentLoaded"'), context);
+  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { getBoardPhotos, moveBoardPhoto, renderGalleryState, captureDate, captureMonth, uploadDateError, getPhotoTimestamp, renderUploadQueue, getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange, getGrandmaPhotos, renderGrandmaDetail };\n  document.addEventListener("DOMContentLoaded"'), context);
   return { ...context.window.testing, requests, storage };
 }
 const session = { claims: { iss: 'issuer', sub: 'parent' }, tokens: { id_token: 'test-token' } };
@@ -119,12 +119,12 @@ test('upload heading includes dates and the wheel has no playback toggle', () =>
 
 test('contributor photos stay in their actual month and personal album uses only server ownership flags',()=>{
   const h=harness();
-  const own={key:`months/grandma/12/by/${'a'.repeat(32)}/2026-05-12-photo.heic`,url:'https://example.com/display.jpg',isMine:true};
+  const own={key:`months/grandma/12/by/${'a'.repeat(32)}/2026-05-12-photo.heic`,url:'https://example.com/display.jpg',isMine:true,audience:'grandma'};
   const other={key:`months/0/by/${'b'.repeat(32)}/2025-05-11-photo.jpg`,url:'https://example.com/other.jpg',isMine:false};
   const album={photos:[own,other],heroPhotos:[]};
   assert.deepEqual(Array.from(h.getMonthItems({manifest:album},12),p=>p.key),[own.key]);
   assert.deepEqual(Array.from(h.getGrandmaPhotos(album),p=>p.key),[own.key]);
-  assert.equal(h.getGrandmaPhotos(album,'family').length,2);
+  assert.equal(h.getGrandmaPhotos(album,'family').length,1);
   assert.equal(h.getGrandmaPhotos({photos:[{...other,isMine:undefined}]}).length,0);
 });
 
@@ -135,7 +135,7 @@ test('grandma page includes phone photo uploads, locked album controls and bound
   h.renderGrandmaDetail(content,{manifest:{photos,heroPhotos:[],timelineStartDate:'2000-12-09',user:{canUpload:true}},actualCollection:'months',selectedMonth:0,memoryScope:'mine',memoryLimit:60,uploadQueue:[{}],uploading:false});
   assert.equal((content.innerHTML.match(/data-photo-trigger/g)||[]).length,60);
   assert.match(content.innerHTML,/data-memory-more/);
-  assert.match(content.innerHTML,/data-memory-scope="family"[^>]*disabled/);
+  assert.match(content.innerHTML,/href="\/gallery\/months\/\?view=family"[^>]*aria-disabled="true"/);
   assert.match(content.innerHTML,/image\/heic/);
   assert.doesNotMatch(content.innerHTML,/accept="[^"]*video/);
 });
@@ -189,4 +189,40 @@ test('equal capture timestamps retain deterministic filename order across refres
   const a={key:'months/0/2000-12-10T09-00-00--a.jpg',url:'a',isMine:true};
   const b={key:'months/0/2000-12-10T09-00-00--b.jpg',url:'b',isMine:true};
   for(const photos of [[a,b],[b,a]]) assert.deepEqual(Array.from(h.getGrandmaPhotos({photos}),p=>p.url),['a','b']);
+});
+
+
+test('grandma family tab uses the regular monthly viewer renderer and a dedicated read-only manifest',async()=>{
+  const h=harness({query:'?view=family',response:{ok:true,json:async()=>({...manifest,user:{canUpload:false,isGrandma:true}})}});
+  await h.fetchManifest(session);assert.match(h.requests[0].url,/scope=family-only$/);
+  const renderer=harness({environment:{document:{body:{dataset:{}},addEventListener(){},getElementById(){return null;}}}});
+  const content={};
+  renderer.renderGalleryState(content,null,{manifest:{photos:[{key:'albums/family/month-01/2000-12-11_shared.jpg',month:0,url:'https://example.com/shared.jpg',audience:'family'}],heroPhotos:[],user:{canUpload:false,isGrandma:true}},actualCollection:'months',selectedMonth:0,grandmaPage:false,uploadQueue:[],uploading:false});
+  assert.match(content.innerHTML,/Спомените на баба и Лили/);assert.match(content.innerHTML,/Цялото семейство/);
+  assert.match(content.innerHTML,/data-month-trigger/);assert.match(content.innerHTML,/growth-wheel/);assert.match(content.innerHTML,/shared.jpg/);
+  assert.doesNotMatch(content.innerHTML,/upload-file-input|data-upload-drop-zone|data-board-edit|grandma-dedication/);
+});
+
+test('backend month field maps readable month folders without a one-month shift',()=>{
+  const h=harness(); const first={key:'albums/family/month-01/date.jpg',month:0}; const last={key:'albums/family/month-60/date.jpg',month:59};
+  const state={manifest:{photos:[first,last],heroPhotos:[]}};
+  assert.deepEqual(Array.from(h.getMonthItems(state,0),p=>p.key),[first.key]);assert.deepEqual(Array.from(h.getMonthItems(state,59),p=>p.key),[last.key]);
+});
+
+
+test('personal board rearrangement does not modify capture dates or family order',()=>{
+ const h=harness();const photos=[{key:'albums/grandma/month-01/a.jpg',capturedAt:'2000-12-10',url:'a',isMine:true},{key:'albums/grandma/month-02/b.jpg',capturedAt:'2001-01-10',url:'b',isMine:true}];
+ const state={manifest:{photos,board:{order:[]}},boardEditing:true,boardDraft:[]};
+ assert.equal(h.moveBoardPhoto(state,photos[1].key,photos[0].key),true);assert.equal(state.boardDirty,true);
+ assert.deepEqual(Array.from(h.getBoardPhotos(state),p=>p.url),['b','a']);assert.equal(photos[0].capturedAt,'2000-12-10');
+ state.boardEditing=false;assert.deepEqual(Array.from(h.getBoardPhotos(state),p=>p.url),['a','b']);
+ state.manifest.board.order=[photos[1].key,photos[0].key];assert.deepEqual(Array.from(h.getBoardPhotos(state),p=>p.url),['b','a']);
+});
+
+test('board editing exposes accessible move and delete confirmation controls only when authorized',()=>{
+ const h=harness({environment:{document:{body:{dataset:{}},addEventListener(){},getElementById(){return null;}}}});const content={};
+ const key='albums/grandma/month-01/a.jpg';const state={manifest:{photos:[{key,month:0,url:'photo',isMine:true}],heroPhotos:[],user:{canManage:true,canUpload:true}},actualCollection:'months',selectedMonth:0,memoryLimit:60,boardEditing:true,boardDraft:[],deleteKey:key,uploadQueue:[]};
+ h.renderGrandmaDetail(content,state);assert.match(content.innerHTML,/data-board-step/);assert.match(content.innerHTML,/data-board-delete-confirm/);assert.match(content.innerHTML,/Запази подредбата/);
+ state.manifest.photos=[];state.deleteKey=null;h.renderGrandmaDetail(content,state);assert.match(content.innerHTML,/data-board-cancel/);assert.match(content.innerHTML,/data-board-save/);
+ state.manifest.user.canManage=false;state.deleteKey=null;state.boardEditing=false;h.renderGrandmaDetail(content,state);assert.doesNotMatch(content.innerHTML,/data-board-edit|data-board-delete/);
 });

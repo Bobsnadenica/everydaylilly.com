@@ -60,7 +60,7 @@
 
   function getManifestUrl() {
     const baseDomain = document.body.dataset.galleryDomain || "";
-    return `${baseDomain.replace(/\/+$/, "")}/api/gallery/manifest`;
+    return `${baseDomain.replace(/\/+$/, "")}/api/gallery/manifest${new URLSearchParams(window.location.search).get("view") === "family" ? "?scope=family-only" : ""}`;
   }
 
   function getUploadUrl() {
@@ -119,6 +119,7 @@
   }
 
   function getMonthBucket(photo) {
+    if (Number.isInteger(photo?.month)) return parseGalleryMonth(photo.month) ?? -1;
     const key = String(photo?.key || "");
     const nestedMonthMatch = key.match(/\/(\d{1,2})\/(?:by\/[a-f0-9]{32}\/)?[^/]+$/);
 
@@ -132,6 +133,7 @@
   }
 
   function getHeroMonthBucket(photo) {
+    if (Number.isInteger(photo?.month)) return parseGalleryMonth(photo.month);
     const key = String(photo?.key || "");
     const nestedHeroMatch = key.match(/\/hero\/(\d{1,2})\/[^/]+$/);
 
@@ -676,7 +678,7 @@
   function getGrandmaPhotos(manifest, scope = "mine") {
     const seen = new Set();
     return [...(manifest.photos || []), ...(manifest.heroPhotos || [])]
-      .filter(photo => photo.url && (scope === "family" || photo.isMine === true))
+      .filter(photo => photo.url && (scope === "family" ? photo.audience !== "grandma" : photo.isMine === true))
       .filter(photo => { if (seen.has(photo.key)) return false; seen.add(photo.key); return true; })
       .sort(comparePhotosByDate);
   }
@@ -691,28 +693,54 @@
     setText("gallery-total", `${photos.length} спомена с обич`);
   }
 
+  function grandmaTabs(personal, locked = false) {
+    return `<nav class="memory-tabs" aria-label="Избери албум">
+      <a href="/gallery/grandma/" ${personal ? 'aria-current="page"' : ""} ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>Спомените на баба и Лили</a>
+      <a href="/gallery/months/?view=family" ${!personal ? 'aria-current="page"' : ""} ${locked ? 'aria-disabled="true" tabindex="-1"' : ""}>Цялото семейство</a>
+    </nav>`;
+  }
+
+  function getBoardPhotos(state) {
+    const photos = getGrandmaPhotos(state.manifest);
+    const order = state.boardEditing ? state.boardDraft || [] : state.manifest.board?.order || [];
+    const rank = new Map(order.map((key, index) => [key, index]));
+    return photos.sort((a, b) => (rank.get(a.key) ?? Infinity) - (rank.get(b.key) ?? Infinity) || comparePhotosByDate(a, b));
+  }
+
+  function moveBoardPhoto(state, key, target) {
+    const keys = getBoardPhotos(state).map(photo => photo.key);
+    const from = keys.indexOf(key), to = keys.indexOf(target);
+    if (from < 0 || to < 0 || from === to) return false;
+    keys.splice(from, 1); keys.splice(to, 0, key);
+    state.boardDraft = keys; state.boardDirty = true;
+    return true;
+  }
+
   function renderGrandmaDetail(content, state) {
-    const photos = getGrandmaPhotos(state.manifest, state.memoryScope);
-    const mine = state.memoryScope !== "family";
-    const locked = state.uploading || state.uploadQueue.length > 0;
+    const photos = getBoardPhotos(state);
+    const locked = state.uploading || state.uploadQueue.length > 0 || state.boardEditing || state.boardBusy;
+    const editable = state.manifest.user?.canManage === true;
     content.className = "grandma-workspace";
     content.innerHTML = `
-      <nav class="memory-tabs" aria-label="Избери албум">
-        <button type="button" data-memory-scope="mine" aria-pressed="${mine}" ${locked ? "disabled" : ""}>Моите спомени с Лили</button>
-        <button type="button" data-memory-scope="family" aria-pressed="${!mine}" ${locked ? "disabled" : ""}>Цялото семейство</button>
-      </nav>
+      ${grandmaTabs(true, locked)}
       ${canUploadToGallery(state) ? `<section class="album-upload grandma-upload" data-upload-drop-zone aria-label="Добави снимки с Лили">
         <div class="upload-intro"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Още един миг заедно.</h3><p>Избери снимки от телефона. Твоите снимки се виждат само от профили с роля „баба“.</p></div></div>
-        <label class="btn btn-primary choose-files">Добави снимки<input class="upload-file-input" type="file" multiple accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/avif,image/gif,.heic,.heif" ${state.uploading ? "disabled" : ""}></label>
+        <label class="btn btn-primary choose-files">Добави снимки<input class="upload-file-input" type="file" multiple accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/avif,image/gif,.heic,.heif" ${state.uploading || state.boardEditing || state.boardBusy ? "disabled" : ""}></label>
         <p class="upload-format-hint">Потвърди точната дата на всяка снимка. Месецът се избира автоматично. Ако не знаеш датата, премахни снимката. Приемаме и HEIC от iPhone.</p>
         <div id="upload-queue" class="upload-queue"></div>
       </section>` : ""}
       <p id="upload-notice" class="upload-notice" role="status" data-tone="${state.uploadNotice?.tone || ""}">${escapeHtml(state.uploadNotice?.message || "")}</p>
       ${state.manifest.pendingCount ? `<p class="viewer-note" role="status">Подготвяме ${state.manifest.pendingCount} снимки за разглеждане. След малко натисни „Обнови албума“.</p>` : ""}
-      <div class="grandma-album-heading"><div><p class="section-kicker">${mine ? "ВАШАТА МАЛКА ИСТОРИЯ" : "ВСИЧКИ, КОИТО Я ОБИЧАТ"}</p><h2>${mine ? "Прегръдки за цял живот." : "Лили, през нашите очи."}</h2></div><span>${photos.length} спомена</span></div>
-      ${photos.length ? `<div class="month-grid grandma-grid">${photos.slice(0, state.memoryLimit).map((photo, i) => buildPhotoCardMarkup(photo, { title: `${mine ? "С баба" : "Семейство"} · Месец ${getMonthBucket(photo) + 1} · ${photoDateLabel(photo) || `Спомен ${i + 1}`}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms` })).join("")}</div>`
-      : '<div class="album-empty"><span class="empty-flower" aria-hidden="true">♡</span><h3>Всяка прегръдка е начало.</h3><p>Добави първите си снимки с Лили. Тук винаги ще бъдат лесни за намиране.</p></div>'}
-      ${photos.length > state.memoryLimit ? '<div class="memory-more"><button class="btn btn-secondary" data-memory-more type="button">Покажи още спомени</button></div>' : ""}
+      <div class="grandma-album-heading"><div><p class="section-kicker">ВАШАТА МАЛКА ИСТОРИЯ</p><h2>Прегръдки за цял живот.</h2></div><span>${photos.length} спомена</span></div>
+      ${editable && (photos.length || state.boardEditing) ? `<div class="board-toolbar">
+        ${state.boardEditing ? `<p>Премести снимките с влачене или със стрелките. Датите им остават същите.</p><div class="board-actions"><button class="btn btn-primary" data-board-save ${state.boardBusy ? "disabled" : ""}>${state.boardBusy ? "Запазваме…" : "Запази подредбата"}</button><button class="btn btn-secondary" data-board-reset ${state.boardBusy ? "disabled" : ""}>По дата</button><button class="btn btn-secondary" data-board-cancel ${state.boardBusy ? "disabled" : ""}>Откажи</button></div>` : `<button class="btn btn-secondary" data-board-edit ${locked ? "disabled" : ""}>Подреди спомените</button>`}
+      </div>` : ""}
+      ${photos.length ? `<div class="month-grid grandma-grid ${state.boardEditing ? "is-arranging" : ""}">${photos.slice(0, state.boardEditing ? photos.length : state.memoryLimit).map((photo, i) => `<div class="memory-pin" data-board-key="${escapeHtml(photo.key)}" draggable="${Boolean(state.boardEditing && !state.boardBusy)}">
+        ${buildPhotoCardMarkup(photo, { title: `С баба · Месец ${getMonthBucket(photo) + 1} · ${photoDateLabel(photo) || `Спомен ${i + 1}`}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms` })}
+        ${editable && state.boardEditing ? `<div class="pin-tools"><button type="button" data-board-step="-1" aria-label="Премести снимка ${i + 1} по-напред" ${i === 0 || state.boardBusy ? "disabled" : ""}>←</button><button type="button" data-board-step="1" aria-label="Премести снимка ${i + 1} по-назад" ${i === photos.length - 1 || state.boardBusy ? "disabled" : ""}>→</button><button type="button" data-board-delete ${state.boardBusy ? "disabled" : ""}>Изтрий</button></div>` : ""}
+        ${state.deleteKey === photo.key ? `<div class="pin-confirm" role="alert"><p>Да премахнем ли тази снимка от албума?</p><button class="btn btn-secondary" data-board-delete-confirm ${state.boardBusy ? "disabled" : ""}>Изтрий снимката</button><button class="btn btn-secondary" data-board-delete-cancel ${state.boardBusy ? "disabled" : ""}>Откажи изтриването</button></div>` : ""}
+      </div>`).join("")}</div>` : '<div class="album-empty"><span class="empty-flower" aria-hidden="true">♡</span><h3>Всяка прегръдка е начало.</h3><p>Добави първите си снимки с Лили. Тук винаги ще бъдат лесни за намиране.</p></div>'}
+      ${!state.boardEditing && photos.length > state.memoryLimit ? '<div class="memory-more"><button class="btn btn-secondary" data-memory-more type="button">Покажи още спомени</button></div>' : ""}
       <p class="grandma-dedication">Най-хубавото в тези снимки е, че сте заедно. <span aria-hidden="true">♡</span></p>`;
     renderUploadQueue(state);
   }
@@ -1160,6 +1188,7 @@
       }
     } else {
       renderMonthDetail(content, state);
+      if (state.manifest.user?.isGrandma) content.innerHTML = grandmaTabs(false) + content.innerHTML;
       if (status) status.textContent = `Спомени от Месец ${state.selectedMonth + 1}`;
     }
   }
@@ -1175,7 +1204,7 @@
     let session = await auth.getSession();
     if (!session) { window.location.replace("/"); return; }
     const account = getAccountKey(session);
-    const state = { grandmaPage: document.body.dataset.galleryExperience === "grandma", memoryScope: "mine", memoryLimit: 60, requestedCollection, actualCollection: requestedCollection, selectedMonth: null, activeFilter: "all", manifest: null, uploadQueue: [], uploading: false, loading: false, uploadNotice: null };
+    const state = { grandmaPage: document.body.dataset.galleryExperience === "grandma", memoryScope: "mine", memoryLimit: 60, requestedCollection, actualCollection: requestedCollection, selectedMonth: null, activeFilter: "all", manifest: null, uploadQueue: [], uploading: false, loading: false, uploadNotice: null, boardEditing: false, boardBusy: false, boardDirty: false, boardDraft: [], deleteKey: null };
 
     let thumbnailRefreshTimer;
     let stopGrowthWheel = () => {};
@@ -1214,7 +1243,9 @@
       stopGrowthWheel();
       renderGalleryState(content, status, state);
       stopGrowthWheel = setupGrowthWheel(content, state);
-      if (refreshButton) refreshButton.disabled = state.uploading || state.loading || state.uploadQueue.length > 0;
+      const signout = document.getElementById("gallery-signout");
+      if (signout) signout.disabled = state.uploading || state.boardBusy || state.boardDirty;
+      if (refreshButton) refreshButton.disabled = state.uploading || state.loading || state.uploadQueue.length > 0 || state.boardEditing || state.boardBusy;
     }
 
     function selectMonth(month, focus = false) {
@@ -1227,7 +1258,7 @@
     }
 
     document.getElementById("gallery-signout")?.addEventListener("click", () => {
-      if (state.uploading) return;
+      if (state.uploading || state.boardBusy || state.boardDirty) return;
       clearTimeout(thumbnailRefreshTimer);
       stopGrowthWheel();
       clearQueue();
@@ -1252,7 +1283,7 @@
       }
     });
     window.addEventListener("beforeunload", event => {
-      if (state.uploading || state.uploadQueue.length) { event.preventDefault(); event.returnValue = ""; }
+      if (state.uploading || state.uploadQueue.length || state.boardDirty || state.boardBusy) { event.preventDefault(); event.returnValue = ""; }
     });
     window.addEventListener("pagehide", () => { clearTimeout(thumbnailRefreshTimer); stopGrowthWheel(); });
     window.addEventListener("pageshow", event => { if (event.persisted) loadManifest(); });
@@ -1267,12 +1298,13 @@
         state.manifest = manifest;
         state.actualCollection = manifest.collection;
         if (requestedCollection !== manifest.collection) { window.location.replace(ROUTES[manifest.collection]); return; }
-        if (manifest.collection === "months" && Boolean(manifest.user.isGrandma) !== state.grandmaPage) {
+        const familyVisit = new URLSearchParams(window.location.search).get("view") === "family";
+        if (manifest.collection === "months" && Boolean(manifest.user.isGrandma) !== state.grandmaPage && !(manifest.user.isGrandma && familyVisit && !state.grandmaPage)) {
           window.location.replace(manifest.user.isGrandma ? "/gallery/grandma/" : ROUTES.months); return;
         }
         if (state.selectedMonth === null) {
-          state.selectedMonth = getInitialMonth(manifest, session);
-          if (manifest.collection === "months") rememberMonth(state.selectedMonth, session);
+          state.selectedMonth = state.grandmaPage ? 0 : getInitialMonth(manifest, session);
+          if (manifest.collection === "months" && !state.grandmaPage) rememberMonth(state.selectedMonth, session);
         }
         if (manifest.collection === "test") applyGalleryBackground(manifest);
         updateGalleryChrome(manifest.collection, manifest, session);
@@ -1302,7 +1334,7 @@
     }
 
     function stageFiles(files) {
-      if (state.uploading || !canUploadToGallery(state)) return;
+      if (state.uploading || state.boardEditing || state.boardBusy || !canUploadToGallery(state)) return;
       const selected = Array.from(files || []);
       if (!selected.length) return;
       clearQueue();
@@ -1357,7 +1389,78 @@
       if (state.manifest) render();
     }
 
+    async function manageBoard(payload) {
+      const latest = await currentSession();
+      const url = getUploadUrl().replace(/upload-url$/, "manage");
+      const response = await fetch(url, { method: "POST", headers: { Authorization: `Bearer ${latest.tokens?.id_token || ""}`, "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store" });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(response.status === 409 ? "Албумът е променен от друго устройство. Откажи подредбата и обнови албума." : "Не успяхме да запазим промяната. Опитай отново.");
+      return body;
+    }
+
+    async function saveBoard() {
+      if (state.boardBusy || !state.boardEditing) return;
+      state.boardBusy = true; render();
+      try {
+        const board = await manageBoard({ action: "order", keys: state.boardDraft, version: state.manifest.board?.version || null });
+        state.manifest.board = board; state.boardEditing = false; state.boardDirty = false; state.deleteKey = null;
+        state.uploadNotice = { tone: "success", message: "Подредбата е запазена. Датите на снимките остават същите." };
+      } catch (error) { state.uploadNotice = { tone: "error", message: error.message }; }
+      finally { state.boardBusy = false; render(); }
+    }
+
+    async function deleteBoardPhoto(key) {
+      if (state.boardBusy || !state.manifest.user?.canManage) return;
+      state.boardBusy = true; render();
+      try {
+        await manageBoard({ action: "delete", key });
+        state.boardDraft = state.boardDraft.filter(value => value !== key); state.deleteKey = null;
+        state.uploadNotice = { tone: "success", message: "Снимката е премахната от албума." };
+        await loadManifest();
+      } catch (error) { state.uploadNotice = { tone: "error", message: error.message }; }
+      finally { state.boardBusy = false; render(); }
+    }
+
+    let draggedKey = null;
+    content.addEventListener("dragstart", event => {
+      const pin = event.target.closest("[data-board-key]");
+      if (!pin || !state.boardEditing || state.boardBusy) return;
+      draggedKey = pin.dataset.boardKey; event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", "memory");
+    });
+    content.addEventListener("dragover", event => { if (draggedKey && event.target.closest("[data-board-key]")) event.preventDefault(); });
+    content.addEventListener("drop", event => {
+      const target = event.target.closest("[data-board-key]");
+      if (!draggedKey || !target) return;
+      event.preventDefault(); event.stopPropagation();
+      if (moveBoardPhoto(state, draggedKey, target.dataset.boardKey)) render();
+      draggedKey = null;
+    });
+    content.addEventListener("dragend", () => { draggedKey = null; });
+
     content.addEventListener("click", event => {
+      if (event.target.closest('.memory-tabs a[aria-disabled="true"]')) { event.preventDefault(); return; }
+      const pin = event.target.closest("[data-board-key]");
+      if (state.boardEditing && event.target.closest("[data-photo-trigger]")) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+      if (state.boardBusy && event.target.closest(".pin-tools, .pin-confirm, .board-toolbar")) return;
+      if (event.target.closest("[data-board-edit]") && state.manifest.user?.canManage && !state.uploadQueue.length) { state.boardDraft = getBoardPhotos(state).map(photo => photo.key); state.boardEditing = true; state.boardDirty = false; render(); return; }
+      if (event.target.closest("[data-board-cancel]")) { state.boardEditing = false; state.boardDirty = false; state.deleteKey = null; render(); return; }
+      if (event.target.closest("[data-board-reset]")) { state.boardDraft = []; state.boardDirty = true; render(); return; }
+      if (event.target.closest("[data-board-save]")) { saveBoard(); return; }
+      const step = event.target.closest("[data-board-step]");
+      if (step && pin && state.boardEditing) {
+        const keys = getBoardPhotos(state).map(photo => photo.key); const index = keys.indexOf(pin.dataset.boardKey); const target = keys[index + Number(step.dataset.boardStep)];
+        if (target && moveBoardPhoto(state, pin.dataset.boardKey, target)) {
+          const key = pin.dataset.boardKey; const direction = step.dataset.boardStep; render();
+          const moved = [...content.querySelectorAll("[data-board-key]")].find(node => node.dataset.boardKey === key);
+          const control = moved?.querySelector(`[data-board-step="${direction}"]:not(:disabled)`) || moved?.querySelector("[data-board-step]:not(:disabled)");
+          control?.focus({ preventScroll: true });
+        }
+        return;
+      }
+      if (event.target.closest("[data-board-delete]") && pin) { state.deleteKey = pin.dataset.boardKey; render(); return; }
+      if (event.target.closest("[data-board-delete-cancel]")) { state.deleteKey = null; render(); return; }
+      if (event.target.closest("[data-board-delete-confirm]") && pin) { deleteBoardPhoto(pin.dataset.boardKey); return; }
+
       if (event.target.closest("[data-upload-start]")) { uploadQueue(); return; }
       if (event.target.closest("[data-upload-cancel]")) { if (!state.uploading) { clearQueue(); state.uploadNotice = null; render(); } return; }
       const remove = event.target.closest("[data-upload-remove]");
@@ -1365,13 +1468,6 @@
         const [item] = state.uploadQueue.splice(Number(remove.dataset.uploadRemove), 1);
         if (item?.preview) URL.revokeObjectURL(item.preview);
         render(); return;
-      }
-      const scope = event.target.closest("[data-memory-scope]");
-      if (scope && !state.uploading && !state.uploadQueue.length) {
-        state.memoryScope = scope.dataset.memoryScope === "family" ? "family" : "mine";
-        state.memoryLimit = 60; render();
-        content.querySelector(`[data-memory-scope="${state.memoryScope}"]`)?.focus({ preventScroll: true });
-        return;
       }
       if (event.target.closest("[data-memory-more]")) {
         state.memoryLimit += 60; render(); return;
@@ -1417,7 +1513,7 @@
       renderFilters(filterContainer, state.manifest.photos, state.activeFilter);
       render();
     });
-    refreshButton?.addEventListener("click", () => { if (!state.uploading && !state.uploadQueue.length) loadManifest(); });
+    refreshButton?.addEventListener("click", () => { if (!state.uploading && !state.uploadQueue.length && !state.boardEditing && !state.boardBusy) loadManifest(); });
     await loadManifest();
   }
 

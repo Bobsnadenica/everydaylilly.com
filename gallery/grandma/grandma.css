@@ -12,9 +12,6 @@
 .grandma-keepsake img:nth-child(3) { right: 0; top: 25px; transform: rotate(11deg); }
 .grandma-keepsake .keepsake-lily { object-fit: contain; border: 0; box-shadow: none; width: 260px; height: 180px; left: 60px; }
 .grandma-album .pond-lily-one { opacity: .25; }
-.memory-tabs { display: flex; gap: 5px; padding: 5px; width: fit-content; max-width: 100%; margin: 4px 0 22px; border: 1px solid #dce3d6; border-radius: 30px; background: #fffdf4c9; }
-.memory-tabs button { min-height: 48px; padding: 11px 23px; border: 0; border-radius: 25px; font: 800 14px "Nunito", sans-serif; color: var(--muted); background: transparent; cursor: pointer; }
-.memory-tabs button[aria-pressed="true"] { background: var(--accent); color: #fffdf7; box-shadow: 0 3px 10px #41573718; }
 .family-album .grandma-upload { padding: 22px 24px; background: #fcfaf1ed; border: 1px solid #e1dfce; }
 .grandma-upload .upload-intro { flex: 1 1 360px; }
 .grandma-upload .upload-intro h3 { font: 500 24px "Playfair Display", Georgia, serif; }
@@ -42,8 +39,6 @@
   .grandma-intro p { font-size: 14px; margin-top: 12px; }
   .grandma-keepsake { width: 280px; max-width: 90%; height: 155px; margin: 24px auto 8px; }
   .grandma-album .gallery-toolbar { margin-bottom: 10px; }
-  .memory-tabs { width: 100%; margin-bottom: 18px; }
-  .memory-tabs button { flex: 1; padding: 10px 7px; font-size: 12px; }
   .family-album .grandma-upload { padding: 18px 15px; }
   .grandma-upload .upload-intro { flex-basis: 100%; }
   .grandma-upload .upload-intro h3 { font-size: 22px; }
@@ -53,3 +48,19 @@
   .grandma-album .grandma-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .grandma-album .photo-card { border-width: 4px; }
 }
+
+.memory-pin { min-width: 0; position: relative; }
+.memory-pin .photo-card { height: 100%; }
+.board-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 20px; }
+.board-toolbar p { color: var(--muted); font-size: 13px; margin: 0; }
+.board-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.is-arranging .memory-pin { cursor: grab; padding-bottom: 40px; }
+.is-arranging .photo-card { height: auto; }
+.is-arranging .memory-pin:active { cursor: grabbing; }
+.pin-tools { display: flex; justify-content: space-between; gap: 4px; margin-top: 8px; }
+.pin-tools button { min-width: 36px; min-height: 40px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fffdf7; color: var(--text); font: 700 12px "Nunito", sans-serif; cursor: pointer; }
+.pin-tools button:disabled { opacity: .35; cursor: default; }
+.pin-tools [data-board-delete] { color: #8b4943; }
+.pin-confirm { position: absolute; z-index: 3; inset: 0 0 auto; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: #fffdf7; box-shadow: 0 8px 30px #20392726; }
+.pin-confirm p { font-size: 13px; }
+.pin-confirm .btn { width: 100%; margin-top: 6px; padding: 8px; font-size: 12px; }

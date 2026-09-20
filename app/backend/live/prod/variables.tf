@@ -108,3 +108,13 @@ variable "gallery_grandma_legacy_contributors" {
   sensitive   = true
   default     = []
 }
+
+variable "gallery_storage_layout" {
+  description = "Active gallery key layout. Legacy support is retained only for controlled rollback."
+  type        = string
+  default     = "albums"
+  validation {
+    condition     = contains(["legacy", "albums"], var.gallery_storage_layout)
+    error_message = "Choose legacy or albums."
+  }
+}

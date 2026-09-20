@@ -4,11 +4,21 @@ Static website and private family photo vault for [www.everydaylilly.com](https:
 
 Architecture and live AWS configuration reviewed on **2026-09-10 (Europe/Sofia)**. The backend is deployed, not a future scaffold. The Flutter source described in older documentation is **not present in this checkout**.
 
-## Grandma privacy and chronological albums — 2026-09-21
+## Grandma's pinboard and organized storage — 2026-09-21
+
+Grandma has two tabs: **Спомените на баба и Лили** opens her personal keepsake board; **Цялото семейство** opens the existing monthly gallery with normal viewer permissions. The family tab uses `scope=family-only`, excludes grandma-private media, and offers no uploads or editing. Her personal board supports phone uploads, drag or arrow reordering, saved arrangements, date-order reset, and confirmed deletion of her own photos. Board order is separate from capture dates and never changes month placement.
+
+The API checks role and ownership for every management request. Contributor manifests store ownership and board order privately in S3, with conditional writes to prevent concurrent changes from overwriting each other. Deletion removes the original and derivatives from current storage and invalidates their CloudFront paths; S3 versions remain recoverable.
+
+Storage now separates `albums/family/month-01/`, `albums/grandma/month-01/`, `covers/family/month-01/`, corresponding `previews/`, and private `manifests/`. Folder numbers are one-based; API month values remain zero-based. Original bytes were verified before old paths were retired. Files with unknown, conflicting or out-of-range capture dates are preserved under `needs-review/family/` and excluded from the dated gallery. No date is inferred from upload or modification time. This layout supersedes historical paths below.
+
+Validation: 55 JavaScript tests, 10 worker tests, synthetic mobile checks for saved order, confirmed deletion and the normal family viewer, plus live Lambda/S3/CloudFront checks. A non-media fixture verified live management permissions and deletion without deleting a family photo. Actual grandma Hosted UI login was not exercised. The [backend runbook](app/backend/README.md) covers operations and Terraform reconciliation.
+
+## Grandma privacy and chronological albums — earlier on 2026-09-21
 
 Grandma uploads are visible only to members of the `grandma` role. Viewer and admin accounts without that role receive neither originals nor preview URLs for these photos. Grandma can still switch between her own photos and all media she is authorized to see, including the family album.
 
-New uploads require a known capture date. Dated camera filenames prefill it; otherwise the uploader must enter a date they know or remove the file. Grandma’s upload destination is calculated from monthly anniversaries; family uploads must match the selected month. Invalid, pre-birth, future and conflicting dates are rejected by the API. Sorting uses capture dates and times, never file modification or S3 upload dates. Existing undated legacy media keeps deterministic filename ordering; no capture date is invented for it.
+New uploads require a known capture date. Dated camera filenames prefill it; otherwise the uploader must enter a date they know or remove the file. Grandma’s upload destination is calculated from monthly anniversaries; family uploads must match the selected month. Invalid, pre-birth, future and conflicting dates are rejected by the API. Sorting uses capture dates and times, never file modification or S3 upload dates. The storage migration above now holds uncertain legacy media outside the dated gallery.
 
 The corrected import retains only verified capture dates, with private originals and derivatives moved to new paths. Old shared paths are removed and their CloudFront caches invalidated. S3 version history remains available for recovery; already downloaded browser copies cannot be recalled. Exact media counts, identifiers, filenames and per-file correction receipts stay outside Git.
 
@@ -18,7 +28,7 @@ Validation: 41 JavaScript regressions cover role isolation, date validation, cap
 
 Members of the `grandma` Cognito group open `/gallery/grandma/` after login: a birthday keepsake page with a photo collage, a personal/family album switch, larger mobile photo tiles and phone uploads. The personal view includes only media attributed by the backend to that account. The privacy policy above supersedes the initial family-wide sharing behavior. Existing viewer, admin and test routing remains distinct.
 
-New grandma uploads are stored under `months/grandma/<month>/by/<contributor>/<dated-filename>`; administrator uploads use `months/<month>/by/<contributor>/<dated-filename>`. The contributor is derived from the authenticated Cognito subject on the server; clients cannot choose another owner. `GET /api/gallery/manifest?scope=mine` provides a separate, always-current personal manifest. The default family manifest includes per-request `isMine` flags so switching views reuses the authorized in-memory response. No family photos, account identifiers or signed URLs are stored in this repository.
+The initial release used contributor paths under `months/`; the storage migration above supersedes these paths. The contributor is derived from the authenticated Cognito subject on the server; clients cannot choose another owner. `GET /api/gallery/manifest?scope=mine` provides a current personal manifest. No family photos, account identifiers or signed URLs are stored in this repository.
 
 HEIC/HEIF uploads now keep their originals in private S3 and generate both a full-resolution JPEG for viewing and a small thumbnail. Camera/location metadata is removed from derivatives. Files awaiting conversion are omitted from the display list and counted as pending. Grandma can upload photos to her own namespace, but cannot change month covers or upload movies. The birthday import excludes movies; the animated lily pond remains the background.
 

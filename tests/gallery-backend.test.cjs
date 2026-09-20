@@ -12,13 +12,15 @@ function backend({objects, derived, existing = false, legacyOwners = ''} = {}) {
   const hash=crypto.createHash('sha256').update('months/0/video.mov\nabc123').digest('hex');
   const requests=[];
   class ListObjectsV2Command {constructor(input){this.input=input;}}
+  class GetObjectCommand {constructor(input){this.input=input;}}
+  class PutObjectCommand {constructor(input){this.input=input;}}
   class HeadObjectCommand {constructor(input){this.input=input;}}
   class S3Client {async send(command){
     requests.push(command.input);
     if(command instanceof HeadObjectCommand){if(existing)return {};throw Object.assign(new Error('missing'),{name:'NotFound',$metadata:{httpStatusCode:404}});}
     return {Contents:command.input.Prefix==='months/'?(objects || [original]):command.input.Prefix==='test/'?[]:(derived || [{Key:`previews/months/${hash}.jpg`,Size:12,ETag:'"thumb"'}])};
   }}
-  const context=vm.createContext({S3Client,ListObjectsV2Command,HeadObjectCommand,crypto,path,fileURLToPath,fs:{readFileSync:()=>privateKey},process:{env:{GALLERY_GRANDMA_LEGACY_CONTRIBUTORS:legacyOwners,AWS_ACCESS_KEY_ID:'test',AWS_SECRET_ACCESS_KEY:'test-secret',GALLERY_BUCKET:'private-test',GALLERY_TIMELINE_START_DATE:'2000-12-09',GALLERY_PUBLIC_BASE_URL:'https://media.example.com',GALLERY_SIGNER_KEY_PAIR_ID:'test-key'}},URL,console,Buffer});
+  const context=vm.createContext({S3Client,ListObjectsV2Command,HeadObjectCommand,GetObjectCommand,PutObjectCommand,crypto,path,fileURLToPath,fs:{readFileSync:()=>privateKey},process:{env:{GALLERY_GRANDMA_LEGACY_CONTRIBUTORS:legacyOwners,AWS_ACCESS_KEY_ID:'test',AWS_SECRET_ACCESS_KEY:'test-secret',GALLERY_BUCKET:'private-test',GALLERY_TIMELINE_START_DATE:'2000-12-09',GALLERY_PUBLIC_BASE_URL:'https://media.example.com',GALLERY_SIGNER_KEY_PAIR_ID:'test-key'}},URL,console,Buffer});
   vm.runInContext(source.replace(/^import .*;\n/gm,'').replaceAll('import.meta.url',JSON.stringify('file:///test/index.mjs')).replace(/^export /gm,'')+'\nglobalThis.api={handler,thumbnailKey,captureDate,captureMonth};',context);
   return {...context.api,requests,hash};
 }

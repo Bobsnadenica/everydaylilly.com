@@ -96,8 +96,32 @@ resource "aws_iam_role_policy" "gallery_manifest_lambda" {
           "s3:GetObject",
           "s3:PutObject"
         ]
+        Effect = "Allow"
+        Resource = [
+          "${aws_s3_bucket.gallery.arn}/albums/*",
+          "${aws_s3_bucket.gallery.arn}/covers/*",
+          "${aws_s3_bucket.gallery.arn}/manifests/contributors/*"
+        ]
+      },
+      {
         Effect   = "Allow"
+        Action   = ["s3:GetObject"]
         Resource = "${aws_s3_bucket.gallery.arn}/${var.gallery_month_prefix}/*"
+      },
+      {
+        Effect   = "Deny"
+        Action   = ["s3:PutObject"]
+        Resource = "${aws_s3_bucket.gallery.arn}/${var.gallery_month_prefix}/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:DeleteObject"]
+        Resource = ["${aws_s3_bucket.gallery.arn}/albums/grandma/*", "${aws_s3_bucket.gallery.arn}/previews/grandma/*"]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudfront:CreateInvalidation"]
+        Resource = aws_cloudfront_distribution.gallery.arn
       }
     ]
   })
@@ -117,6 +141,8 @@ resource "aws_lambda_function" "gallery_manifest" {
     variables = {
       GALLERY_BUCKET                      = aws_s3_bucket.gallery.bucket
       GALLERY_DEFAULT_PREFIX              = var.gallery_month_prefix
+      GALLERY_STORAGE_LAYOUT              = var.gallery_storage_layout
+      GALLERY_DISTRIBUTION_ID             = aws_cloudfront_distribution.gallery.id
       GALLERY_TEST_PREFIX                 = var.gallery_test_prefix
       GALLERY_PUBLIC_BASE_URL             = trimsuffix(var.gallery_public_base_url, "/")
       GALLERY_TIMELINE_START_DATE         = var.gallery_timeline_start_date
@@ -184,6 +210,14 @@ resource "aws_apigatewayv2_route" "gallery_manifest" {
 resource "aws_apigatewayv2_route" "gallery_upload_url" {
   api_id             = aws_apigatewayv2_api.gallery.id
   route_key          = "POST ${local.gallery_upload_path}"
+  target             = "integrations/${aws_apigatewayv2_integration.gallery_manifest.id}"
+  authorizer_id      = aws_apigatewayv2_authorizer.gallery_jwt.id
+  authorization_type = "JWT"
+}
+
+resource "aws_apigatewayv2_route" "gallery_manage" {
+  api_id             = aws_apigatewayv2_api.gallery.id
+  route_key          = "POST /api/gallery/manage"
   target             = "integrations/${aws_apigatewayv2_integration.gallery_manifest.id}"
   authorizer_id      = aws_apigatewayv2_authorizer.gallery_jwt.id
   authorization_type = "JWT"

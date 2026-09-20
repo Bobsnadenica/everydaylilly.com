@@ -19,9 +19,9 @@ resource "aws_iam_role_policy" "gallery_thumbnails" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      { Effect = "Allow", Action = ["s3:GetObject"], Resource = ["${aws_s3_bucket.gallery.arn}/${var.gallery_month_prefix}/*", "${aws_s3_bucket.gallery.arn}/previews/${var.gallery_month_prefix}/*"] },
-      { Effect = "Allow", Action = ["s3:PutObject"], Resource = "${aws_s3_bucket.gallery.arn}/previews/${var.gallery_month_prefix}/*" },
-      { Effect = "Allow", Action = "s3:ListBucket", Resource = aws_s3_bucket.gallery.arn, Condition = { StringLike = { "s3:prefix" = "previews/${var.gallery_month_prefix}/*" } } }
+      { Effect = "Allow", Action = ["s3:GetObject"], Resource = ["${aws_s3_bucket.gallery.arn}/${var.gallery_month_prefix}/*", "${aws_s3_bucket.gallery.arn}/albums/*", "${aws_s3_bucket.gallery.arn}/covers/*", "${aws_s3_bucket.gallery.arn}/previews/*"] },
+      { Effect = "Allow", Action = ["s3:PutObject"], Resource = "${aws_s3_bucket.gallery.arn}/previews/*" },
+      { Effect = "Allow", Action = "s3:ListBucket", Resource = aws_s3_bucket.gallery.arn, Condition = { StringLike = { "s3:prefix" = "previews/*" } } }
     ]
   })
 }
@@ -54,10 +54,16 @@ resource "aws_lambda_permission" "gallery_thumbnails_s3" {
 resource "aws_s3_bucket_notification" "gallery_thumbnails" {
   bucket = aws_s3_bucket.gallery.id
   lambda_function {
-    id                  = "gallery-thumbnails"
+    id                  = "gallery-album-thumbnails"
     lambda_function_arn = aws_lambda_function.gallery_thumbnails.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "${var.gallery_month_prefix}/"
+    filter_prefix       = "albums/"
+  }
+  lambda_function {
+    id                  = "gallery-cover-thumbnails"
+    lambda_function_arn = aws_lambda_function.gallery_thumbnails.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "covers/"
   }
   depends_on = [aws_lambda_permission.gallery_thumbnails_s3]
 }

@@ -26,6 +26,19 @@ class ThumbnailTests(unittest.TestCase):
         self.assertEqual(worker.generate('another-bucket', 'months/0/example.jpg'), 'ignored')
         worker.s3.head_object.assert_not_called()
 
+    def test_readable_album_and_cover_paths_have_separate_versioned_previews(self):
+        for source, expected in [('albums/grandma/month-01/2001-01-01_asset.heic', 'previews/grandma/month-01/2001-01-01_asset-'), ('covers/family/month-01/cover.jpg', 'previews/covers/family/month-01/cover-')]:
+            key = worker.thumbnail_key(source, '"abc123"')
+            self.assertTrue(key.startswith(expected))
+            self.assertNotEqual(key, worker.thumbnail_key(source, 'changed'))
+            worker.s3.list_objects_v2.return_value = {'Contents': [{'Key': key}, {'Key': key.replace('.jpg', '.display.jpg')}]}
+            self.assertEqual(worker.generate('private-test', source), 'exists')
+
+    def test_review_and_invalid_month_paths_are_not_published(self):
+        for key in ['needs-review/family/unknown.jpg', 'albums/grandma/month-00/photo.jpg', 'albums/family/month-61/photo.jpg']:
+            self.assertEqual(worker.generate('private-test', key), 'ignored')
+        worker.s3.head_object.assert_not_called()
+
     def test_repeated_event_reuses_existing_preview(self):
         target = worker.thumbnail_key('months/0/example.jpg', 'abc123')
         worker.s3.list_objects_v2.return_value = {'Contents': [{'Key': target}]}
