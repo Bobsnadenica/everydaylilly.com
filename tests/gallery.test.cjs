@@ -14,7 +14,7 @@ function harness({ query = '', saved, response, environment = {} } = {}) {
     fetch: async (url, options) => { requests.push({url, options}); return response; },
     ...environment
   });
-  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange };\n  document.addEventListener("DOMContentLoaded"'), context);
+  vm.runInContext(source.replace('  document.addEventListener("DOMContentLoaded"', '  window.testing = { getInitialMonth, getMonthItems, fetchManifest, rememberMonth, buildMediaMarkup, getGrowthPhotos, renderMonthDetail, getMonthDateRange, getGrandmaPhotos, renderGrandmaDetail };\n  document.addEventListener("DOMContentLoaded"'), context);
   return { ...context.window.testing, requests, storage };
 }
 const session = { claims: { iss: 'issuer', sub: 'parent' }, tokens: { id_token: 'test-token' } };
@@ -115,4 +115,38 @@ test('upload heading includes dates and the wheel has no playback toggle', () =>
   assert.match(content.innerHTML,/upload-month-dates/);
   assert.match(content.innerHTML,/декември/);
   assert.doesNotMatch(content.innerHTML,/growth-toggle|data-growth-toggle/);
+});
+
+test('contributor photos stay in their actual month and personal album uses only server ownership flags',()=>{
+  const h=harness();
+  const own={key:`months/12/by/${'a'.repeat(32)}/2026-05-12-photo.heic`,url:'https://example.com/display.jpg',isMine:true};
+  const other={key:`months/0/by/${'b'.repeat(32)}/2025-05-11-photo.jpg`,url:'https://example.com/other.jpg',isMine:false};
+  const album={photos:[own,other],heroPhotos:[]};
+  assert.deepEqual(Array.from(h.getMonthItems({manifest:album},12),p=>p.key),[own.key]);
+  assert.deepEqual(Array.from(h.getGrandmaPhotos(album),p=>p.key),[own.key]);
+  assert.equal(h.getGrandmaPhotos(album,'family').length,2);
+  assert.equal(h.getGrandmaPhotos({photos:[{...other,isMine:undefined}]}).length,0);
+});
+
+test('grandma page includes phone photo uploads, locked album controls and bounded photo rendering',()=>{
+  const h=harness({environment:{document:{body:{dataset:{}},addEventListener(){},getElementById(){return null;}}}});
+  const photos=Array.from({length:70},(_,i)=>({key:`months/0/by/${'a'.repeat(32)}/${i}.jpg`,url:`https://example.com/${i}.jpg`,isMine:true}));
+  const content={};
+  h.renderGrandmaDetail(content,{manifest:{photos,heroPhotos:[],timelineStartDate:'2000-12-09',user:{canUpload:true}},actualCollection:'months',selectedMonth:0,memoryScope:'mine',memoryLimit:60,uploadQueue:[{}],uploading:false});
+  assert.equal((content.innerHTML.match(/data-photo-trigger/g)||[]).length,60);
+  assert.match(content.innerHTML,/data-memory-more/);
+  assert.match(content.innerHTML,/data-memory-scope="family"[^>]*disabled/);
+  assert.match(content.innerHTML,/image\/heic/);
+  assert.doesNotMatch(content.innerHTML,/accept="[^"]*video/);
+});
+
+test('login sends grandma to her page while preserving admin, viewer and test routing',()=>{
+  const context=vm.createContext({window:{},console});
+  vm.runInContext(fs.readFileSync('auth/auth.js','utf8'),context);
+  const destination=context.window.EverydayLillyAuth.getGalleryDestination;
+  assert.equal(destination({claims:{'cognito:groups':['viewers','grandma']}}),'/gallery/grandma/');
+  assert.equal(destination({claims:{'cognito:groups':'["grandma"]'}}),'/gallery/grandma/');
+  assert.equal(destination({claims:{'cognito:groups':['admin']}}),'/gallery/months/');
+  assert.equal(destination({claims:{'cognito:groups':['viewers']}}),'/gallery/months/');
+  assert.equal(destination({claims:{'cognito:groups':['grandma','test']}}),'/gallery/test/');
 });

@@ -120,7 +120,7 @@
 
   function getMonthBucket(photo) {
     const key = String(photo?.key || "");
-    const nestedMonthMatch = key.match(/\/(\d{1,2})\/[^/]+$/);
+    const nestedMonthMatch = key.match(/\/(\d{1,2})\/(?:by\/[a-f0-9]{32}\/)?[^/]+$/);
 
     if (nestedMonthMatch) {
       return parseGalleryMonth(nestedMonthMatch[1]) ?? -1;
@@ -628,8 +628,8 @@
         ${canUploadToGallery(state) ? `
           <section class="album-upload" data-upload-drop-zone aria-label="Качване в Месец ${month + 1}">
             <div class="upload-intro"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Добави спомени в Месец ${month + 1}${dateRange ? `<span class="upload-month-dates">${escapeHtml(dateRange)}</span>` : ""}</h3><p>Пусни снимките тук или ги избери от телефона.</p></div></div>
-            <label class="btn btn-primary choose-files">Избери снимки<input class="upload-file-input" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.avif,.gif,.mp4,.mov,.webm,.m4v" ${state.uploading ? "disabled" : ""}></label>
-            <p class="upload-format-hint">JPG, PNG, WebP, AVIF, GIF или видео. За HEIC избери JPG при експортиране.</p>
+            <label class="btn btn-primary choose-files">Избери снимки<input class="upload-file-input" type="file" multiple accept=".jpg,.jpeg,.heic,.heif,.png,.webp,.avif,.gif,.mp4,.mov,.webm,.m4v" ${state.uploading ? "disabled" : ""}></label>
+            <p class="upload-format-hint">Снимки от iPhone (HEIC), JPG, PNG или видео. HEIC снимките се подготвят автоматично.</p>
             <div id="upload-queue" class="upload-queue"></div>
           </section>` : `<p class="viewer-note">Разглеждаш семейния албум. Снимки могат да добавят администраторите.</p>`}
         <p id="upload-notice" class="upload-notice" role="status" data-tone="${state.uploadNotice?.tone || ""}">${escapeHtml(state.uploadNotice?.message || "")}</p>
@@ -637,6 +637,53 @@
           <div class="album-empty"><span class="empty-flower" aria-hidden="true">✿</span><h3>Малките мигове започват тук.</h3><p>${canUploadToGallery(state) ? `Добави първите снимки за Месец ${month + 1}.<br>Те ще се появят само на тази страница.` : "Този месец още очаква своите първи снимки."}</p></div>`}
         <p class="album-footnote">Месец ${month + 1} от 60 <span aria-hidden="true">·</span> Малко по малко, цял един свят.</p>
       </section>`;
+    renderUploadQueue(state);
+  }
+
+  function getGrandmaPhotos(manifest, scope = "mine") {
+    const seen = new Set();
+    return [...(manifest.photos || []), ...(manifest.heroPhotos || [])]
+      .filter(photo => photo.url && (scope === "family" || photo.isMine === true))
+      .filter(photo => { if (seen.has(photo.key)) return false; seen.add(photo.key); return true; })
+      .sort(comparePhotosByDate);
+  }
+
+  function updateGrandmaKeepsake(manifest) {
+    const container = document.getElementById("grandma-keepsake");
+    if (!container) return;
+    const photos = getGrandmaPhotos(manifest).filter(photo => getMediaKind(photo) !== "movie");
+    const picks = [...new Set([photos[0], photos[Math.floor(photos.length / 2)], photos.at(-1)])].filter(Boolean);
+    container.innerHTML = picks.length ? picks.map(photo => `<img src="${escapeHtml(photo.thumbnailUrl || photo.url)}" alt="" width="160" height="190" decoding="async">`).join("")
+      : '<img class="keepsake-lily" src="/images/album-water-lily.svg" alt="" width="260" height="180">';
+    setText("gallery-total", `${photos.length} спомена с обич`);
+  }
+
+  function renderGrandmaDetail(content, state) {
+    const photos = getGrandmaPhotos(state.manifest, state.memoryScope);
+    const mine = state.memoryScope !== "family";
+    const locked = state.uploading || state.uploadQueue.length > 0;
+    content.className = "grandma-workspace";
+    content.innerHTML = `
+      <nav class="memory-tabs" aria-label="Избери албум">
+        <button type="button" data-memory-scope="mine" aria-pressed="${mine}" ${locked ? "disabled" : ""}>Моите спомени с Лили</button>
+        <button type="button" data-memory-scope="family" aria-pressed="${!mine}" ${locked ? "disabled" : ""}>Цялото семейство</button>
+      </nav>
+      ${canUploadToGallery(state) ? `<section class="album-upload grandma-upload" data-upload-drop-zone aria-label="Добави снимки с Лили">
+        <div class="upload-intro"><span class="upload-symbol" aria-hidden="true">＋</span><div><h3>Още един миг заедно.</h3><p>Избери снимки от телефона. Ще ги запазим сред твоите спомени и в семейния албум.</p></div></div>
+        <label class="btn btn-primary choose-files">Добави снимки<input class="upload-file-input" type="file" multiple accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/avif,image/gif,.heic,.heif" ${state.uploading ? "disabled" : ""}></label>
+        <label class="grandma-month">Към кой месец на Лили?
+          <select data-upload-month ${locked ? "disabled" : ""}>${Array.from({length: GALLERY_MONTH_COUNT}, (_, month) => `<option value="${month}" ${month === state.selectedMonth ? "selected" : ""}>Месец ${month + 1} · ${escapeHtml(getMonthDateRange(state.manifest, month) || "")}</option>`).join("")}</select>
+        </label>
+        <p class="upload-format-hint">Приемаме и HEIC снимки от iPhone. Остави страницата отворена, докато завърши качването.</p>
+        <div id="upload-queue" class="upload-queue"></div>
+      </section>` : ""}
+      <p id="upload-notice" class="upload-notice" role="status" data-tone="${state.uploadNotice?.tone || ""}">${escapeHtml(state.uploadNotice?.message || "")}</p>
+      ${state.manifest.pendingCount ? `<p class="viewer-note" role="status">Подготвяме ${state.manifest.pendingCount} снимки за разглеждане. След малко натисни „Обнови албума“.</p>` : ""}
+      <div class="grandma-album-heading"><div><p class="section-kicker">${mine ? "ВАШАТА МАЛКА ИСТОРИЯ" : "ВСИЧКИ, КОИТО Я ОБИЧАТ"}</p><h2>${mine ? "Прегръдки за цял живот." : "Лили, през нашите очи."}</h2></div><span>${photos.length} спомена</span></div>
+      ${photos.length ? `<div class="month-grid grandma-grid">${photos.slice(0, state.memoryLimit).map((photo, i) => buildPhotoCardMarkup(photo, { title: `${mine ? "С баба" : "Семейство"} · Месец ${getMonthBucket(photo) + 1} · Спомен ${i + 1}`, showMeta: false, priority: i === 0, style: `--reveal-delay:${Math.min(i, 7) * 18}ms` })).join("")}</div>`
+      : '<div class="album-empty"><span class="empty-flower" aria-hidden="true">♡</span><h3>Всяка прегръдка е начало.</h3><p>Добави първите си снимки с Лили. Тук винаги ще бъдат лесни за намиране.</p></div>'}
+      ${photos.length > state.memoryLimit ? '<div class="memory-more"><button class="btn btn-secondary" data-memory-more type="button">Покажи още спомени</button></div>' : ""}
+      <p class="grandma-dedication">Най-хубавото в тези снимки е, че сте заедно. <span aria-hidden="true">♡</span></p>`;
     renderUploadQueue(state);
   }
 
@@ -1062,7 +1109,10 @@
     if (!content || !state.manifest) return;
     dismissViewer();
 
-    if (state.actualCollection === "test") {
+    if (state.grandmaPage) {
+      renderGrandmaDetail(content, state);
+      if (status) status.textContent = "Твоето специално място в семейния албум.";
+    } else if (state.actualCollection === "test") {
       const visiblePhotos = filterPhotos(state.manifest.photos || [], state.activeFilter);
       renderTestGallery(content, state.manifest, visiblePhotos);
       if (status) {
@@ -1085,19 +1135,19 @@
     let session = await auth.getSession();
     if (!session) { window.location.replace("/"); return; }
     const account = getAccountKey(session);
-    const state = { requestedCollection, actualCollection: requestedCollection, selectedMonth: null, activeFilter: "all", manifest: null, uploadQueue: [], uploading: false, loading: false, uploadNotice: null };
+    const state = { grandmaPage: document.body.dataset.galleryExperience === "grandma", memoryScope: "mine", memoryLimit: 60, requestedCollection, actualCollection: requestedCollection, selectedMonth: null, activeFilter: "all", manifest: null, uploadQueue: [], uploading: false, loading: false, uploadNotice: null };
 
     let thumbnailRefreshTimer;
     let stopGrowthWheel = () => {};
 
     function scheduleThumbnailRefresh(attempt = 0) {
       clearTimeout(thumbnailRefreshTimer);
-      if (attempt >= 3 || !state.manifest?.photos.some(photo => !photo.thumbnailUrl)) return;
+      if (attempt >= 4 || (!state.manifest?.pendingCount && !state.manifest?.photos.some(photo => !photo.thumbnailUrl))) return;
       thumbnailRefreshTimer = setTimeout(async () => {
         if (state.uploading || state.uploadQueue.length) return;
         await loadManifest();
         scheduleThumbnailRefresh(attempt + 1);
-      }, 4000);
+      }, [3000, 6000, 12000, 20000][attempt]);
     }
 
     function clearQueue() {
@@ -1177,12 +1227,16 @@
         state.manifest = manifest;
         state.actualCollection = manifest.collection;
         if (requestedCollection !== manifest.collection) { window.location.replace(ROUTES[manifest.collection]); return; }
+        if (manifest.collection === "months" && Boolean(manifest.user.isGrandma) !== state.grandmaPage) {
+          window.location.replace(manifest.user.isGrandma ? "/gallery/grandma/" : ROUTES.months); return;
+        }
         if (state.selectedMonth === null) {
           state.selectedMonth = getInitialMonth(manifest, session);
           if (manifest.collection === "months") rememberMonth(state.selectedMonth, session);
         }
         if (manifest.collection === "test") applyGalleryBackground(manifest);
         updateGalleryChrome(manifest.collection, manifest, session);
+        if (state.grandmaPage) updateGrandmaKeepsake(manifest);
         if (filterContainer) {
           filterContainer.style.display = manifest.collection === "test" ? "" : "none";
           state.activeFilter = ensureAvailableFilter(state.activeFilter, manifest.photos);
@@ -1212,14 +1266,14 @@
       const selected = Array.from(files || []);
       if (!selected.length) return;
       clearQueue();
-      const supported = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
+      const supported = state.grandmaPage ? /\.(avif|gif|heic|heif|jpe?g|png|webp)$/i : /\.(avif|gif|heic|heif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
       let rejected = 0;
       for (const file of selected) {
         if (!file.size || !supported.test(file.name)) { rejected += 1; continue; }
         if (state.uploadQueue.some(item => item.file.name === file.name && item.file.size === file.size && item.file.lastModified === file.lastModified)) continue;
-        state.uploadQueue.push({ file, status: "pending", preview: /^image\//.test(file.type) ? URL.createObjectURL(file) : "" });
+        state.uploadQueue.push({ file, status: "pending", preview: /^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name) ? URL.createObjectURL(file) : "" });
       }
-      state.uploadNotice = rejected ? {tone: "error", message: `${rejected} файла не са добавени. Избери JPG, PNG, WebP, AVIF, GIF или поддържано видео. За HEIC експортирай като JPG.`} : null;
+      state.uploadNotice = rejected ? {tone: "error", message: `${rejected} файла не са добавени. Избери поддържани снимки (включително HEIC от iPhone).`} : null;
       render();
     }
 
@@ -1266,6 +1320,16 @@
     content.addEventListener("click", event => {
       if (event.target.closest("[data-upload-start]")) { uploadQueue(); return; }
       if (event.target.closest("[data-upload-cancel]")) { if (!state.uploading) { clearQueue(); state.uploadNotice = null; render(); } return; }
+      const scope = event.target.closest("[data-memory-scope]");
+      if (scope && !state.uploading && !state.uploadQueue.length) {
+        state.memoryScope = scope.dataset.memoryScope === "family" ? "family" : "mine";
+        state.memoryLimit = 60; render();
+        content.querySelector(`[data-memory-scope="${state.memoryScope}"]`)?.focus({ preventScroll: true });
+        return;
+      }
+      if (event.target.closest("[data-memory-more]")) {
+        state.memoryLimit += 60; render(); return;
+      }
       const month = event.target.closest("[data-month-trigger]");
       if (month) {
         selectMonth(parseGalleryMonth(month.dataset.monthTrigger));
@@ -1273,6 +1337,7 @@
       }
     });
     content.addEventListener("change", event => {
+      if (event.target.matches("[data-upload-month]")) selectMonth(parseGalleryMonth(event.target.value));
       if (event.target.matches("#gallery-year")) {
         selectMonth(Number(event.target.value) * 12 + state.selectedMonth % 12);
         document.getElementById("gallery-year")?.focus({ preventScroll: true });

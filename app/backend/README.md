@@ -1,5 +1,17 @@
 # Everyday Lilly vault backend
 
+## Personal albums and iPhone photos — 2026-09-20
+
+- `grandma` grants family viewing and attributed photo uploads, not administrator privileges. Test claims retain priority and cannot upload into the family collection. Add only the owner-approved account; fresh sign-in is required for changed group claims.
+- Regular uploads now use `months/<0-59>/by/<sha256(subject)[0:32]>/<filename>`. The API ignores client-supplied ownership. Hero uploads remain admin-only at the existing path; conditional PUT still prevents replacement.
+- The default manifest shares media across authorized family members and computes `isMine` for the requesting identity. `?scope=mine` filters before signing and provides a live personal manifest; it does not depend on a stale saved list. CloudFront's API origin request policy forwards `scope` as well as `refresh`. No extra API route is needed.
+- HEIC/HEIF originals remain intact. The worker's pinned Pillow/Pillow-Heif dependencies decode them into private metadata-free `<digest>.display.jpg` full-resolution views and existing `<digest>.jpg` 640px previews. The manifest withholds HEIC without a display derivative and returns `pendingCount`. Existing JPEG/video preview processing remains unchanged. All derivatives stay under the already-authorized `previews/months/` prefix, so no broader worker IAM permissions are required.
+- Deployment used source-verified copies of the live Lambda packages, preserving signing keys and environment configuration. Only Lambda code, API query forwarding and the new Cognito group were changed. No full Terraform apply was performed. Import the group into recovered authoritative state and reconcile these edits before a future apply.
+- Build the worker with `python3 scripts/build-gallery-thumbnails.py /private/tmp/gallery-thumbnails.zip`; the builder verifies pinned Linux x86_64 Python 3.12 wheel hashes. Worker tests need `pip install -r tests/requirements-thumbnail.txt` in an isolated environment, followed by `python -m unittest discover -s tests -p 'test_*.py'`. Frontend/backend tests: `node --test tests/*.test.cjs`.
+- Browser QA used synthetic photos. Live Lambda invocations exercised personal/family manifests with controlled authorizer claims, and real signed CloudFront reads verified JPEG delivery. This does not certify a Hosted UI login as the grandmother. No password was changed.
+
+
+
 Initial review: **2026-09-10**. Stored-preview deployment and live verification: **2026-09-11 (Europe/Sofia)**.
 
 The vault is a deployed, Terraform-managed AWS serverless backend in **eu-central-1 (Frankfurt)**. The public site is hosted on GitHub Pages and calls Cognito directly. No Amplify integration is used by this repository.
@@ -105,10 +117,11 @@ The API accepts a Cognito ID token in `Authorization: Bearer …`. API Gateway v
 | --- | --- |
 | `admin` or `admins` group | Monthly gallery and upload capability |
 | `viewers` or `viewer` group | Monthly gallery, read only |
+| `grandma` group | Personal/family gallery, own photo uploads |
 | `test` group or supported test claim | Test collection; takes precedence over monthly routing |
 | No permitted role/claim | Manifest returns 403 |
 
-Supported test claims are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`. Upload authorization independently requires an admin group. Terraform defines `admin` and `viewers`; the live pool also contains `test`, whose creation is not represented in the current Terraform files.
+Supported test claims are `custom:tag`, `custom:tags`, `tag`, `tags`, `custom:test`, and `test`. Upload authorization independently requires an admin or grandma group and rejects test accounts; grandma is limited to ordinary photos. Terraform defines `admin`, `viewers` and `grandma`; the live pool also contains `test`, whose creation is not represented in the current Terraform files.
 
 **2026-09-10 account review:** the owner-supplied account was enabled and confirmed but had no group memberships. The browser showed “This account is not assigned to a gallery role.” An intentionally assigned gallery role and fresh tokens are required; an admin-looking email does not confer access. No memberships were changed during review.
 
@@ -128,7 +141,8 @@ Both archive and gallery buckets have all S3 public-access-block settings enable
 New gallery keys use zero-based month IDs:
 
 ```text
-months/<0-59>/<filename>          Normal media
+months/<0-59>/<filename>          Legacy normal media
+months/<0-59>/by/<owner>/<file>   New attributed media
 months/hero/<0-59>/<filename>     Month cover images
 test/<filename>                  Test collection
 ```
@@ -139,7 +153,7 @@ Admin upload sequence:
 
 1. Open a month and select/drop one or more files into its upload panel; review and confirm the destination. No hero upload is required.
 2. Request an upload URL with month ID, filename, content type, and upload kind.
-3. Lambda checks the admin role, validates the request, and rejects an existing target with 409.
+3. Lambda checks upload privileges and the authenticated contributor, validates the request, and rejects an existing target with 409.
 4. The browser PUTs directly to S3 using a URL valid for at most 900 seconds and the returned signed headers, including `If-None-Match: *`.
 5. Conditional PUT prevents overwrite races. The batch refreshes the manifest, and an S3 event creates a preview. Bounded follow-up refreshes can pick up the preview; manual refresh remains available.
 

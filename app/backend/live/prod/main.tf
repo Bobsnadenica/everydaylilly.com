@@ -378,6 +378,13 @@ resource "aws_cognito_user_group" "gallery_viewers" {
   precedence   = 20
 }
 
+resource "aws_cognito_user_group" "gallery_grandma" {
+  name         = "grandma"
+  user_pool_id = aws_cognito_user_pool.gallery.id
+  description  = "Personal memories with Lilly, family viewing and attributed photo uploads."
+  precedence   = 15
+}
+
 resource "aws_cognito_user_pool_client" "gallery" {
   name         = "${local.prefix}-web"
   user_pool_id = aws_cognito_user_pool.gallery.id

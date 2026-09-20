@@ -1,6 +1,15 @@
 # Everyday Lilly Project Memory
 
-Last updated: 2026-09-11 Europe/Sofia
+Last updated: 2026-09-20 Europe/Sofia
+
+## Grandma's personal album — 2026-09-20
+
+- Owner authorized a grandma role, a birthday page, attributed uploads, family-wide sharing and a personal manifest for the designated existing account. Later clarified photos only: leave source movies untouched and defer video-background work. Never record the account email/subject, media keys or private source paths in Git.
+- Added `/gallery/grandma/` with a warm Bulgarian birthday greeting, three-photo keepsake collage, personal/family switch, two-column phone grid, batches of 60 tiles and HEIC-aware phone uploads. Backend `isGrandma` is authoritative for routing; auth helper routes fresh group claims. Scope switches reuse the in-memory family manifest. Existing viewer/admin/test behavior stays distinct.
+- New regular uploads use `months/<month>/by/<server-derived contributor>/<filename>`; contributor = first 32 hex chars of SHA256(Cognito sub). Client ownership input is ignored. `?scope=mine` is a separate current personal manifest and default manifests return `isMine`. Grandma can add own photos, not covers or movies. Test accounts cannot upload family originals.
+- HEIC support preserves originals and generates metadata-free full-resolution JPEG display derivatives plus thumbnails in the existing preview prefix. Pillow 12.3.0 / Pillow-Heif 1.7.0 Linux wheels are checksum-pinned by the builder. Existing Lambda signing material and settings were preserved during isolated code deployments; API CloudFront query forwarding now includes scope. Terraform source includes grandma group; import/reconcile authoritative state before any apply.
+- All imported originals passed S3 SHA256 checks; their display copies/previews decoded successfully, and pre-existing originals remained unchanged. Identical local copies map to a single immutable object. Read EXIF dates when available and file modification dates otherwise. Keep private per-file verification/cleanup receipts outside Git. Deletion requires fresh remote checksum and unchanged local bytes; never delete movies or unsupported/failed files.
+- Validation: 32 JS tests, eight Python worker tests, syntax and Terraform formatting checks; synthetic desktop/mobile view switching, pagination, viewer, upload destination locking and complete HEIC upload flow. Live Lambda personal/family checks and signed CloudFront image reads passed; unsigned media and unauthenticated API stay denied. No grandmother password was available or changed, so actual Hosted UI login is not claimed.
 
 ## Faster hover-pause carousel — 2026-09-11
 

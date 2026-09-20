@@ -57,6 +57,41 @@ class ThumbnailTests(unittest.TestCase):
                 worker.generate('private-test', 'months/0/example.mov')
         worker.s3.put_object.assert_not_called()
 
+    def test_heic_creates_display_and_thumbnail_jpegs_without_metadata(self):
+        import io
+        from PIL import Image
+        from pillow_heif import register_heif_opener
+        register_heif_opener()
+        original = io.BytesIO()
+        exif = Image.Exif()
+        exif[270] = 'private camera metadata'
+        Image.new('RGB', (80, 48), '#b9cfb1').save(original, format='HEIF', exif=exif)
+        worker.s3.download_file.side_effect = lambda bucket, key, dest: Path(dest).write_bytes(original.getvalue())
+        self.assertEqual(worker.generate('private-test', 'months/3/by/owner/phone.heic'), 'created')
+        calls = [c.kwargs for c in worker.s3.put_object.call_args_list]
+        self.assertEqual(len(calls), 2)
+        self.assertTrue(calls[0]['Key'].endswith('.display.jpg'))
+        for request in calls:
+            self.assertEqual(request['IfNoneMatch'], '*')
+            with Image.open(io.BytesIO(request['Body'])) as image:
+                image.load()
+                self.assertEqual(image.format, 'JPEG')
+                self.assertEqual(image.size, (80, 48))
+                self.assertFalse(image.getexif())
+        worker.s3.generate_presigned_url.assert_not_called()
+
+    def test_corrupt_heic_does_not_publish_an_unusable_preview(self):
+        worker.s3.download_file.side_effect = lambda bucket, key, dest: Path(dest).write_bytes(b'bad image')
+        with self.assertRaises(Exception):
+            worker.generate('private-test', 'months/3/by/owner/broken.heic')
+        worker.s3.put_object.assert_not_called()
+
+    def test_duplicate_worker_delivery_tolerates_conditional_write_race(self):
+        error = RuntimeError('already created')
+        error.response = {'ResponseMetadata': {'HTTPStatusCode': 412}}
+        worker.s3.put_object.side_effect = error
+        worker.put_preview('previews/months/example.jpg', b'jpeg')
+
 
 if __name__ == '__main__':
     unittest.main()

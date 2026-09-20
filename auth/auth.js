@@ -246,7 +246,9 @@
 
   function getGalleryDestination(input) {
     const collection = getGalleryCollection(input);
-    return collection === "test" ? "/gallery/test/" : "/gallery/months/";
+    if (collection === "test") return "/gallery/test/";
+    return normalizeClaimValues(sessionClaims(input)["cognito:groups"]).includes("grandma")
+      ? "/gallery/grandma/" : "/gallery/months/";
   }
 
   function getPopupFeatures() {

@@ -50,7 +50,7 @@ resource "aws_cloudfront_origin_request_policy" "gallery_api" {
     query_string_behavior = "whitelist"
 
     query_strings {
-      items = ["refresh"]
+      items = ["refresh", "scope"]
     }
   }
 }

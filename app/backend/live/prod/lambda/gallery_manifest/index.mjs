@@ -18,7 +18,7 @@ const configuredSignedUrlTtlSeconds = Number.parseInt(process.env.GALLERY_SIGNED
 const signedUrlTtlSeconds = Number.isFinite(configuredSignedUrlTtlSeconds)
   ? Math.max(configuredSignedUrlTtlSeconds, minimumSignedUrlTtlSeconds)
   : minimumSignedUrlTtlSeconds;
-const mediaExtensionPattern = /\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
+const mediaExtensionPattern = /\.(avif|gif|heic|heif|jpe?g|m4v|mov|mp4|png|webm|webp)$/i;
 const heroExtensionPattern = /\.(avif|gif|jpe?g|png|webp)$/i;
 const configuredUploadUrlTtlSeconds = Number.parseInt(process.env.GALLERY_UPLOAD_URL_TTL || "900", 10);
 const uploadUrlTtlSeconds = Number.isFinite(configuredUploadUrlTtlSeconds)
@@ -31,6 +31,8 @@ const viewerGroupNames = new Set(["viewer", "viewers"]);
 const mediaContentTypesByExtension = new Map([
   [".avif", "image/avif"],
   [".gif", "image/gif"],
+  [".heic", "image/heic"],
+  [".heif", "image/heif"],
   [".jpg", "image/jpeg"],
   [".jpeg", "image/jpeg"],
   [".m4v", "video/x-m4v"],
@@ -135,7 +137,26 @@ function isGalleryAdmin(claims) {
 }
 
 function isGalleryViewer(claims) {
-  return getGroups(claims).some((group) => viewerGroupNames.has(group) || adminGroupNames.has(group));
+  return getGroups(claims).some((group) => viewerGroupNames.has(group) || adminGroupNames.has(group) || group === "grandma");
+}
+
+function isGrandma(claims) {
+  return getGroups(claims).includes("grandma") && !isTestAccount(claims);
+}
+
+function canUpload(claims) {
+  return !isTestAccount(claims) && (isGalleryAdmin(claims) || isGrandma(claims));
+}
+
+function contributorId(claims) {
+  return typeof claims.sub === "string" && claims.sub.trim()
+    ? crypto.createHash("sha256").update(claims.sub).digest("hex").slice(0, 32) : null;
+}
+
+function ownsMedia(key, claims) {
+  const owner = contributorId(claims);
+  const parts = key.split("/");
+  return Boolean(owner && parts[0] === defaultPrefix && /^\d{1,2}$/.test(parts[1]) && parts[2] === "by" && parts[3] === owner && parts.length === 5);
 }
 
 function hasGalleryAccess(claims) {
@@ -337,7 +358,7 @@ function parseJsonBody(event) {
 }
 
 function normalizeUploadMonth(value) {
-  const month = Number.parseInt(String(value ?? ""), 10);
+  const month = /^\d{1,2}$/.test(String(value ?? "")) ? Number(value) : NaN;
 
   if (!Number.isInteger(month) || month < 0 || month >= galleryMonthCount) {
     throw Object.assign(new Error(`Choose a month between 0 and ${galleryMonthCount - 1}.`), { statusCode: 400 });
@@ -505,9 +526,9 @@ function createPresignedPutUrl(key, contentType) {
 }
 
 async function handleUploadUrl(event, claims) {
-  if (!isGalleryAdmin(claims)) {
+  if (!canUpload(claims)) {
     return json(403, {
-      error: "Only gallery admins can upload photos.",
+      error: "This account cannot upload to the family gallery.",
     });
   }
 
@@ -516,6 +537,11 @@ async function handleUploadUrl(event, claims) {
   const uploadKind = normalizeUploadKind(payload.uploadKind || payload.kind || payload.target);
   const filename = sanitizeFilename(payload.filename);
   const contentType = normalizeContentType(payload.contentType, filename);
+  const owner = contributorId(claims);
+  if (!owner) return json(403, { error: "An authenticated contributor is required." });
+  if (!isGalleryAdmin(claims) && (uploadKind === "hero" || getMediaKind(filename) === "movie")) {
+    return json(403, { error: "Grandma accounts can add photos to their own memories." });
+  }
 
   if (uploadKind === "hero" && !heroExtensionPattern.test(filename)) {
     return json(400, {
@@ -523,7 +549,8 @@ async function handleUploadUrl(event, claims) {
     });
   }
 
-  const key = getUploadKey(uploadKind, month, filename);
+  const key = uploadKind === "hero" ? getUploadKey(uploadKind, month, filename)
+    : `${defaultPrefix}/${month}/by/${owner}/${filename}`;
 
   if (await objectExists(key)) {
     return json(409, {
@@ -561,6 +588,9 @@ async function handleManifest(event, claims) {
     : defaultCacheVersion;
 
   const isTest = isTestAccount(claims);
+  const scope = event?.queryStringParameters?.scope || "family";
+  if (!["family", "mine"].includes(scope)) return json(400, { error: "Unknown album scope." });
+  if (scope === "mine" && !contributorId(claims)) return json(403, { error: "An authenticated contributor is required." });
   const prefix = isTest ? testPrefix : defaultPrefix;
   const heroPrefix = `${prefix}/hero`;
   const items = await listGalleryItems(prefix);
@@ -568,10 +598,18 @@ async function handleManifest(event, claims) {
   const expiresAtEpochSeconds = getStableExpiryEpochSeconds();
   const photos = [];
   const heroPhotos = [];
+  let pendingCount = 0;
 
   for (const item of items) {
-    const signedMedia = await buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion);
+    const isMine = !isTest && ownsMedia(item.key, claims);
+    if (scope === "mine" && !isMine) continue;
     const previewKey = thumbnailKey(item, prefix);
+    const displayKey = previewKey.replace(/\.jpg$/, ".display.jpg");
+    const needsDisplay = /\.(heic|heif)$/i.test(item.key);
+    if (needsDisplay && !previews.has(displayKey)) { pendingCount += 1; continue; }
+    const signedMedia = await buildSignedMedia(item, expiresAtEpochSeconds, cacheVersion);
+    signedMedia.isMine = isMine;
+    if (needsDisplay) signedMedia.url = (await buildSignedMedia(displayKey, expiresAtEpochSeconds, cacheVersion)).url;
     if (previews.has(previewKey)) {
       signedMedia.thumbnailUrl = (await buildSignedMedia(previewKey, expiresAtEpochSeconds, cacheVersion)).url;
     }
@@ -589,10 +627,13 @@ async function handleManifest(event, claims) {
     expiresAt: expiresAtEpochSeconds,
     cacheTtlSeconds: signedUrlTtlSeconds,
     cacheVersion,
+    scope,
+    pendingCount,
     user: {
       email: claims.email || null,
       roles: getGroups(claims),
-      canUpload: isGalleryAdmin(claims),
+      canUpload: canUpload(claims),
+      isGrandma: isGrandma(claims),
     },
     photos,
     heroPhotos,

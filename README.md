@@ -4,6 +4,16 @@ Static website and private family photo vault for [www.everydaylilly.com](https:
 
 Architecture and live AWS configuration reviewed on **2026-09-10 (Europe/Sofia)**. The backend is deployed, not a future scaffold. The Flutter source described in older documentation is **not present in this checkout**.
 
+## Grandma's personal album — 2026-09-20
+
+Members of the `grandma` Cognito group open `/gallery/grandma/` after login: a birthday keepsake page with a photo collage, a personal/family album switch, larger mobile photo tiles and phone uploads. The personal view includes only media attributed by the backend to that account. Other family members see these same photos in the monthly gallery; originals are not duplicated between albums. Existing viewer, admin and test routing remains distinct.
+
+New regular uploads are stored under `months/<month>/by/<contributor>/<filename>`. The contributor is derived from the authenticated Cognito subject on the server; clients cannot choose another owner. `GET /api/gallery/manifest?scope=mine` provides a separate, always-current personal manifest. The default family manifest includes per-request `isMine` flags so switching views reuses the authorized in-memory response. No family photos, account identifiers or signed URLs are stored in this repository.
+
+HEIC/HEIF uploads now keep their originals in private S3 and generate both a full-resolution JPEG for viewing and a small thumbnail. Camera/location metadata is removed from derivatives. Files awaiting conversion are omitted from the display list and counted as pending. Grandma can upload photos to her own namespace, but cannot change month covers or upload movies. The birthday import excludes movies; the animated lily pond remains the background.
+
+Validation: 32 JavaScript tests, eight worker tests, desktop/mobile synthetic browser checks including a complete HEIC upload flow, and live Lambda/S3/CloudFront checks. The latter verify ownership filtering, shared-family visibility, checksums, decoded display images and signed/unsigned access boundaries; they are not a browser login using the grandmother's password. See the [backend runbook](app/backend/README.md) for deployment and test dependencies.
+
 ## Gallery polish and stored previews — 2026-09-11
 
 Empty months have faded numerals, a subtle blur and an outlined marker; they remain selectable for uploads. A small horizontal growth carousel sits below the month selector, ordered from the first month to the last. Dated backup filenames use their capture day for sorting; other files retain the existing modification-date/name fallback. Swipe, scroll, arrow buttons and keyboard navigation are supported, and tapping a frame opens the original in the viewer.
@@ -31,7 +41,7 @@ The gallery now opens directly into one month, with a warm ivory/green album lay
 - The destination is locked while files are queued/uploading. Completed batches stay in that month; duplicate filenames are skipped, successful files appear after one manifest refresh, and only failed files remain for retry.
 - A new page visit checks authorization with the backend. Signed manifests are no longer persisted in browser storage. Auth session changes clear legacy caches, and logout/account-change events remove the open gallery in other tabs. Each API action reacquires a valid session.
 - Media URLs stay stable when refreshing metadata or finishing uploads, preserving browser/CloudFront cache hits. The stored-preview update above replaces the original browser-decoded video approach. Originals remain available in the viewer.
-- HEIC is not supported by the existing backend; the uploader explains which formats it accepts and asks for JPG export. Files are not silently compressed or converted.
+- HEIC/HEIF is supported as of the personal-album update above. Untouched originals stay private in S3; the browser displays generated JPEGs.
 
 [Figma design direction](https://www.figma.com/design/uS7zZItz2W003PrCbyu8G9?node-id=2-2) uses an empty album state and contains no private family photos.
 

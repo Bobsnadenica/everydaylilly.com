@@ -1,0 +1,55 @@
+.grandma-album { --accent: #647b60; --text: #3d5547; --muted: #6c796b; }
+.grandma-album .shell { max-width: 1120px; }
+.grandma-intro { position: relative; min-height: 270px; padding: 36px 0; gap: 24px; }
+.grandma-intro h1 { font-size: clamp(38px, 4.8vw, 60px); line-height: 1.12; }
+.grandma-intro h1 em { color: #957164; }
+.grandma-intro p { max-width: 380px; line-height: 1.7; }
+.grandma-intro .album-seal { display: none; }
+.grandma-keepsake { position: relative; flex: 0 0 390px; height: 210px; }
+.grandma-keepsake img { position: absolute; width: 140px; height: 175px; object-fit: cover; border: 7px solid #fffdf7; border-bottom-width: 22px; border-radius: 5px; box-shadow: 0 8px 25px #4d624522; }
+.grandma-keepsake img:nth-child(1) { left: 0; top: 20px; transform: rotate(-10deg); }
+.grandma-keepsake img:nth-child(2) { left: 116px; top: 0; transform: rotate(3deg); z-index: 1; }
+.grandma-keepsake img:nth-child(3) { right: 0; top: 25px; transform: rotate(11deg); }
+.grandma-keepsake .keepsake-lily { object-fit: contain; border: 0; box-shadow: none; width: 260px; height: 180px; left: 60px; }
+.grandma-album .pond-lily-one { opacity: .25; }
+.memory-tabs { display: flex; gap: 5px; padding: 5px; width: fit-content; max-width: 100%; margin: 4px 0 22px; border: 1px solid #dce3d6; border-radius: 30px; background: #fffdf4c9; }
+.memory-tabs button { min-height: 48px; padding: 11px 23px; border: 0; border-radius: 25px; font: 800 14px "Nunito", sans-serif; color: var(--muted); background: transparent; cursor: pointer; }
+.memory-tabs button[aria-pressed="true"] { background: var(--accent); color: #fffdf7; box-shadow: 0 3px 10px #41573718; }
+.family-album .grandma-upload { padding: 22px 24px; background: #fcfaf1ed; border: 1px solid #e1dfce; }
+.grandma-upload .upload-intro { flex: 1 1 360px; }
+.grandma-upload .upload-intro h3 { font: 500 24px "Playfair Display", Georgia, serif; }
+.grandma-upload .upload-intro p { max-width: 530px; font-size: 14px; line-height: 1.6; }
+.grandma-month { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 15px; flex-basis: 100%; font-size: 13px; color: var(--muted); }
+.grandma-month select { max-width: 100%; min-height: 44px; border: 1px solid #d8dece; border-radius: 9px; padding: 9px 12px; background: #fffdf9; color: var(--text); font: 700 13px "Nunito", sans-serif; }
+.grandma-album-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 32px 0 16px; }
+.grandma-album-heading h2 { font: 400 clamp(26px, 3vw, 36px) "Playfair Display", Georgia, serif; margin: 0; }
+.grandma-album-heading > span { flex-shrink: 0; font-size: 13px; color: var(--muted); }
+.grandma-album .grandma-grid { margin-top: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.grandma-album .photo-card { border: 5px solid #fffdf7; border-radius: 9px; box-shadow: 0 4px 15px #3f574514; }
+.memory-more { display: flex; justify-content: center; margin: 28px 0; }
+.grandma-dedication { text-align: center; color: #897364; font: italic 18px/1.7 "Playfair Display", Georgia, serif; margin: 42px 0 8px; }
+.grandma-dedication span { display: block; font-size: 25px; }
+.grandma-album .album-footer { text-align: center; line-height: 1.7; }
+@media (max-width: 800px) {
+  .grandma-keepsake { flex-basis: 270px; height: 175px; }
+  .grandma-keepsake img { width: 103px; height: 136px; border-width: 5px; border-bottom-width: 16px; }
+  .grandma-keepsake img:nth-child(2) { left: 83px; }
+  .grandma-album .grandma-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 540px) {
+  .grandma-intro { display: block; padding: 28px 0 8px; }
+  .grandma-intro h1 { font-size: 39px; max-width: none; }
+  .grandma-intro p { font-size: 14px; margin-top: 12px; }
+  .grandma-keepsake { width: 280px; max-width: 90%; height: 155px; margin: 24px auto 8px; }
+  .grandma-album .gallery-toolbar { margin-bottom: 10px; }
+  .memory-tabs { width: 100%; margin-bottom: 18px; }
+  .memory-tabs button { flex: 1; padding: 10px 7px; font-size: 12px; }
+  .family-album .grandma-upload { padding: 18px 15px; }
+  .grandma-upload .upload-intro { flex-basis: 100%; }
+  .grandma-upload .upload-intro h3 { font-size: 22px; }
+  .grandma-month { display: grid; width: 100%; }
+  .grandma-month select { width: 100%; font-size: 12px; }
+  .grandma-album-heading { align-items: flex-start; flex-direction: column; gap: 8px; margin-top: 26px; }
+  .grandma-album .grandma-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .grandma-album .photo-card { border-width: 4px; }
+}

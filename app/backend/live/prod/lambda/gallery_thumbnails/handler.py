@@ -13,13 +13,53 @@ s3 = boto3.client('s3')
 BUCKET = os.environ['GALLERY_BUCKET']
 PREFIX = os.environ.get('GALLERY_PREFIX', 'months')
 FFMPEG = os.environ.get('FFMPEG_PATH', '/var/task/ffmpeg')
-MEDIA = re.compile(r'\.(avif|gif|jpe?g|m4v|mov|mp4|png|webm|webp)$', re.I)
+MEDIA = re.compile(r'\.(avif|gif|heic|heif|jpe?g|m4v|mov|mp4|png|webm|webp)$', re.I)
 VIDEO = re.compile(r'\.(m4v|mov|mp4|webm)$', re.I)
+HEIF = re.compile(r'\.(heic|heif)$', re.I)
 
 
 def thumbnail_key(key, etag):
     digest = hashlib.sha256((key + '\n' + etag.strip('"')).encode()).hexdigest()
     return f'previews/{PREFIX}/{digest}.jpg'
+
+
+def put_preview(key, data):
+    try:
+        s3.put_object(Bucket=BUCKET, Key=key, Body=data, ContentType='image/jpeg',
+                      CacheControl='private, max-age=31536000, immutable', IfNoneMatch='*')
+    except Exception as error:
+        if getattr(error, 'response', {}).get('ResponseMetadata', {}).get('HTTPStatusCode') != 412:
+            raise
+
+
+def generate_heif(key, target, source):
+    # Decode on the server once, preserving the untouched original in S3.
+    import io
+    from PIL import Image, ImageOps, ImageCms
+    from pillow_heif import register_heif_opener
+    register_heif_opener(thumbnails=False, decode_threads=1)
+    if source['ContentLength'] > 80 * 1024 * 1024:
+        raise RuntimeError('HEIC exceeds the supported image size')
+    with tempfile.TemporaryDirectory() as directory:
+        original = Path(directory) / 'original.heic'
+        s3.download_file(BUCKET, key, str(original))
+        with Image.open(original) as image:
+            profile = image.info.get('icc_profile')
+            image = ImageOps.exif_transpose(image).convert('RGB')
+            if profile:
+                image = ImageCms.profileToProfile(image, ImageCms.ImageCmsProfile(io.BytesIO(profile)),
+                                                 ImageCms.createProfile('sRGB'), outputMode='RGB')
+            # Fresh pixel buffers exclude camera/location metadata from derivatives.
+            clean = Image.new('RGB', image.size)
+            clean.paste(image)
+            display = io.BytesIO()
+            clean.save(display, format='JPEG', quality=92, optimize=True)
+            put_preview(target.replace('.jpg', '.display.jpg'), display.getvalue())
+            clean.thumbnail((640, 640), Image.Resampling.LANCZOS)
+            preview = io.BytesIO()
+            clean.save(preview, format='JPEG', quality=82, optimize=True)
+            put_preview(target, preview.getvalue())
+    return 'created'
 
 
 def generate(bucket, key):
@@ -29,9 +69,12 @@ def generate(bucket, key):
     if not source['ContentLength']:
         return 'ignored'
     target = thumbnail_key(key, source['ETag'])
-    existing = s3.list_objects_v2(Bucket=BUCKET, Prefix=target, MaxKeys=1)
-    if any(item['Key'] == target for item in existing.get('Contents', [])):
+    existing = s3.list_objects_v2(Bucket=BUCKET, Prefix=target.removesuffix('.jpg'), MaxKeys=4)
+    keys = {item['Key'] for item in existing.get('Contents', [])}
+    if target in keys and (not HEIF.search(key) or target.replace('.jpg', '.display.jpg') in keys):
         return 'exists'
+    if HEIF.search(key):
+        return generate_heif(key, target, source)
     url = s3.generate_presigned_url('get_object', Params={'Bucket': BUCKET, 'Key': key}, ExpiresIn=300)
     with tempfile.TemporaryDirectory() as directory:
         output = Path(directory) / 'preview.jpg'
@@ -51,8 +94,7 @@ def generate(bucket, key):
                 break
         else:
             raise RuntimeError('Unable to decode gallery preview')
-        s3.put_object(Bucket=BUCKET, Key=target, Body=output.read_bytes(), ContentType='image/jpeg',
-                      CacheControl='private, max-age=31536000, immutable', IfNoneMatch='*')
+        put_preview(target, output.read_bytes())
     return 'created'
 
 
