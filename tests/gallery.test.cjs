@@ -182,3 +182,11 @@ test('upload queue offers date correction and removal and disables submit for un
   state.uploadQueue[0].capturedAt='2001-01-10';h.renderUploadQueue(state);
   assert.doesNotMatch(queue.innerHTML,/data-upload-start[^>]*disabled/);assert.match(queue.innerHTML,/Месец 2/);
 });
+
+
+test('equal capture timestamps retain deterministic filename order across refreshes',()=>{
+  const h=harness();
+  const a={key:'months/0/2000-12-10T09-00-00--a.jpg',url:'a',isMine:true};
+  const b={key:'months/0/2000-12-10T09-00-00--b.jpg',url:'b',isMine:true};
+  for(const photos of [[a,b],[b,a]]) assert.deepEqual(Array.from(h.getGrandmaPhotos({photos}),p=>p.url),['a','b']);
+});

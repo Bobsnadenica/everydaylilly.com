@@ -232,7 +232,7 @@
       return leftTimestamp - rightTimestamp;
     }
 
-    if (leftTimestamp !== null || rightTimestamp !== null) {
+    if ((leftTimestamp !== null) !== (rightTimestamp !== null)) {
       return leftTimestamp !== null ? -1 : 1;
     }
 

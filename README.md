@@ -12,7 +12,7 @@ New uploads require a known capture date. Dated camera filenames prefill it; oth
 
 The corrected import retains only verified capture dates, with private originals and derivatives moved to new paths. Old shared paths are removed and their CloudFront caches invalidated. S3 version history remains available for recovery; already downloaded browser copies cannot be recalled. Exact media counts, identifiers, filenames and per-file correction receipts stay outside Git.
 
-Validation: 40 JavaScript regressions cover role isolation, date validation, capture-time ordering and upload controls. Synthetic phone testing covers blocked unknown dates, automatic month assignment and a complete confirmed-date upload.
+Validation: 41 JavaScript regressions cover role isolation, date validation, capture-time ordering and upload controls. Synthetic phone testing covers blocked unknown dates, automatic month assignment and a complete confirmed-date upload.
 
 ## Grandma's personal album — 2026-09-20
 
